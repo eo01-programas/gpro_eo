@@ -31,8 +31,7 @@
             display: flex;
             flex-direction: row;
             gap: 15px;
-            /* align-items: stretch; */ /* <-- MODIFICACIÓN: Eliminado */
-            align-items: flex-start; /* <-- MODIFICACIÓN: Añadido */
+            align-items: flex-start; 
             width: 100%;
         }
 
@@ -46,13 +45,12 @@
         }
         
         .main-column > .process-section-box {
-            /* flex-grow: 1; */ /* <-- MODIFICACIÓN: Eliminado (ya no se estira) */
             display: flex; 
             flex-direction: column;
         }
         
         .main-column > .process-section-box > .process-map {
-            /* flex-grow: 1; */ /* <-- MODIFICACIÓN: Eliminado (ya no se estira) */
+            /* No se estira */
         }
 
         .support-section { width: 100%; }
@@ -145,11 +143,10 @@
         .strategic-column .progress-percentage { font-size: 8px; margin-top: 1px; }
         .strategic-column #planeamiento .container-title { font-size: 10px; }
         
-        /* --- MODIFICACIÓN: Añadido para que la caja interna llene la columna --- */
         .strategic-column .process-section-box {
             height: 100%;
             box-sizing: border-box;
-            display: flex; /* Para que el contenido interno se alinee bien */
+            display: flex; 
             flex-direction: column;
         }
 
@@ -193,12 +190,17 @@
             font-weight: bold;
             color: #343a40;
         }
+        
+        /* --- INICIO: MODIFICACION CSS (Tooltips) --- */
         .summary-hours-actual {
             color: #007bff; /* Azul */
+            cursor: help; /* Añade cursor de ayuda */
         }
         .summary-hours-proy {
             color: #fd7e14; /* Ámbar/Naranja */
+            cursor: help; /* Añade cursor de ayuda */
         }
+        /* --- FIN: MODIFICACION CSS (Tooltips) --- */
 
         .summary-status-terminado {
             color: #007bff; /* Azul */
@@ -519,8 +521,8 @@
                 <div id="summary-estacionamiento" class="summary-status-block summary-status-estacionamiento">Estacionamiento 0% [0]</div>
                 <div class="summary-divider-double"></div>
                 <div class="summary-hours-block">
-                    [<span id="summary-hours-actual" class="summary-hours-actual">0.0 hrs actual</span> - 
-                     <span id="summary-hours-proy" class="summary-hours-proy">0 hrs proy/año</span>]
+                    [<span id="summary-hours-actual" class="summary-hours-actual" title="0.0 personas">0.0 hrs actual</span> - 
+                     <span id="summary-hours-proy" class="summary-hours-proy" title="0.0 personas">0 hrs proy/año</span>]
                 </div>
             </div>
 
@@ -692,19 +694,17 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     
-    // --- INICIO: MODIFICACIÓN JAVASCRIPT (Alinear Alturas) ---
     function alignColumnHeights() {
         const mainColumn = document.querySelector('.main-column');
-        const strategicColumn = document.querySelector('.strategic-column'); // Apunta a la columna
+        const strategicColumn = document.querySelector('.strategic-column'); 
         
         if (mainColumn && strategicColumn) {
-            strategicColumn.style.height = 'auto'; // Resetea la altura
+            strategicColumn.style.height = 'auto'; 
             
-            const mainHeight = mainColumn.offsetHeight; // Mide la altura de la columna derecha
-            strategicColumn.style.height = `${mainHeight}px`; // Aplica esa altura a la columna izquierda
+            const mainHeight = mainColumn.offsetHeight; 
+            strategicColumn.style.height = `${mainHeight}px`; 
         }
     }
-    // --- FIN: MODIFICACIÓN JAVASCRIPT ---
 
 
     const mapStructure = {
@@ -865,6 +865,7 @@ document.addEventListener('DOMContentLoaded', () => {
         for (const id in processedStats) updateElementUI(id, processedStats[id]);
     }
 
+    // --- INICIO: MODIFICACION JAVASCRIPT (Tooltips) ---
     function updateSummaryBox(stats, totalHrs, totalHrsActual) {
         const total = stats.total;
         const t = total ? Math.round((stats.Terminado / total) * 100) : 0;
@@ -874,6 +875,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const formattedTotalHrs = formatNumber(totalHrs || 0);
         const formattedTotalHrsActual = formatNumberOneDecimal(totalHrsActual || 0);
         
+        // --- Cálculos para Tooltips ---
+        const personasActual = (totalHrsActual || 0) / 2304;
+        const personasProy = (totalHrs || 0) / 2304;
+        
+        const formattedPersonasActual = personasActual.toFixed(1) + ' personas';
+        const formattedPersonasProy = personasProy.toFixed(1) + ' personas';
+        
+        // --- Actualizar DOM ---
         const summaryTotalCount = document.getElementById('summary-total-count');
         if (summaryTotalCount) {
             summaryTotalCount.textContent = `Total ${total}`;
@@ -886,13 +895,16 @@ document.addEventListener('DOMContentLoaded', () => {
         const summaryHoursActual = document.getElementById('summary-hours-actual');
         if (summaryHoursActual) {
             summaryHoursActual.textContent = `${formattedTotalHrsActual} hrs actual`;
+            summaryHoursActual.setAttribute('title', formattedPersonasActual); // <-- Aplicar tooltip
         }
         
         const summaryHoursProy = document.getElementById('summary-hours-proy');
         if (summaryHoursProy) {
             summaryHoursProy.textContent = `${formattedTotalHrs} hrs proy/año`;
+            summaryHoursProy.setAttribute('title', formattedPersonasProy); // <-- Aplicar tooltip
         }
     }
+    // --- FIN: MODIFICACION JAVASCRIPT (Tooltips) ---
 
     // === Carga automática desde Google Sheets vía JSONP ===
     function gvizToObjects(resp) {
@@ -1087,16 +1099,15 @@ document.addEventListener('DOMContentLoaded', () => {
              }
              setupKanbanModalListeners();
              hideLoading();
-             alignColumnHeights(); // <-- MODIFICACIÓN: Alinear alturas al final
+             alignColumnHeights(); 
         })
         .catch(err => {
             hideLoading();
-            alignColumnHeights(); // <-- MODIFICACIÓN: Alinear alturas también si falla
+            alignColumnHeights(); 
             console.error('[GViz JSONP Error]', err);
             showError(err.message || 'No se pudo leer una de las Google Sheets. Verifica permisos y nombres de pestañas.');
         });
         
-    // --- MODIFICACIÓN: Alinear alturas si se cambia el tamaño de la ventana ---
     window.addEventListener('resize', alignColumnHeights);
 });
 </script>
