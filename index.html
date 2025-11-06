@@ -191,16 +191,14 @@
             color: #343a40;
         }
         
-        /* --- INICIO: MODIFICACION CSS (Tooltips) --- */
         .summary-hours-actual {
             color: #007bff; /* Azul */
-            cursor: help; /* Añade cursor de ayuda */
+            cursor: help; 
         }
         .summary-hours-proy {
             color: #fd7e14; /* Ámbar/Naranja */
-            cursor: help; /* Añade cursor de ayuda */
+            cursor: help; 
         }
-        /* --- FIN: MODIFICACION CSS (Tooltips) --- */
 
         .summary-status-terminado {
             color: #007bff; /* Azul */
@@ -685,6 +683,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Función helper para formatear números (enteros)
     function formatNumber(num) {
+        // Redondea al entero más cercano
         return Math.round(num).toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
     }
     
@@ -741,6 +740,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const allIds = new Set(Object.values(areaNameToIdMap));
         
         let totalHrsActualGlobal = 0; 
+        // --- INICIO: CORRECCIÓN SUMA TOTAL ---
+        let totalHrsProyGlobal = 0; // 1. Inicializar el total global de Proy.
+        // --- FIN: CORRECCIÓN SUMA TOTAL ---
 
         allIds.forEach(id => processedStats[id] = { total: 0, Terminado: 0, "En proceso": 0, "Estacionamiento": 0, hrsProy: 0 }); 
 
@@ -749,17 +751,28 @@ document.addEventListener('DOMContentLoaded', () => {
             const id = areaNameToIdMap[rawAreaName];
             const estadoRaw = row.ESTADO ? String(row.ESTADO).trim().toLowerCase() : undefined;
 
-            const hrsRaw = row[HORAS_COLUMN_NAME] ? String(row[HORAS_COLUMN_NAME]).replace(/,/g, '') : '0';
+            // 2. Limpiar AMBAS columnas de horas
+            let hrsRaw = row[HORAS_COLUMN_NAME] ? String(row[HORAS_COLUMN_NAME]) : '0';
+            hrsRaw = hrsRaw.replace(/[$,\s]/g, ''); // <-- Limpia $, comas y espacios
             const hrs = parseFloat(hrsRaw) || 0;
             
             let hrsActualRaw = row[HORAS_ACTUAL_COLUMN_NAME] ? String(row[HORAS_ACTUAL_COLUMN_NAME]) : '0';
             hrsActualRaw = hrsActualRaw.replace(/[$,\s]/g, ''); 
             const hrsActual = parseFloat(hrsActualRaw) || 0;
 
+            // Suma global de Hrs Actual (siempre)
             if (!isNaN(hrsActual)) {
                 totalHrsActualGlobal += hrsActual;
             }
+            
+            // --- INICIO: CORRECCIÓN SUMA TOTAL ---
+            // 3. Suma global de Hrs Proy (SOLO si el estado aplica)
+            if ((estadoRaw === 'terminado' || estadoRaw === 'en proceso') && !isNaN(hrs)) {
+                totalHrsProyGlobal += hrs;
+            }
+            // --- FIN: CORRECCIÓN SUMA TOTAL ---
 
+            // Lógica de Área (para las barras y tooltips de áreas)
             if (id && processedStats[id]) {
                 processedStats[id].total++; globalStats.total++;
                 let counted = false;
@@ -777,6 +790,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     globalStats["Estacionamiento"]++;
                 }
 
+                // Sumar 'hrsProy' por AREA (para las barras)
                 if ((estadoRaw === 'terminado' || estadoRaw === 'en proceso') && !isNaN(hrs)) {
                     processedStats[id].hrsProy += hrs;
                 }
@@ -808,13 +822,13 @@ document.addEventListener('DOMContentLoaded', () => {
             return a;
         }
 
+        // Esta lógica sigue siendo necesaria para las barras de progreso de las categorías
         const planeamientoStats = aggregateChildStats(mapStructure.planeamiento);
         processedStats.planeamiento = { ...planeamientoStats, percentage: calculateAverage(mapStructure.planeamiento) };
         const pTextilesStats = aggregateChildStats(mapStructure.pTextiles);
         processedStats.pTextiles = { ...pTextilesStats, percentage: calculateAverage(mapStructure.pTextiles) };
         const pManufacturaStats = aggregateChildStats(mapStructure.pManufactura);
         processedStats.pManufactura = { ...pManufacturaStats, percentage: calculateAverage(mapStructure.pManufactura) };
-
         const strategicCategoryStats = aggregateChildStats(mapStructure.strategicCategory);
         processedStats.strategicCategoryPercentage = { ...strategicCategoryStats, percentage: calculateAverage(mapStructure.strategicCategory) };
         const principalesCategoryStats = aggregateChildStats(mapStructure.principalesCategory);
@@ -822,11 +836,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const supportCategoryStats = aggregateChildStats(mapStructure.supportCategory);
         processedStats.supportCategoryPercentage = { ...supportCategoryStats, percentage: calculateAverage(mapStructure.supportCategory) };
 
-        const totalHrsSumados = (strategicCategoryStats.hrsProy || 0) +
-                                (principalesCategoryStats.hrsProy || 0) +
-                                (supportCategoryStats.hrsProy || 0);
-
-        updateSummaryBox(globalStats, totalHrsSumados, totalHrsActualGlobal);
+        // --- INICIO: CORRECCIÓN SUMA TOTAL ---
+        // 4. Usar las nuevas variables globales
+        updateSummaryBox(globalStats, totalHrsProyGlobal, totalHrsActualGlobal);
+        // --- FIN: CORRECCIÓN SUMA TOTAL ---
 
         function updateElementUI(id, stats) {
             const rounded = Math.round(stats.percentage || 0);
@@ -865,24 +878,23 @@ document.addEventListener('DOMContentLoaded', () => {
         for (const id in processedStats) updateElementUI(id, processedStats[id]);
     }
 
-    // --- INICIO: MODIFICACION JAVASCRIPT (Tooltips) ---
     function updateSummaryBox(stats, totalHrs, totalHrsActual) {
         const total = stats.total;
         const t = total ? Math.round((stats.Terminado / total) * 100) : 0;
         const p = total ? Math.round((stats["En proceso"] / total) * 100) : 0;
         const e = total ? Math.round((stats.Estacionamiento / total) * 100) : 0;
         
-        const formattedTotalHrs = formatNumber(totalHrs || 0);
+        // totalHrs (proy) ahora es la suma global correcta
+        // totalHrsActual es la suma global correcta
+        const formattedTotalHrs = formatNumber(totalHrs || 0); 
         const formattedTotalHrsActual = formatNumberOneDecimal(totalHrsActual || 0);
         
-        // --- Cálculos para Tooltips ---
         const personasActual = (totalHrsActual || 0) / 2304;
         const personasProy = (totalHrs || 0) / 2304;
         
         const formattedPersonasActual = personasActual.toFixed(1) + ' personas';
         const formattedPersonasProy = personasProy.toFixed(1) + ' personas';
         
-        // --- Actualizar DOM ---
         const summaryTotalCount = document.getElementById('summary-total-count');
         if (summaryTotalCount) {
             summaryTotalCount.textContent = `Total ${total}`;
@@ -895,16 +907,15 @@ document.addEventListener('DOMContentLoaded', () => {
         const summaryHoursActual = document.getElementById('summary-hours-actual');
         if (summaryHoursActual) {
             summaryHoursActual.textContent = `${formattedTotalHrsActual} hrs actual`;
-            summaryHoursActual.setAttribute('title', formattedPersonasActual); // <-- Aplicar tooltip
+            summaryHoursActual.setAttribute('title', formattedPersonasActual); 
         }
         
         const summaryHoursProy = document.getElementById('summary-hours-proy');
         if (summaryHoursProy) {
             summaryHoursProy.textContent = `${formattedTotalHrs} hrs proy/año`;
-            summaryHoursProy.setAttribute('title', formattedPersonasProy); // <-- Aplicar tooltip
+            summaryHoursProy.setAttribute('title', formattedPersonasProy); 
         }
     }
-    // --- FIN: MODIFICACION JAVASCRIPT (Tooltips) ---
 
     // === Carga automática desde Google Sheets vía JSONP ===
     function gvizToObjects(resp) {
