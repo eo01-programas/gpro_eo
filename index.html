@@ -1,0 +1,1105 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MAPA DE PROYECTOS CON AVANCE</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 10px;
+            background: #f8f9fa;
+            display: flex;
+            justify-content: center;
+        }
+
+        /* ... (Estilos anteriores del mapa sin cambios) ... */
+
+        .main-layout-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            width: 100%;
+            max-width: 1600px;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+
+        .top-row {
+            display: flex;
+            flex-direction: row;
+            gap: 15px;
+            /* align-items: stretch; */ /* <-- MODIFICACIÓN: Eliminado */
+            align-items: flex-start; /* <-- MODIFICACIÓN: Añadido */
+            width: 100%;
+        }
+
+        .strategic-column { flex: 1 1 15%; }
+        
+        .main-column { 
+            flex: 1 1 85%; 
+            display: flex;
+            flex-direction: column;
+            gap: 15px; 
+        }
+        
+        .main-column > .process-section-box {
+            /* flex-grow: 1; */ /* <-- MODIFICACIÓN: Eliminado (ya no se estira) */
+            display: flex; 
+            flex-direction: column;
+        }
+        
+        .main-column > .process-section-box > .process-map {
+            /* flex-grow: 1; */ /* <-- MODIFICACIÓN: Eliminado (ya no se estira) */
+        }
+
+        .support-section { width: 100%; }
+
+        .section-title {
+            font-weight: bold;
+            font-size: 16px;
+            margin-top: 15px;
+            margin-bottom: 8px;
+            text-align: center;
+            color: #343a40;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .process-map {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            flex-wrap: wrap;
+            margin-bottom: 10px;
+            width: 100%;
+            justify-content: center;
+        }
+
+        .base-step {
+            padding: 8px 10px;
+            border-radius: 6px;
+            text-align: center;
+            position: relative;
+            cursor: pointer;
+            text-decoration: none;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            font-weight: bold;
+            font-size: 10px;
+            white-space: normal;
+            border: 1px solid;
+            text-transform: uppercase;
+            min-width: 80px;
+            min-height: 40px;
+            flex: 1;
+            box-sizing: border-box;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+        }
+        .base-step:hover { transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0,0,0,0.15); }
+
+        .step-strategic-color { background-color: #003366; color: #ffffff; border-color: #002244; }
+        .step-principal-container-color { background-color: #0056b3; color: #ffffff; border-color: #004085; }
+        .step-quality-color { background-color: #6c757d; color: #ffffff; border-color: #5a6268; }
+        .step-support-color { background-color: #d1e7dd; color: #0f5132; border-color: #badbcc; font-weight: normal; }
+        .step-default-color { background-color: #e9ecef; color: #495057; border-color: #ced4da; }
+        .sub-step-color { background-color: #d4edda; color: #1a472a; border-color: #c3e6cb; }
+
+        .sub-step { min-width: 50px; padding: 4px 8px; font-size: 9px; margin: 2px; border: 1px solid rgba(0,0,0,0.1); flex: 1; position: relative; box-sizing: border-box; box-shadow: none; }
+        .sub-step:hover { transform: translateY(-1px); box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); }
+        .sub-step-long-label { min-width: 100px; padding: 6px 10px; font-size: 9px; }
+        .base-step-long-label { min-width: 120px; padding: 6px 10px; font-size: 9px; }
+
+        .step-container-general { min-width: 150px; padding: 8px; display: flex; flex-direction: column; align-items: center; gap: 4px; flex-shrink: 0; flex: 1; position: relative; box-sizing: border-box; overflow: hidden; }
+        .step-container-general .container-title { font-size: 11px; font-weight: bold; margin-bottom: 4px; text-transform: uppercase; color: #ffffff; z-index: 1; }
+        .step-container-general .sub-steps-wrapper { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; width: 100%; z-index: 1; }
+
+        #planeamiento .sub-steps-wrapper { flex-direction: column; align-items: stretch; gap: 6px; }
+
+        .arrow { font-size: 20px; color: #6c757d; margin: 0 8px; flex-shrink: 0; }
+        .process-section-box { background-color: #ffffff; border: 1px dashed #adb5bd; border-radius: 10px; padding: 15px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08); width: 100%; box-sizing: border-box; }
+
+        .main-flow-container { display: flex; flex-direction: column; gap: 15px; width: 100%; }
+        .main-flow-row { display: flex; flex-direction: row; align-items: stretch; gap: 8px; width: 100%; }
+        .main-flow-row .arrow { display: flex; align-items: center; }
+        .main-flow-row > .base-step { flex: 1 1 15%; }
+        .main-flow-row > .step-container-general { flex: 1 1 60%; }
+        .vertical-connector { width: 3px; height: 20px; background-color: #adb5bd; margin: auto; }
+
+        .progress-bar-container { width: calc(100% - 16px); height: 6px; background-color: rgba(255, 255, 255, 0.3); border-radius: 3px; margin-top: 5px; overflow: hidden; position: relative; }
+        .progress-bar-fill { height: 100%; background-color: #28a745; border-radius: 3px; transition: width 0.5s ease-in-out; }
+        .progress-percentage { font-size: 9px; font-weight: bold; color: inherit; margin-top: 2px; display: block; white-space: nowrap; }
+        .category-progress-percentage { font-size: 14px; font-weight: bold; margin-left: 8px; color: #007bff; }
+        .base-step > span:first-child:not(.progress-percentage), .step-container-general .container-title { flex-grow: 1; display: flex; align-items: center; justify-content: center; }
+
+        .strategic-column .process-map { display: flex; flex-direction: column; align-items: stretch; gap: 6px; }
+        .strategic-column .base-step { flex-grow: 0; width: 100%; min-height: 30px; padding-top: 6px; padding-bottom: 6px; font-size: 9px; }
+        .strategic-column .progress-bar-container { height: 5px; margin-top: 4px; }
+        .strategic-column .progress-percentage { font-size: 8px; margin-top: 1px; }
+        .strategic-column #planeamiento .container-title { font-size: 10px; }
+        
+        /* --- MODIFICACIÓN: Añadido para que la caja interna llene la columna --- */
+        .strategic-column .process-section-box {
+            height: 100%;
+            box-sizing: border-box;
+            display: flex; /* Para que el contenido interno se alinee bien */
+            flex-direction: column;
+        }
+
+        #summary-box {
+            background-color: white;
+            padding: 10px 15px; 
+            border-radius: 10px; 
+            box-shadow: 0 4px 8px rgba(0,0,0,0.08); 
+            border: 1px dashed #adb5bd; 
+            box-sizing: border-box; 
+            display: flex;
+            flex-direction: row; 
+            align-items: center; 
+            justify-content: flex-start; 
+            gap: 16px; 
+            flex-wrap: wrap; 
+        }
+        
+        #summary-total-count {
+            font-size: 16px;
+            font-weight: bold;
+            color: #343a40;
+        }
+        .summary-divider {
+            border-left: 1px solid #ced4da; 
+            height: 24px; 
+        }
+        .summary-divider-double {
+            border-left: 3px double #adb5bd;
+            height: 24px;
+            margin-left: 8px; 
+        }
+        
+        .summary-status-block {
+            font-size: 14px;
+            font-weight: 600; 
+        }
+        
+        .summary-hours-block {
+            font-size: 16px; 
+            font-weight: bold;
+            color: #343a40;
+        }
+        .summary-hours-actual {
+            color: #007bff; /* Azul */
+        }
+        .summary-hours-proy {
+            color: #fd7e14; /* Ámbar/Naranja */
+        }
+
+        .summary-status-terminado {
+            color: #007bff; /* Azul */
+        }
+        .summary-status-en-proceso {
+            color: #fd7e14; /* Ámbar/Naranja */
+        }
+        .summary-status-estacionamiento {
+            color: #b22222; /* Rojo oscuro (firebrick) */
+        }
+
+        /* Banner de error */
+        #error-banner {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            background: #fee2e2;
+            color: #991b1b;
+            border-bottom: 1px solid #fecaca;
+            padding: 10px 16px;
+            font-size: 14px;
+            display: none;
+            z-index: 3000;
+            text-align: center;
+        }
+
+        /* Overlay de Cargando */
+        #loading-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(255,255,255,0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 12px;
+            z-index: 2500;
+        }
+        .spinner {
+            width: 48px;
+            height: 48px;
+            border: 4px solid #e5e7eb;
+            border-top-color: #0d6efd;
+            border-radius: 50%;
+            animation: spin 0.9s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+
+        /* --- INICIO: ESTILOS MODAL DETALLES --- */
+        #details-modal { 
+            display: none;
+            position: fixed; z-index: 4000; left: 0; top: 0;
+            width: 100%; height: 100%; overflow: auto;
+            background-color: rgba(0,0,0,0.5);
+        }
+        .modal-content {
+            background-color: #fefefe; margin: 5% auto; padding: 20px 25px;
+            border: 1px solid #888; border-radius: 8px; width: 80%;
+            max-width: 900px; position: relative; box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        .modal-close {
+            color: #aaa; position: absolute; top: 10px; right: 20px;
+            font-size: 28px; font-weight: bold; cursor: pointer;
+        }
+        .modal-close:hover, .modal-close:focus { color: #000; text-decoration: none; }
+        #modal-title {
+            margin-top: 0; color: #003366; font-family: 'Inter', sans-serif;
+            border-bottom: 2px solid #f0f0f0; padding-bottom: 10px; font-size: 1.2em;
+        }
+        .modal-title-stats {
+            color: #007bff; font-weight: bold; font-size: 0.9em; margin-left: 15px;
+        }
+        .modal-table-wrapper { max-height: 450px; overflow-y: auto; margin-top: 15px; }
+        .modal-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        .modal-table th, .modal-table td {
+            border: 1px solid #ddd; padding: 8px; text-align: left;
+            white-space: normal; word-break: break-word;
+        }
+        .modal-table th {
+            background-color: #f2f2f2; text-transform: uppercase; font-weight: 600;
+            font-family: 'Inter', sans-serif; position: sticky; top: 0;
+        }
+        .modal-table tr:nth-child(even) { background-color: #f9f9f9; }
+        .modal-table th:nth-child(1) { width: 5%; }
+        .modal-table th:nth-child(2) { width: 30%; }
+        .modal-table th:nth-child(3) { width: 35%; }
+        .modal-table th:nth-child(4) { width: 15%; }
+        .modal-table th:nth-child(5) { width: 15%; }
+        .status-terminado { background-color: #d4edda; color: #155724; }
+        .status-en-proceso { background-color: #fff3cd; color: #856404; }
+        .status-estacionamiento { background-color: #f8d7da; color: #721c24; }
+        /* --- FIN: ESTILOS MODAL DETALLES --- */
+
+
+        /* --- INICIO: NUEVOS ESTILOS BOTÓN Y MODAL KANBAN --- */
+
+        #kanban-button {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1002;
+            padding: 5px 10px;
+            font-size: 12px;
+            font-weight: bold;
+            background-color: #fd7e14; 
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            transition: background-color 0.2s ease;
+        }
+        #kanban-button:hover {
+            background-color: #e66a00;
+        }
+
+        #kanban-modal {
+            display: none; 
+            position: fixed;
+            z-index: 5000; 
+            left: 0; top: 0;
+            width: 100%; height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.6); 
+        }
+
+        .kanban-content {
+            background-color: #fefefe;
+            margin: 3% auto; 
+            padding: 20px 25px;
+            border-radius: 8px;
+            width: 90%; 
+            max-width: 1200px;
+            position: relative;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        #kanban-modal .modal-close {
+             top: 15px; right: 25px;
+        }
+
+        .kanban-board {
+            display: flex;
+            gap: 15px; 
+            justify-content: space-between; 
+            min-height: 500px; 
+            margin-top: 15px;
+        }
+
+        .kanban-column {
+            flex: 1;
+            background-color: #e9ecef;
+            border-radius: 5px;
+            padding: 10px;
+            display: flex; 
+            flex-wrap: wrap; 
+            gap: 8px; 
+            align-content: flex-start; 
+            max-height: 60vh;
+            overflow-y: auto;
+        }
+
+        .kanban-column h3 {
+            text-align: center;
+            margin-top: 5px;
+            margin-bottom: 10px;
+            color: #495057;
+            font-family: 'Inter', sans-serif;
+            text-transform: uppercase;
+            font-size: 14px;
+            border-bottom: 2px solid #ced4da;
+            padding-bottom: 5px;
+            position: sticky;
+            top: -10px;
+            background-color: #e9ecef;
+            z-index: 10;
+            width: 100%; 
+            order: -1; 
+        }
+
+        .kanban-card {
+            background-color: white;
+            border-radius: 4px;
+            padding: 10px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            font-size: 11px;
+            cursor: grab;
+            width: calc(50% - 4px);
+            box-sizing: border-box; 
+        }
+        .kanban-card .card-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+            font-size: 12px;
+            color: #333;
+            overflow-wrap: break-word;
+            word-break: break-word; 
+            hyphens: auto; 
+        }
+        .kanban-card .card-detail {
+            color: #555;
+            margin-bottom: 3px;
+            overflow-wrap: break-word; 
+            word-break: break-word;
+        }
+        .kanban-card.color-1 { border-left: 4px solid #6f42c1; }
+        .kanban-card.color-2 { border-left: 4px solid #20c997; }
+        .kanban-card.color-3 { border-left: 4px solid #fd7e14; }
+        .kanban-card.color-4 { border-left: 4px solid #0dcaf0; }
+        .kanban-card.color-5 { border-left: 4px solid #ffc107; }
+
+        /* --- FIN: NUEVOS ESTILOS BOTÓN Y MODAL KANBAN --- */
+
+
+        /* Ajustes responsivos (asegúrate de tener esto) */
+        @media (max-width: 768px) {
+           /* ... otros estilos responsivos ... */
+
+            /* Ajustes Kanban modal para móviles */
+            .kanban-content { width: 95%; margin: 5% auto; padding: 15px; }
+            .kanban-board { flex-direction: column; min-height: auto; gap: 20px; }
+            .kanban-column {
+                max-height: 300px;
+                flex-direction: column; 
+                flex-wrap: nowrap; 
+            }
+            .kanban-card {
+                width: 100%;
+            }
+        }
+
+
+        @media (max-width: 992px) {
+            .top-row { flex-direction: column; }
+            .strategic-column, .main-column { width: 100%; }
+        }
+        @media (max-width: 768px) {
+            .main-flow-row { flex-direction: column; align-items: stretch; }
+            .main-flow-row .arrow { margin: 8px auto; transform: rotate(90deg); }
+            .base-step, .sub-step, .base-step-long-label, .sub-step-long-label { font-size: 9px; min-height: 30px; }
+            .section-title { font-size: 14px; }
+            .step-container-general .container-title { font-size: 10px; }
+            .progress-bar-container { width: calc(100% - 10px); }
+            #kanban-button { 
+                 top: 10px; right: 10px; font-size: 11px; padding: 4px 8px;
+            }
+
+            /* Ajustes modales para móviles */
+            .modal-content { width: 95%; margin: 10% auto; padding: 15px; }
+            .modal-table { font-size: 11px; }
+            #modal-title { font-size: 1.1em; }
+            .modal-title-stats { display: block; margin-left: 0; margin-top: 5px; font-size: 0.85em; }
+
+            /* Ajustes Kanban modal para móviles */
+            .kanban-content { width: 95%; margin: 5% auto; padding: 15px; }
+            .kanban-board { flex-direction: column; min-height: auto; gap: 20px; }
+            .kanban-column { max-height: 300px; } 
+        }
+    </style>
+</head>
+<body>
+
+<button id="kanban-button">Kanban</button>
+
+<div id="error-banner" role="alert" aria-live="assertive"></div>
+<div id="loading-overlay" aria-live="polite">
+    <div class="spinner" aria-hidden="true"></div>
+    <div style="font-weight:600;color:#0d6efd;">Cargando datos…</div>
+</div>
+
+<div class="main-layout-container">
+    
+    <div class="top-row">
+        <div class="process-section-box strategic-column">
+            <div class="section-title">PROCESOS ESTRATEGICOS <span class="category-progress-percentage" id="strategicCategoryPercentage"></span></div>
+            <div class="process-map">
+                <a href="#" target="_blank" class="base-step step-strategic-color" id="altaDireccion">
+                    <span>ALTA DIRECCION</span>
+                    <div class="progress-bar-container"><div class="progress-bar-fill" id="altaDireccionFill"></div></div>
+                    <span class="progress-percentage" id="altaDireccionPercentage"></span>
+                </a>
+                <a href="#" target="_blank" class="base-step step-strategic-color" id="sostenibilidad">
+                    <span>SOSTENIBILIDAD</span>
+                    <div class="progress-bar-container"><div class="progress-bar-fill" id="sostenibilidadFill"></div></div>
+                    <span class="progress-percentage" id="sostenibilidadPercentage"></span>
+                </a>
+                <div class="base-step step-container-general step-strategic-color" id="planeamiento">
+                    <span class="container-title">PLANEAMIENTO</span>
+                    <div class="sub-steps-wrapper">
+                        <a href="#" target="_blank" class="base-step sub-step sub-step-color" id="pcpTextil">
+                            <span>PCP TEXTIL</span>
+                            <div class="progress-bar-container"><div class="progress-bar-fill" id="pcpTextilFill"></div></div>
+                            <span class="progress-percentage" id="pcpTextilPercentage"></span>
+                        </a>
+                        <a href="#" target="_blank" class="base-step sub-step sub-step-color" id="pcpConfecciones">
+                            <span>PCP CONFECCIONES</span>
+                            <div class="progress-bar-container"><div class="progress-bar-fill" id="pcpConfeccionesFill"></div></div>
+                            <span class="progress-percentage" id="pcpConfeccionesPercentage"></span>
+                        </a>
+                    </div>
+                    <div class="progress-bar-container" style="margin-top: 10px;"><div class="progress-bar-fill" id="planeamientoFill"></div></div>
+                    <span class="progress-percentage" id="planeamientoPercentage"></span>
+                </div>
+                <a href="#" target="_blank" class="base-step step-strategic-color" id="comercial">
+                    <span>COMERCIAL</span>
+                    <div class="progress-bar-container"><div class="progress-bar-fill" id="comercialFill"></div></div>
+                    <span class="progress-percentage" id="comercialPercentage"></span>
+                </a>
+            </div>
+        </div>
+
+        <div class="main-column">
+            
+            <div id="summary-box">
+                <div id="summary-total-count" class="summary-total-block">Total 0</div>
+                <div class="summary-divider"></div>
+                <div id="summary-terminado" class="summary-status-block summary-status-terminado">Terminado 0% [0]</div>
+                <div id="summary-en-proceso" class="summary-status-block summary-status-en-proceso">En proceso 0% [0]</div>
+                <div id="summary-estacionamiento" class="summary-status-block summary-status-estacionamiento">Estacionamiento 0% [0]</div>
+                <div class="summary-divider-double"></div>
+                <div class="summary-hours-block">
+                    [<span id="summary-hours-actual" class="summary-hours-actual">0.0 hrs actual</span> - 
+                     <span id="summary-hours-proy" class="summary-hours-proy">0 hrs proy/año</span>]
+                </div>
+            </div>
+
+            <div class="process-section-box">
+                <div class="section-title">PROCESOS PRINCIPALES <span class="category-progress-percentage" id="principalesCategoryPercentage"></span></div>
+                <div class="process-map">
+                    <div class="main-flow-container">
+                        <div class="main-flow-row">
+                            <a href="#" target="_blank" class="base-step step-strategic-color" id="desarrolloTextil">
+                                <span>DESARROLLO TEXTIL</span>
+                                <div class="progress-bar-container"><div class="progress-bar-fill" id="desarrolloTextilFill"></div></div>
+                                <span class="progress-percentage" id="desarrolloTextilPercentage"></span>
+                            </a>
+                            <span class="arrow">&rarr;</span>
+                            <div class="base-step step-container-general step-principal-container-color" id="pTextiles">
+                                <span class="container-title">TEXTIL</span>
+                                <div class="sub-steps-wrapper">
+                                    <a href="#" target="_blank" class="base-step step-default-color" id="hilanderia"><span>HILANDERIA</span><div class="progress-bar-container"><div class="progress-bar-fill" id="hilanderiaFill"></div></div><span class="progress-percentage" id="hilanderiaPercentage"></span></a>
+                                    <a href="#" target="_blank" class="base-step step-default-color" id="tejeduria"><span>TEJEDURIA</span><div class="progress-bar-container"><div class="progress-bar-fill" id="tejeduriaFill"></div></div><span class="progress-percentage" id="tejeduriaPercentage"></span></a>
+                                    <a href="#" target="_blank" class="base-step step-default-color" id="tintoreria"><span>TINTORERIA</span><div class="progress-bar-container"><div class="progress-bar-fill" id="tintoreriaFill"></div></div><span class="progress-percentage" id="tintoreriaPercentage"></span></a>
+                                    <a href="#" target="_blank" class="base-step step-default-color" id="lavanderia"><span>LAVANDERIA</span><div class="progress-bar-container"><div class="progress-bar-fill" id="lavanderiaFill"></div></div><span class="progress-percentage" id="lavanderiaPercentage"></span></a>
+                                    <a href="#" target="_blank" class="base-step step-default-color" id="estampado"><span>ESTAMPADO</span><div class="progress-bar-container"><div class="progress-bar-fill" id="estampadoFill"></div></div><span class="progress-percentage" id="estampadoPercentage"></span></a>
+                                </div>
+                                <div class="progress-bar-container" style="margin-top: 10px;"><div class="progress-bar-fill" id="pTextilesFill"></div></div>
+                                <span class="progress-percentage" id="pTextilesPercentage"></span>
+                            </div>
+                            <span class="arrow">&rarr;</span>
+                            <a href="#" target="_blank" class="base-step step-quality-color" id="asgCalidadTextil">
+                                <span>ASG. CALIDAD TEXTIL</span>
+                                <div class="progress-bar-container"><div class="progress-bar-fill" id="asgCalidadTextilFill"></div></div>
+                                <span class="progress-percentage" id="asgCalidadTextilPercentage"></span>
+                            </a>
+                        </div>
+                        <div class="vertical-connector"></div>
+                        <div class="main-flow-row">
+                            <a href="#" target="_blank" class="base-step step-strategic-color" id="desarrolloConfecciones">
+                                <span>DESARROLLO CONFECCIONES</span>
+                                <div class="progress-bar-container"><div class="progress-bar-fill" id="desarrolloConfeccionesFill"></div></div>
+                                <span class="progress-percentage" id="desarrolloConfeccionesPercentage"></span>
+                            </a>
+                            <span class="arrow">&rarr;</span>
+                            <div class="base-step step-container-general step-principal-container-color" id="pManufactura">
+                                <span class="container-title">CONFECCIONES</span>
+                                <div class="sub-steps-wrapper">
+                                    <a href="#" target="_blank" class="base-step step-default-color" id="corteHabilitado"><span>CORTE Y HABILITADO</span><div class="progress-bar-container"><div class="progress-bar-fill" id="corteHabilitadoFill"></div></div><span class="progress-percentage" id="corteHabilitadoPercentage"></span></a>
+                                    <a href="#" target="_blank" class="base-step step-default-color" id="costura"><span>COSTURA</span><div class="progress-bar-container"><div class="progress-bar-fill" id="costuraFill"></div></div><span class="progress-percentage" id="costuraPercentage"></span></a>
+                                    <a href="#" target="_blank" class="base-step step-default-color" id="acabadoEmbalaje"><span>ACABADO Y EMBALAJE</span><div class="progress-bar-container"><div class="progress-bar-fill" id="acabadoEmbalajeFill"></div></div><span class="progress-percentage" id="acabadoEmbalajePercentage"></span></a>
+                                    <a href="#" target="_blank" class="base-step step-default-color" id="bordado"><span>BORDADO</span><div class="progress-bar-container"><div class="progress-bar-fill" id="bordadoFill"></div></div><span class="progress-percentage" id="bordadoPercentage"></span></a>
+                                </div>
+                                <div class="progress-bar-container" style="margin-top: 10px;"><div class="progress-bar-fill" id="pManufacturaFill"></div></div>
+                                <span class="progress-percentage" id="pManufacturaPercentage"></span>
+                            </div>
+                            <span class="arrow">&rarr;</span>
+                            <a href="#" target="_blank" class="base-step step-quality-color" id="asgCalidadConfecciones">
+                                <span>ASG. CALIDAD CONFECCIONES</span>
+                                <div class="progress-bar-container"><div class="progress-bar-fill" id="asgCalidadConfeccionesFill"></div></div>
+                                <span class="progress-percentage" id="asgCalidadConfeccionesPercentage"></span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="process-section-box support-section">
+        <div class="section-title">PROCESOS DE SOPORTE <span class="category-progress-percentage" id="supportCategoryPercentage"></span></div>
+        <div class="process-map">
+            <a href="#" target="_blank" class="base-step step-support-color" id="compras"><span>COMPRAS</span><div class="progress-bar-container"><div class="progress-bar-fill" id="comprasFill"></div></div><span class="progress-percentage" id="comprasPercentage"></span></a>
+            <a href="#" target="_blank" class="base-step step-support-color base-step-long-label" id="almMateriaPrima"><span>ALM. DE MATERIA PRIMA</span><div class="progress-bar-container"><div class="progress-bar-fill" id="almMateriaPrimaFill"></div></div><span class="progress-percentage" id="almMateriaPrimaPercentage"></span></a>
+            <a href="#" target="_blank" class="base-step step-support-color" id="almHilos"><span>ALM. DE HILOS</span><div class="progress-bar-container"><div class="progress-bar-fill" id="almHilosFill"></div></div><span class="progress-percentage" id="almHilosPercentage"></span></a>
+            <a href="#" target="_blank" class="base-step step-support-color base-step-long-label" id="almTelaAcabada"><span>ALM. DE TELA ACABADA</span><div class="progress-bar-container"><div class="progress-bar-fill" id="almTelaAcabadaFill"></div></div><span class="progress-percentage" id="almTelaAcabadaPercentage"></span></a>
+            <a href="#" target="_blank" class="base-step step-support-color base-step-long-label" id="almDespachoAvios"><span>ALM. Y DESPACHO DE AVIOS</span><div class="progress-bar-container"><div class="progress-bar-fill" id="almDespachoAviosFill"></div></div><span class="progress-percentage" id="almDespachoAviosPercentage"></span></a>
+            <a href="#" target="_blank" class="base-step step-support-color" id="servicios"><span>SERVICIOS</span><div class="progress-bar-container"><div class="progress-bar-fill" id="serviciosFill"></div></div><span class="progress-percentage" id="serviciosPercentage"></span></a>
+            <a href="#" target="_blank" class="base-step step-support-color base-step-long-label" id="gestionAdministrativa"><span>GESTION ADMINISTRATIVA</span><div class="progress-bar-container"><div class="progress-bar-fill" id="gestionAdministrativaFill"></div></div><span class="progress-percentage" id="gestionAdministrativaPercentage"></span></a>
+        </div>
+        <div class="process-map">
+            <a href="#" target="_blank" class="base-step step-support-color" id="gestionTi"><span>GESTION DE TI</span><div class="progress-bar-container"><div class="progress-bar-fill" id="gestionTiFill"></div></div><span class="progress-percentage" id="gestionTiPercentage"></span></a>
+            <a href="#" target="_blank" class="base-step step-support-color" id="mantenimiento"><span>MANTENIMIENTO</span><div class="progress-bar-container"><div class="progress-bar-fill" id="mantenimientoFill"></div></div><span class="progress-percentage" id="mantenimientoPercentage"></span></a>
+            <a href="#" target="_blank" class="base-step step-support-color base-step-long-label" id="ingTiempoMetodos"><span>ING. TIEMPO Y METODOS</span><div class="progress-bar-container"><div class="progress-bar-fill" id="ingTiempoMetodosFill"></div></div><span class="progress-percentage" id="ingTiempoMetodosPercentage"></span></a>
+            <a href="#" target="_blank" class="base-step step-support-color" id="labTintoreria"><span>LAB. DE TINTORERIA</span><div class="progress-bar-container"><div class="progress-bar-fill" id="labTintoreriaFill"></div></div><span class="progress-percentage" id="labTintoreriaPercentage"></span></a>
+            <a href="#" target="_blank" class="base-step step-support-color" id="gestionRrhh"><span>GESTION DE RRHH</span><div class="progress-bar-container"><div class="progress-bar-fill" id="gestionRrhhFill"></div></div><span class="progress-percentage" id="gestionRrhhPercentage"></span></a>
+            <a href="#" target="_blank" class="base-step step-support-color" id="ptari"><span>PTARI</span><div class="progress-bar-container"><div class="progress-bar-fill" id="ptariFill"></div></div><span class="progress-percentage" id="ptariPercentage"></span></a>
+            <a href="#" target="_blank" class="base-step step-support-color base-step-long-label" id="gestionSeguridad"><span>GESTION DE LA SEGURIDAD</span><div class="progress-bar-container"><div class="progress-bar-fill" id="gestionSeguridadFill"></div></div><span class="progress-percentage" id="gestionSeguridadPercentage"></span></a>
+        </div>
+    </div>
+</div>
+
+
+<div id="details-modal">
+    <div class="modal-content">
+        <span class="modal-close" id="details-modal-close-button">&times;</span> <h2 id="modal-title">Detalle de Proyectos</h2>
+        <div class="modal-table-wrapper">
+            <table class="modal-table">
+                <thead>
+                    <tr>
+                        <th>n</th><th>PROYECTO</th><th>TAREA</th><th>HERRAMIENTA</th><th>ESTADO</th>
+                    </tr>
+                </thead>
+                <tbody id="modal-table-body"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div id="kanban-modal">
+    <div class="kanban-content">
+        <span class="modal-close" id="kanban-modal-close-button">&times;</span>
+        <h2>Vista Kanban</h2>
+        <div class="kanban-board">
+            <div class="kanban-column" id="kanban-col-estacionamiento">
+                <h3>Estacionamiento</h3>
+                </div>
+            <div class="kanban-column" id="kanban-col-en-proceso">
+                <h3>En proceso</h3>
+                </div>
+            <div class="kanban-column" id="kanban-col-terminado">
+                <h3>Terminado</h3>
+                </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+/* ========= CONFIG DEL GOOGLE SHEET ========= */
+const SHEET_ID    = '1lRBoAr2JN2elTtB9QgmvIYNIq1zsxvBENpuwzjIuZt4'; // tu ID
+const SHEET_NAME_BD = 'Bd'; // nombre de pestaña principal
+const SHEET_NAME_KANBAN = 'Kanban'; // Nombre correcto de la pestaña Kanban
+
+const HORAS_COLUMN_NAME = 'HRS PROY.(AÑO)'; 
+const HORAS_ACTUAL_COLUMN_NAME = 'HRS AHORRADO (ACTUAL)';
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Helpers de UI
+    const $loading = document.getElementById('loading-overlay');
+    const $error   = document.getElementById('error-banner');
+    const showLoading = () => { $loading.style.display = 'flex'; };
+    const hideLoading = () => { $loading.style.display = 'none'; };
+    const showError = (msg) => { $error.textContent = msg; $error.style.display = 'block'; };
+
+    // Variables globales
+    let allRowsData = [];
+    let kanbanData = [];
+    let processedStats = {};
+
+    // Referencias a Modales
+    const $detailsModal = document.getElementById('details-modal');
+    const $detailsModalClose = document.getElementById('details-modal-close-button');
+    const $modalTitle = document.getElementById('modal-title');
+    const $modalTableBody = document.getElementById('modal-table-body');
+
+    // Referencias a Modal Kanban
+    const $kanbanButton = document.getElementById('kanban-button');
+    const $kanbanModal = document.getElementById('kanban-modal');
+    const $kanbanModalClose = document.getElementById('kanban-modal-close-button');
+    const $kanbanColEstacionamiento = document.getElementById('kanban-col-estacionamiento');
+    const $kanbanColEnProceso = document.getElementById('kanban-col-en-proceso');
+    const $kanbanColTerminado = document.getElementById('kanban-col-terminado');
+
+    // Función helper para formatear números (enteros)
+    function formatNumber(num) {
+        return Math.round(num).toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
+    }
+    
+    // Función para formatear con 1 decimal
+    function formatNumberOneDecimal(num) {
+         return (num || 0).toFixed(1).replace(/(\d)(?=(\d{3})+\.)/g, '$1,');
+    }
+    
+    
+    // --- INICIO: MODIFICACIÓN JAVASCRIPT (Alinear Alturas) ---
+    function alignColumnHeights() {
+        const mainColumn = document.querySelector('.main-column');
+        const strategicColumn = document.querySelector('.strategic-column'); // Apunta a la columna
+        
+        if (mainColumn && strategicColumn) {
+            strategicColumn.style.height = 'auto'; // Resetea la altura
+            
+            const mainHeight = mainColumn.offsetHeight; // Mide la altura de la columna derecha
+            strategicColumn.style.height = `${mainHeight}px`; // Aplica esa altura a la columna izquierda
+        }
+    }
+    // --- FIN: MODIFICACIÓN JAVASCRIPT ---
+
+
+    const mapStructure = {
+        planeamiento: ['pcpTextil', 'pcpConfecciones'],
+        pTextiles: ['hilanderia', 'tejeduria', 'tintoreria', 'lavanderia', 'estampado'],
+        pManufactura: ['corteHabilitado', 'bordado', 'costura', 'acabadoEmbalaje'],
+        strategicCategory: ['altaDireccion', 'sostenibilidad', 'planeamiento', 'comercial'],
+        principalesCategory: ['desarrolloTextil', 'pTextiles', 'asgCalidadTextil', 'desarrolloConfecciones', 'pManufactura', 'asgCalidadConfecciones'],
+        supportCategory: ['compras','almMateriaPrima','almHilos','almTelaAcabada','almDespachoAvios','servicios','gestionAdministrativa','gestionTi','mantenimiento','ingTiempoMetodos','labTintoreria','gestionRrhh','ptari','gestionSeguridad']
+    };
+    const areaNameToIdMap = {
+        'ALTA DIRECCION':'altaDireccion','SOSTENIBILIDAD':'sostenibilidad','PLANEAMIENTO':'planeamiento',
+        'PCP TEXTIL':'pcpTextil','PCP CONFECCIONES':'pcpConfecciones','COMERCIAL':'comercial',
+        'DESARROLLO TEXTIL':'desarrolloTextil','TEXTIL':'pTextiles','HILANDERIA':'hilanderia',
+        'TEJEDURIA':'tejeduria','TINTORERIA':'tintoreria','LAVANDERIA':'lavanderia','ESTAMPADO':'estampado',
+        'ASG. CALIDAD TEXTIL':'asgCalidadTextil','DESARROLLO CONFECCIONES':'desarrolloConfecciones',
+        'CONFECCIONES':'pManufactura','CORTE Y HABILITADO':'corteHabilitado','COSTURA':'costura',
+        'ACABADO Y EMBALAJE':'acabadoEmbalaje','BORDADO':'bordado','ASG. CALIDAD CONFECCIONES':'asgCalidadConfecciones',
+        'COMPRAS':'compras','ALM. DE MATERIA PRIMA':'almMateriaPrima','ALM. DE HILOS':'almHilos',
+        'ALM. DE TELA ACABADA':'almTelaAcabada','ALM. Y DESPACHO DE AVIOS':'almDespachoAvios',
+        'SERVICIOS':'servicios','GESTION ADMINISTRATIVA':'gestionAdministrativa','GESTION DE TI':'gestionTi',
+        'MANTENIMIENTO':'mantenimiento','ING. TIEMPO Y METODOS':'ingTiempoMetodos',
+        'LAB. DE TINTORERIA':'labTintoreria','GESTION DE RRHH':'gestionRrhh','PTARI':'ptari',
+        'GESTION DE LA SEGURIDAD':'gestionSeguridad'
+    };
+    const idToAreaNameMap = Object.entries(areaNameToIdMap).reduce((acc, [name, id]) => {
+        acc[id] = name;
+        return acc;
+    }, {});
+
+    function updateMapWithData(rows) {
+        processedStats = {};
+        const globalStats = { total: 0, Terminado: 0, "En proceso": 0, "Estacionamiento": 0 };
+        const allIds = new Set(Object.values(areaNameToIdMap));
+        
+        let totalHrsActualGlobal = 0; 
+
+        allIds.forEach(id => processedStats[id] = { total: 0, Terminado: 0, "En proceso": 0, "Estacionamiento": 0, hrsProy: 0 }); 
+
+        rows.forEach(row => {
+            const rawAreaName = row.AREA ? String(row.AREA).trim().toUpperCase() : undefined;
+            const id = areaNameToIdMap[rawAreaName];
+            const estadoRaw = row.ESTADO ? String(row.ESTADO).trim().toLowerCase() : undefined;
+
+            const hrsRaw = row[HORAS_COLUMN_NAME] ? String(row[HORAS_COLUMN_NAME]).replace(/,/g, '') : '0';
+            const hrs = parseFloat(hrsRaw) || 0;
+            
+            let hrsActualRaw = row[HORAS_ACTUAL_COLUMN_NAME] ? String(row[HORAS_ACTUAL_COLUMN_NAME]) : '0';
+            hrsActualRaw = hrsActualRaw.replace(/[$,\s]/g, ''); 
+            const hrsActual = parseFloat(hrsActualRaw) || 0;
+
+            if (!isNaN(hrsActual)) {
+                totalHrsActualGlobal += hrsActual;
+            }
+
+            if (id && processedStats[id]) {
+                processedStats[id].total++; globalStats.total++;
+                let counted = false;
+
+                if (estadoRaw === 'terminado') {
+                    processedStats[id].Terminado++;
+                    globalStats.Terminado++;
+                    counted = true;
+                } else if (estadoRaw === 'en proceso') {
+                    processedStats[id]["En proceso"]++;
+                    globalStats["En proceso"]++;
+                    counted = true;
+                } else if (estadoRaw === 'estacionamiento') {
+                    processedStats[id]["Estacionamiento"]++;
+                    globalStats["Estacionamiento"]++;
+                }
+
+                if ((estadoRaw === 'terminado' || estadoRaw === 'en proceso') && !isNaN(hrs)) {
+                    processedStats[id].hrsProy += hrs;
+                }
+            }
+        });
+
+        for (const id in processedStats) {
+            const s = processedStats[id];
+            s.percentage = s.total > 0 ? (s.Terminado / s.total) * 100 : 0;
+        }
+
+        function calculateAverage(childrenIds) {
+            let totalProjects = 0, totalFinished = 0;
+            childrenIds.forEach(id => { if (processedStats[id]) { totalProjects += processedStats[id].total; totalFinished += processedStats[id].Terminado; }});
+            return totalProjects > 0 ? (totalFinished / totalProjects) * 100 : 0;
+        }
+        
+        function aggregateChildStats(childrenIds) {
+            const a = { total: 0, Terminado: 0, "En proceso": 0, "Estacionamiento": 0, hrsProy: 0 };
+            childrenIds.forEach(id => {
+                const c = processedStats[id]; if(c){
+                    a.total += c.total;
+                    a.Terminado += c.Terminado;
+                    a["En proceso"] += c["En proceso"];
+                    a["Estacionamiento"] += c["Estacionamiento"];
+                    a.hrsProy += (c.hrsProy || 0);
+                }
+            });
+            return a;
+        }
+
+        const planeamientoStats = aggregateChildStats(mapStructure.planeamiento);
+        processedStats.planeamiento = { ...planeamientoStats, percentage: calculateAverage(mapStructure.planeamiento) };
+        const pTextilesStats = aggregateChildStats(mapStructure.pTextiles);
+        processedStats.pTextiles = { ...pTextilesStats, percentage: calculateAverage(mapStructure.pTextiles) };
+        const pManufacturaStats = aggregateChildStats(mapStructure.pManufactura);
+        processedStats.pManufactura = { ...pManufacturaStats, percentage: calculateAverage(mapStructure.pManufactura) };
+
+        const strategicCategoryStats = aggregateChildStats(mapStructure.strategicCategory);
+        processedStats.strategicCategoryPercentage = { ...strategicCategoryStats, percentage: calculateAverage(mapStructure.strategicCategory) };
+        const principalesCategoryStats = aggregateChildStats(mapStructure.principalesCategory);
+        processedStats.principalesCategoryPercentage = { ...principalesCategoryStats, percentage: calculateAverage(mapStructure.principalesCategory) };
+        const supportCategoryStats = aggregateChildStats(mapStructure.supportCategory);
+        processedStats.supportCategoryPercentage = { ...supportCategoryStats, percentage: calculateAverage(mapStructure.supportCategory) };
+
+        const totalHrsSumados = (strategicCategoryStats.hrsProy || 0) +
+                                (principalesCategoryStats.hrsProy || 0) +
+                                (supportCategoryStats.hrsProy || 0);
+
+        updateSummaryBox(globalStats, totalHrsSumados, totalHrsActualGlobal);
+
+        function updateElementUI(id, stats) {
+            const rounded = Math.round(stats.percentage || 0);
+            const totalProjects = stats.total || 0;
+            const finished = stats.Terminado || 0;
+            const hours = stats.hrsProy || 0;
+            const formattedHours = formatNumber(hours);
+
+            if (id.includes('CategoryPercentage')) {
+                const catEl = document.getElementById(id);
+                if (catEl) catEl.textContent = `${rounded}% (${finished}/${totalProjects}) [${formattedHours}hrs]`;
+                return;
+            }
+            const element = document.getElementById(id);
+            if (!element) return;
+
+            const fillEl = document.getElementById(id + 'Fill');
+            const percentEl = document.getElementById(id + 'Percentage');
+
+            if (fillEl) fillEl.style.width = rounded + '%';
+            if (percentEl) percentEl.textContent = `${rounded}% (${finished}/${totalProjects}) [${formattedHours}hrs]`;
+
+            const titleSpan = element.querySelector('span:first-child');
+            if (!titleSpan) return;
+
+            const areaName = titleSpan.textContent;
+            let tooltipText = `${areaName} (${rounded}%)\n`;
+            if (stats.total > 0) {
+                 tooltipText += `En proceso: ${stats["En proceso"]}\nEstacionamiento: ${stats["Estacionamiento"]}\nTerminado: ${stats.Terminado}\nHoras Sumadas: ${formattedHours}`;
+            } else {
+                 tooltipText += `0 proyectos`;
+            }
+            element.setAttribute('title', tooltipText);
+        }
+
+        for (const id in processedStats) updateElementUI(id, processedStats[id]);
+    }
+
+    function updateSummaryBox(stats, totalHrs, totalHrsActual) {
+        const total = stats.total;
+        const t = total ? Math.round((stats.Terminado / total) * 100) : 0;
+        const p = total ? Math.round((stats["En proceso"] / total) * 100) : 0;
+        const e = total ? Math.round((stats.Estacionamiento / total) * 100) : 0;
+        
+        const formattedTotalHrs = formatNumber(totalHrs || 0);
+        const formattedTotalHrsActual = formatNumberOneDecimal(totalHrsActual || 0);
+        
+        const summaryTotalCount = document.getElementById('summary-total-count');
+        if (summaryTotalCount) {
+            summaryTotalCount.textContent = `Total ${total}`;
+        }
+
+        document.getElementById('summary-terminado').textContent = `Terminado ${t}% [${stats.Terminado}]`;
+        document.getElementById('summary-en-proceso').textContent = `En proceso ${p}% [${stats["En proceso"]}]`;
+        document.getElementById('summary-estacionamiento').textContent = `Estacionamiento ${e}% [${stats.Estacionamiento}]`;
+
+        const summaryHoursActual = document.getElementById('summary-hours-actual');
+        if (summaryHoursActual) {
+            summaryHoursActual.textContent = `${formattedTotalHrsActual} hrs actual`;
+        }
+        
+        const summaryHoursProy = document.getElementById('summary-hours-proy');
+        if (summaryHoursProy) {
+            summaryHoursProy.textContent = `${formattedTotalHrs} hrs proy/año`;
+        }
+    }
+
+    // === Carga automática desde Google Sheets vía JSONP ===
+    function gvizToObjects(resp) {
+        if (!resp || !resp.table) return [];
+        const cols = (resp.table.cols || []).map(c => String(c.label || c.id || '').trim().toUpperCase());
+        return (resp.table.rows || []).map(r => {
+            const o = {};
+            cols.forEach((h, i) => {
+                const cell = r.c && r.c[i] ? r.c[i] : null;
+                o[h] = cell && (cell.v !== null && cell.v !== undefined) ? cell.v : '';
+            });
+            return o;
+        });
+    }
+
+    function loadSheetJSONP(sheetId, sheetName) {
+        const TIMEOUT_MS = 15000;
+
+        return new Promise((resolve, reject) => {
+            const cbName = 'GVIZ_CB_' + Math.random().toString(36).slice(2);
+            let script = document.createElement('script'); 
+            let timer = null; 
+
+            function cleanup() {
+                if (timer) {
+                    clearTimeout(timer); 
+                    timer = null;
+                }
+                delete window[cbName]; 
+                if (script && script.parentNode) {
+                    script.parentNode.removeChild(script); 
+                    script = null;
+                }
+            }
+
+            timer = setTimeout(() => {
+                cleanup(); 
+                reject(new Error(`Tiempo de espera agotado (>${TIMEOUT_MS / 1000}s) al cargar "${sheetName}". El navegador (Safari/iOS) puede estar bloqueando la solicitud.`));
+            }, TIMEOUT_MS);
+
+            window[cbName] = function (resp) {
+                cleanup(); 
+                try {
+                    resolve(gvizToObjects(resp)); 
+                } catch (e) {
+                    reject(e); 
+                }
+            };
+            
+            script.onerror = (err) => {
+                cleanup(); 
+                console.error(`Error de script al cargar: ${sheetName}`, err);
+                reject(new Error(`No se pudo cargar la hoja "${sheetName}" (revisa permisos, nombre o bloqueo del navegador).`));
+            };
+
+            const base = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq`;
+            const url  = `${base}?sheet=${encodeURIComponent(sheetName)}&headers=1&tq=${encodeURIComponent('select *')}&tqx=out:json;responseHandler:${cbName}&nocache=${new Date().getTime()}`;
+            
+            script.src = url;
+            document.head.appendChild(script);
+        });
+    }
+
+    // *** --- INICIO: FUNCIONES MODAL DETALLES --- ***
+    const statusOrder = { 'terminado': 1, 'en proceso': 2, 'estacionamiento': 3 };
+
+    function openDetailsModal(areaId) {
+        const areaName = idToAreaNameMap[areaId];
+        if (!areaName) return;
+        const stats = processedStats[areaId];
+        if (!stats) return;
+
+        const rounded = Math.round(stats.percentage || 0);
+        const totalProjects = stats.total || 0;
+        const finished = stats.Terminado || 0;
+        const hours = stats.hrsProy || 0;
+        const formattedHours = formatNumber(hours);
+
+        $modalTitle.innerHTML = `Proyectos: ${areaName} <span class="modal-title-stats">${rounded}% (${finished}/${totalProjects}) [${formattedHours}hrs]</span>`;
+        $modalTableBody.innerHTML = '';
+
+        const filteredRows = allRowsData.filter(row =>
+            (row.AREA ? row.AREA.trim().toUpperCase() : '') === areaName
+        );
+
+        filteredRows.sort((a, b) => {
+            const statusA = (a.ESTADO || '').toLowerCase();
+            const statusB = (b.ESTADO || '').toLowerCase();
+            const orderA = statusOrder[statusA] || 99;
+            const orderB = statusOrder[statusB] || 99;
+            return orderA - orderB;
+        });
+
+        let tableHtml = '';
+        let n = 1;
+        if (filteredRows.length === 0) {
+            tableHtml = '<tr><td colspan="5" style="text-align:center;">No hay proyectos para mostrar.</td></tr>';
+        } else {
+            filteredRows.forEach(row => {
+                let statusClass = '';
+                const estadoLower = (row.ESTADO || '').toLowerCase();
+                if (estadoLower === 'terminado') statusClass = 'status-terminado';
+                else if (estadoLower === 'en proceso') statusClass = 'status-en-proceso';
+                else if (estadoLower === 'estacionamiento') statusClass = 'status-estacionamiento';
+                tableHtml += `<tr><td>${n++}</td><td>${row.PROYECTO || ''}</td><td>${row.TAREA || ''}</td><td>${row.HERRAMIENTA || ''}</td><td class="${statusClass}">${row.ESTADO || ''}</td></tr>`;
+            });
+        }
+        $modalTableBody.innerHTML = tableHtml;
+        $detailsModal.style.display = 'block';
+    }
+
+    function setupDetailsModalListeners() {
+        document.querySelectorAll('.base-step[id]:not(.step-container-general)').forEach(areaElement => {
+            areaElement.addEventListener('click', (e) => {
+                e.preventDefault();
+                openDetailsModal(areaElement.id);
+            });
+        });
+        $detailsModalClose.addEventListener('click', () => $detailsModal.style.display = 'none');
+        $detailsModal.addEventListener('click', (e) => { if (e.target === $detailsModal) $detailsModal.style.display = 'none'; });
+    }
+    // *** --- FIN: FUNCIONES MODAL DETALLES --- ***
+
+
+    // *** --- INICIO: FUNCIONES MODAL KANBAN --- ***
+
+    function displayKanbanModal() {
+        if (!kanbanData || kanbanData.length === 0) {
+            showError("No se encontraron datos en la hoja 'Kanban' o aún no se han cargado.");
+            return;
+        }
+
+        $kanbanColEstacionamiento.innerHTML = '<h3>Estacionamiento</h3>';
+        $kanbanColEnProceso.innerHTML = '<h3>En proceso</h3>';
+        $kanbanColTerminado.innerHTML = '<h3>Terminado</h3>';
+
+        let colorIndex = 1;
+
+        kanbanData.forEach(row => {
+            const estadoLower = (row.ESTADO || '').toLowerCase();
+            let targetColumn;
+
+            if (estadoLower === 'estacionamiento') targetColumn = $kanbanColEstacionamiento;
+            else if (estadoLower === 'en proceso') targetColumn = $kanbanColEnProceso;
+            else if (estadoLower === 'terminado') targetColumn = $kanbanColTerminado;
+            else return;
+
+            const card = document.createElement('div');
+            card.className = `kanban-card color-${colorIndex}`;
+            
+            card.innerHTML = `
+                <div class="card-title">${row.TAREA || 'Sin Tarea'}</div>
+                <div class="card-detail">Area: ${row.AREA || 'N/A'}</div>
+                <div class="card-detail">Responsable: ${row.RESPONSABLE || 'N/A'}</div>
+            `;
+
+            targetColumn.appendChild(card);
+            colorIndex = (colorIndex % 5) + 1;
+        });
+
+        $kanbanModal.style.display = 'block';
+    }
+
+    function setupKanbanModalListeners() {
+        $kanbanButton.addEventListener('click', displayKanbanModal);
+        $kanbanModalClose.addEventListener('click', () => $kanbanModal.style.display = 'none');
+        $kanbanModal.addEventListener('click', (e) => { if (e.target === $kanbanModal) $kanbanModal.style.display = 'none'; });
+    }
+
+    // *** --- FIN: FUNCIONES MODAL KANBAN --- ***
+
+
+    // --- Flujo Principal de Carga ---
+    showLoading();
+    loadSheetJSONP(SHEET_ID, SHEET_NAME_BD)
+        .then(rowsBd => {
+            if (!Array.isArray(rowsBd)) {
+                 throw new Error(`La hoja "${SHEET_NAME_BD}" no devolvió datos válidos.`);
+            }
+            allRowsData = rowsBd;
+            updateMapWithData(allRowsData);
+            setupDetailsModalListeners();
+
+            return loadSheetJSONP(SHEET_ID, SHEET_NAME_KANBAN);
+        })
+        .then(rowsKanban => {
+             if (!Array.isArray(rowsKanban)) {
+                 console.warn(`La hoja "${SHEET_NAME_KANBAN}" no devolvió datos válidos o está vacía.`);
+                 kanbanData = [];
+             } else {
+                 kanbanData = rowsKanban;
+             }
+             setupKanbanModalListeners();
+             hideLoading();
+             alignColumnHeights(); // <-- MODIFICACIÓN: Alinear alturas al final
+        })
+        .catch(err => {
+            hideLoading();
+            alignColumnHeights(); // <-- MODIFICACIÓN: Alinear alturas también si falla
+            console.error('[GViz JSONP Error]', err);
+            showError(err.message || 'No se pudo leer una de las Google Sheets. Verifica permisos y nombres de pestañas.');
+        });
+        
+    // --- MODIFICACIÓN: Alinear alturas si se cambia el tamaño de la ventana ---
+    window.addEventListener('resize', alignColumnHeights);
+});
+</script>
+
+</body>
+</html>
