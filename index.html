@@ -15,8 +15,6 @@
             justify-content: center;
         }
 
-        /* ... (Estilos anteriores del mapa sin cambios) ... */
-
         .main-layout-container {
             display: flex;
             flex-direction: column;
@@ -31,26 +29,22 @@
             display: flex;
             flex-direction: row;
             gap: 15px;
-            align-items: flex-start; 
+            align-items: flex-start;
             width: 100%;
         }
 
         .strategic-column { flex: 1 1 15%; }
-        
-        .main-column { 
-            flex: 1 1 85%; 
+
+        .main-column {
+            flex: 1 1 85%;
             display: flex;
             flex-direction: column;
-            gap: 15px; 
+            gap: 15px;
         }
-        
+
         .main-column > .process-section-box {
-            display: flex; 
+            display: flex;
             flex-direction: column;
-        }
-        
-        .main-column > .process-section-box > .process-map {
-            /* No se estira */
         }
 
         .support-section { width: 100%; }
@@ -67,6 +61,7 @@
             align-items: center;
             justify-content: center;
         }
+
         .process-map {
             display: flex;
             align-items: center;
@@ -101,7 +96,11 @@
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
             overflow: hidden;
         }
-        .base-step:hover { transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0,0,0,0.15); }
+
+        .base-step:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
 
         .step-strategic-color { background-color: #003366; color: #ffffff; border-color: #002244; }
         .step-principal-container-color { background-color: #0056b3; color: #ffffff; border-color: #004085; }
@@ -110,104 +109,269 @@
         .step-default-color { background-color: #e9ecef; color: #495057; border-color: #ced4da; }
         .sub-step-color { background-color: #d4edda; color: #1a472a; border-color: #c3e6cb; }
 
-        .sub-step { min-width: 50px; padding: 4px 8px; font-size: 9px; margin: 2px; border: 1px solid rgba(0,0,0,0.1); flex: 1; position: relative; box-sizing: border-box; box-shadow: none; }
-        .sub-step:hover { transform: translateY(-1px); box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); }
+        .sub-step {
+            min-width: 50px;
+            padding: 4px 8px;
+            font-size: 9px;
+            margin: 2px;
+            border: 1px solid rgba(0,0,0,0.1);
+            flex: 1;
+            position: relative;
+            box-sizing: border-box;
+            box-shadow: none;
+        }
+
+        .sub-step:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
         .sub-step-long-label { min-width: 100px; padding: 6px 10px; font-size: 9px; }
         .base-step-long-label { min-width: 120px; padding: 6px 10px; font-size: 9px; }
 
-        .step-container-general { min-width: 150px; padding: 8px; display: flex; flex-direction: column; align-items: center; gap: 4px; flex-shrink: 0; flex: 1; position: relative; box-sizing: border-box; overflow: hidden; }
-        .step-container-general .container-title { font-size: 11px; font-weight: bold; margin-bottom: 4px; text-transform: uppercase; color: #ffffff; z-index: 1; }
-        .step-container-general .sub-steps-wrapper { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; width: 100%; z-index: 1; }
+        .step-container-general {
+            min-width: 150px;
+            padding: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            flex-shrink: 0;
+            flex: 1;
+            position: relative;
+            box-sizing: border-box;
+            overflow: hidden;
+        }
 
-        #planeamiento .sub-steps-wrapper { flex-direction: column; align-items: stretch; gap: 6px; }
+        .step-container-general .container-title {
+            font-size: 11px;
+            font-weight: bold;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            color: #ffffff;
+            z-index: 1;
+        }
 
-        .arrow { font-size: 20px; color: #6c757d; margin: 0 8px; flex-shrink: 0; }
-        .process-section-box { background-color: #ffffff; border: 1px dashed #adb5bd; border-radius: 10px; padding: 15px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08); width: 100%; box-sizing: border-box; }
+        .step-container-general .sub-steps-wrapper {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 4px;
+            width: 100%;
+            z-index: 1;
+        }
 
-        .main-flow-container { display: flex; flex-direction: column; gap: 15px; width: 100%; }
-        .main-flow-row { display: flex; flex-direction: row; align-items: stretch; gap: 8px; width: 100%; }
+        #planeamiento .sub-steps-wrapper {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 6px;
+        }
+
+        .arrow {
+            font-size: 20px;
+            color: #6c757d;
+            margin: 0 8px;
+            flex-shrink: 0;
+        }
+
+        .process-section-box {
+            background-color: #ffffff;
+            border: 1px dashed #adb5bd;
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .main-flow-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            width: 100%;
+        }
+
+        .main-flow-row {
+            display: flex;
+            flex-direction: row;
+            align-items: stretch;
+            gap: 8px;
+            width: 100%;
+        }
+
         .main-flow-row .arrow { display: flex; align-items: center; }
         .main-flow-row > .base-step { flex: 1 1 15%; }
         .main-flow-row > .step-container-general { flex: 1 1 60%; }
-        .vertical-connector { width: 3px; height: 20px; background-color: #adb5bd; margin: auto; }
 
-        .progress-bar-container { width: calc(100% - 16px); height: 6px; background-color: rgba(255, 255, 255, 0.3); border-radius: 3px; margin-top: 5px; overflow: hidden; position: relative; }
-        .progress-bar-fill { height: 100%; background-color: #28a745; border-radius: 3px; transition: width 0.5s ease-in-out; }
-        .progress-percentage { font-size: 9px; font-weight: bold; color: inherit; margin-top: 2px; display: block; white-space: nowrap; }
-        .category-progress-percentage { font-size: 14px; font-weight: bold; margin-left: 8px; color: #007bff; }
-        .base-step > span:first-child:not(.progress-percentage), .step-container-general .container-title { flex-grow: 1; display: flex; align-items: center; justify-content: center; }
+        .vertical-connector {
+            width: 3px;
+            height: 20px;
+            background-color: #adb5bd;
+            margin: auto;
+        }
 
-        .strategic-column .process-map { display: flex; flex-direction: column; align-items: stretch; gap: 6px; }
-        .strategic-column .base-step { flex-grow: 0; width: 100%; min-height: 30px; padding-top: 6px; padding-bottom: 6px; font-size: 9px; }
+        .progress-bar-container {
+            width: calc(100% - 16px);
+            height: 6px;
+            background-color: rgba(255, 255, 255, 0.3);
+            border-radius: 3px;
+            margin-top: 5px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background-color: #28a745;
+            border-radius: 3px;
+            transition: width 0.5s ease-in-out;
+        }
+
+        .progress-percentage {
+            font-size: 9px;
+            font-weight: bold;
+            color: inherit;
+            margin-top: 2px;
+            display: block;
+            white-space: nowrap;
+        }
+
+        .category-progress-percentage {
+            font-size: 14px;
+            font-weight: bold;
+            margin-left: 8px;
+            color: #007bff;
+        }
+
+        .base-step > span:first-child:not(.progress-percentage),
+        .step-container-general .container-title {
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .strategic-column .process-map {
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 6px;
+        }
+
+        .strategic-column .base-step {
+            flex-grow: 0;
+            width: 100%;
+            min-height: 30px;
+            padding-top: 6px;
+            padding-bottom: 6px;
+            font-size: 9px;
+        }
+
         .strategic-column .progress-bar-container { height: 5px; margin-top: 4px; }
         .strategic-column .progress-percentage { font-size: 8px; margin-top: 1px; }
+
         .strategic-column #planeamiento .container-title { font-size: 10px; }
-        
+
         .strategic-column .process-section-box {
             height: 100%;
             box-sizing: border-box;
-            display: flex; 
+            display: flex;
             flex-direction: column;
         }
 
+        /* ===== RESUMEN + BOTONES ===== */
         #summary-box {
             background-color: white;
-            padding: 10px 15px; 
-            border-radius: 10px; 
-            box-shadow: 0 4px 8px rgba(0,0,0,0.08); 
-            border: 1px dashed #adb5bd; 
-            box-sizing: border-box; 
+            padding: 10px 15px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+            border: 1px dashed #adb5bd;
+            box-sizing: border-box;
             display: flex;
-            flex-direction: row; 
-            align-items: center; 
-            justify-content: flex-start; 
-            gap: 16px; 
-            flex-wrap: wrap; 
+            flex-direction: row;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 16px;
+            flex-wrap: wrap;
+            width: 100%;
         }
-        
+
         #summary-total-count {
             font-size: 16px;
             font-weight: bold;
             color: #343a40;
         }
+
         .summary-divider {
-            border-left: 1px solid #ced4da; 
-            height: 24px; 
+            border-left: 1px solid #ced4da;
+            height: 24px;
         }
+
         .summary-divider-double {
             border-left: 3px double #adb5bd;
             height: 24px;
-            margin-left: 8px; 
+            margin-left: 8px;
         }
-        
-        .summary-status-block {
-            font-size: 14px;
-            font-weight: 600; 
-        }
-        
+
+        .summary-status-block { font-size: 14px; font-weight: 600; }
+
         .summary-hours-block {
-            font-size: 16px; 
+            font-size: 16px;
             font-weight: bold;
             color: #343a40;
         }
-        
+
         .summary-hours-actual {
-            color: #007bff; /* Azul */
-            cursor: help; 
-        }
-        .summary-hours-proy {
-            color: #fd7e14; /* Ámbar/Naranja */
-            cursor: help; 
+            color: #007bff;
+            cursor: help;
         }
 
-        .summary-status-terminado {
-            color: #007bff; /* Azul */
+        .summary-hours-proy {
+            color: #fd7e14;
+            cursor: help;
         }
-        .summary-status-en-proceso {
-            color: #fd7e14; /* Ámbar/Naranja */
+
+        .summary-status-terminado { color: #007bff; }
+        .summary-status-en-proceso { color: #fd7e14; }
+        .summary-status-estacionamiento { color: #b22222; }
+
+        .summary-actions {
+            margin-left: auto;
+            display: flex;
+            gap: 8px;
+            align-items: center;
         }
-        .summary-status-estacionamiento {
-            color: #b22222; /* Rojo oscuro (firebrick) */
+
+        #kanban-button,
+        #informe-button {
+            padding: 5px 10px;
+            font-size: 12px;
+            font-weight: bold;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            transition: background-color 0.2s ease, transform 0.1s ease;
+        }
+
+        #kanban-button {
+            background-color: #fd7e14;
+            color: white;
+        }
+
+        #kanban-button:hover {
+            background-color: #e66a00;
+            transform: translateY(-1px);
+        }
+
+        #informe-button {
+            background-color: #A3E635;
+            color: #064e3b;
+        }
+
+        #informe-button:hover {
+            filter: brightness(0.95);
+            transform: translateY(-1px);
         }
 
         /* Banner de error */
@@ -236,6 +400,7 @@
             gap: 12px;
             z-index: 2500;
         }
+
         .spinner {
             width: 48px;
             height: 48px;
@@ -244,106 +409,376 @@
             border-radius: 50%;
             animation: spin 0.9s linear infinite;
         }
-        @keyframes spin { to { transform: rotate(360deg); } }
 
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
 
-        /* --- INICIO: ESTILOS MODAL DETALLES --- */
-        #details-modal { 
+        /* --- ESTILOS MODALES GENERALES --- */
+        #details-modal,
+        #informe-modal {
             display: none;
-            position: fixed; z-index: 4000; left: 0; top: 0;
-            width: 100%; height: 100%; overflow: auto;
-            background-color: rgba(0,0,0,0.5);
-        }
-        .modal-content {
-            background-color: #fefefe; margin: 5% auto; padding: 20px 25px;
-            border: 1px solid #888; border-radius: 8px; width: 80%;
-            max-width: 900px; position: relative; box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-        }
-        .modal-close {
-            color: #aaa; position: absolute; top: 10px; right: 20px;
-            font-size: 28px; font-weight: bold; cursor: pointer;
-        }
-        .modal-close:hover, .modal-close:focus { color: #000; text-decoration: none; }
-        #modal-title {
-            margin-top: 0; color: #003366; font-family: 'Inter', sans-serif;
-            border-bottom: 2px solid #f0f0f0; padding-bottom: 10px; font-size: 1.2em;
-        }
-        .modal-title-stats {
-            color: #007bff; font-weight: bold; font-size: 0.9em; margin-left: 15px;
-        }
-        .modal-table-wrapper { max-height: 450px; overflow-y: auto; margin-top: 15px; }
-        .modal-table { width: 100%; border-collapse: collapse; font-size: 12px; }
-        .modal-table th, .modal-table td {
-            border: 1px solid #ddd; padding: 8px; text-align: left;
-            white-space: normal; word-break: break-word;
-        }
-        .modal-table th {
-            background-color: #f2f2f2; text-transform: uppercase; font-weight: 600;
-            font-family: 'Inter', sans-serif; position: sticky; top: 0;
-        }
-        .modal-table tr:nth-child(even) { background-color: #f9f9f9; }
-        .modal-table th:nth-child(1) { width: 5%; }
-        .modal-table th:nth-child(2) { width: 30%; }
-        .modal-table th:nth-child(3) { width: 35%; }
-        .modal-table th:nth-child(4) { width: 15%; }
-        .modal-table th:nth-child(5) { width: 15%; }
-        .status-terminado { background-color: #d4edda; color: #155724; }
-        .status-en-proceso { background-color: #fff3cd; color: #856404; }
-        .status-estacionamiento { background-color: #f8d7da; color: #721c24; }
-        /* --- FIN: ESTILOS MODAL DETALLES --- */
-
-
-        /* --- INICIO: NUEVOS ESTILOS BOTÓN Y MODAL KANBAN --- */
-
-        #kanban-button {
             position: fixed;
-            top: 20px;
-            left: 20px;
-            z-index: 1002;
-            padding: 5px 10px;
-            font-size: 12px;
-            font-weight: bold;
-            background-color: #fd7e14; 
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-            transition: background-color 0.2s ease;
-        }
-        #kanban-button:hover {
-            background-color: #e66a00;
-        }
-
-        #kanban-modal {
-            display: none; 
-            position: fixed;
-            z-index: 5000; 
+            z-index: 4000;
             left: 0; top: 0;
             width: 100%; height: 100%;
             overflow: auto;
-            background-color: rgba(0,0,0,0.6); 
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 20px 25px;
+            border: 1px solid #888;
+            border-radius: 8px;
+            width: 80%;
+            max-width: 900px;
+            max-height: 85vh;
+            position: relative;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+        }
+
+        #informe-modal .modal-content {
+            width: 80%;
+            max-width: 1000px;
+        }
+
+        .modal-close {
+            color: #aaa;
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .modal-close:hover,
+        .modal-close:focus {
+            color: #000;
+            text-decoration: none;
+        }
+
+        #modal-title,
+        #informe-modal-title {
+            margin-top: 0;
+            color: #003366;
+            font-family: 'Inter', sans-serif;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 10px;
+            font-size: 1.2em;
+        }
+
+        .modal-title-stats {
+            color: #007bff;
+            font-weight: bold;
+            font-size: 0.9em;
+            margin-left: 15px;
+        }
+
+        .modal-table-wrapper {
+            max-height: 450px;
+            overflow-y: auto;
+            margin-top: 15px;
+            flex: 1;
+            overflow-x: hidden;
+        }
+
+        #informe-modal .modal-table-wrapper {
+            max-height: calc(85vh - 120px);
+        }
+
+        .modal-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+
+        .modal-table th,
+        .modal-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+            white-space: normal;
+            word-break: break-word;
+        }
+
+        .modal-table th {
+            background-color: #f2f2f2;
+            text-transform: uppercase;
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+            position: sticky;
+            top: 0;
+        }
+
+        .modal-table tr:nth-child(even) { background-color: #f9f9f9; }
+
+        .status-terminado {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .status-en-proceso {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        .status-estacionamiento {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        /* === BLOQUES DEL INFORME === */
+        .informe-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding-right: 8px;
+        }
+
+        .informe-project-block {
+            border: 1px solid #d0d7de;
+            border-radius: 6px;
+            overflow: visible;
+            background: #ffffff;
+            box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
+            page-break-inside: avoid;
+            height: auto;
+            min-height: fit-content;
+        }
+
+        .informe-project-header {
+            padding: 8px 16px;
+            background: #e3f2fd;
+            font-weight: 700;
+            font-size: 13px;
+            text-transform: uppercase;
+            color: #0b3b71;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            /* make project header sticky within the scrollable wrapper */
+            position: sticky;
+            top: 0;
+            z-index: 25;
+            height: 44px;
+            box-shadow: inset 0 -1px 0 rgba(0,0,0,0.04);
+        }
+
+        .informe-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+            table-layout: fixed;
+            height: auto;
+        }
+
+        .informe-table th,
+        .informe-table td {
+            padding: 8px 10px;
+            border: 1px solid #e1e4e8;
+            text-align: left;
+            white-space: normal;
+            word-break: break-word;
+            overflow-wrap: break-word;
+            vertical-align: top;
+            height: auto;
+            min-height: 35px;
+        }
+
+        .informe-table thead th {
+            background: #c6f6d5;
+            color: #1a4731;
+            font-weight: 700;
+            text-transform: uppercase;
+            position: sticky;
+            /* place table header right below the project header */
+            top: 44px;
+            z-index: 20;
+            text-align: center;
+            vertical-align: middle;
+            padding-top: 12px;
+            padding-bottom: 12px;
+        }
+
+        .informe-table tbody tr:nth-child(even) {
+            background: #f9fafb;
+        }
+
+        /* --- ESTADO (viñetas) --- */
+        .estado-bullet {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            line-height: 18px;
+            text-align: center;
+            font-size: 12px;
+            color: #ffffff;
+            font-weight: 700;
+        }
+
+        .estado-terminado { background: #28a745; }
+        .estado-en-proceso { background: #ffc107; color: #3a2d00; }
+        .estado-estacionamiento { background: #dc3545; }
+
+        /* --- LEYENDA (en modal informe, esquina superior derecha) --- */
+        .informe-legend {
+            position: absolute;
+            /* header will now control positioning; keep inline styles for internal layout */
+            position: static;
+            display: flex;
+            gap: 14px;
+            align-items: center;
+            font-size: 13px;
+            color: #0b3b71;
+            white-space: nowrap;
+            z-index: 30;
+            font-weight: 600;
+        }
+
+        .informe-legend .legend-item { display:flex; gap:8px; align-items:center; }
+        .informe-legend .legend-bullet-small { width:12px; height:12px; border-radius:50%; display:inline-block; }
+        .informe-legend .legend-bullet-check { width:14px; height:14px; display:inline-flex; align-items:center; justify-content:center; border-radius:50%; color:#fff; font-weight:700; }
+        .informe-legend .legend-text { font-size:13px; color:#0b3b71; }
+
+        .legend-terminado { background:#28a745; }
+        .legend-en-proceso { background:#ffc107; color:#3a2d00; }
+        .legend-estacionamiento { background:#dc3545; }
+
+        /* Toggle switch styles */
+        .toggle-switch {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            vertical-align: middle;
+            margin-right: 12px;
+            z-index: 40;
+            transform: scale(0.7);
+            transform-origin: right center;
+        }
+        .toggle-switch input { display: none; }
+        .toggle-slider {
+            width: 64px;
+            height: 34px;
+            background: #d6eefe;
+            border-radius: 22px;
+            position: relative;
+            box-shadow: inset 0 0 0 1px rgba(30,144,255,0.35);
+            cursor: pointer;
+            border: 1px solid rgba(30,144,255,0.25);
+        }
+        .toggle-slider::after {
+            content: '';
+            position: absolute;
+            top: 4px;
+            left: 4px;
+            width: 26px;
+            height: 26px;
+            background: #fff;
+            border-radius: 50%;
+            transition: left 0.18s ease;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.12);
+        }
+        .toggle-switch input:checked + .toggle-slider {
+            background: #b0b0b0;
+        }
+        .toggle-switch input:checked + .toggle-slider::after {
+            left: 34px;
+        }
+        .toggle-label {
+            font-size: 13px;
+            color: #0b3b71;
+            font-weight:600;
+            white-space:nowrap;
+        }
+
+        /* Header layout for modal title + legend + switch on one line */
+        .informe-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            padding-right: 18px;
+        }
+        .informe-header #informe-modal-title { margin: 0; }
+        .informe-controls { display:flex; align-items:center; gap:12px; }
+
+        /* Modal background when filter active (darker) */
+        #informe-modal.filter-active .modal-content {
+            background-color: #939393; /* ~40% darker than #f5f5f5 */
+        }
+
+        /* --- BARRA DE AVANCE DENTRO DE LA CELDA %AVANCE --- */
+        .avance-cell {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .avance-bar-container {
+            flex: 1 1 auto;
+            background: #e9f5ff; /* fondo claro */
+            border-radius: 6px;
+            height: 18px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .avance-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg,#cfe9ff,#7ec1ff);
+            width: 0%;
+            transition: width 0.6s ease;
+        }
+
+        .avance-label {
+            min-width: 36px;
+            text-align: right;
+            font-weight: 600;
+            font-size: 12px;
+            color: #064b8a;
+        }
+
+        /* --- MODAL KANBAN --- */
+        #kanban-modal {
+            display: none;
+            position: fixed;
+            z-index: 5000;
+            left: 0; top: 0;
+            width: 100%; height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.6);
         }
 
         .kanban-content {
             background-color: #fefefe;
-            margin: 3% auto; 
+            margin: 3% auto;
             padding: 20px 25px;
             border-radius: 8px;
-            width: 90%; 
+            width: 90%;
             max-width: 1200px;
             position: relative;
             box-shadow: 0 5px 15px rgba(0,0,0,0.3);
         }
+
         #kanban-modal .modal-close {
-             top: 15px; right: 25px;
+            top: 15px;
+            right: 25px;
         }
 
         .kanban-board {
             display: flex;
-            gap: 15px; 
-            justify-content: space-between; 
-            min-height: 500px; 
+            gap: 15px;
+            justify-content: space-between;
+            min-height: 500px;
             margin-top: 15px;
         }
 
@@ -352,10 +787,10 @@
             background-color: #e9ecef;
             border-radius: 5px;
             padding: 10px;
-            display: flex; 
-            flex-wrap: wrap; 
-            gap: 8px; 
-            align-content: flex-start; 
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-content: flex-start;
             max-height: 60vh;
             overflow-y: auto;
         }
@@ -374,8 +809,8 @@
             top: -10px;
             background-color: #e9ecef;
             z-index: 10;
-            width: 100%; 
-            order: -1; 
+            width: 100%;
+            order: -1;
         }
 
         .kanban-card {
@@ -386,81 +821,105 @@
             font-size: 11px;
             cursor: grab;
             width: calc(50% - 4px);
-            box-sizing: border-box; 
+            box-sizing: border-box;
         }
+
         .kanban-card .card-title {
             font-weight: bold;
             margin-bottom: 5px;
             font-size: 12px;
             color: #333;
             overflow-wrap: break-word;
-            word-break: break-word; 
-            hyphens: auto; 
+            word-break: break-word;
+            hyphens: auto;
         }
+
         .kanban-card .card-detail {
             color: #555;
             margin-bottom: 3px;
-            overflow-wrap: break-word; 
+            overflow-wrap: break-word;
             word-break: break-word;
         }
+
         .kanban-card.color-1 { border-left: 4px solid #6f42c1; }
         .kanban-card.color-2 { border-left: 4px solid #20c997; }
         .kanban-card.color-3 { border-left: 4px solid #fd7e14; }
         .kanban-card.color-4 { border-left: 4px solid #0dcaf0; }
         .kanban-card.color-5 { border-left: 4px solid #ffc107; }
 
-        /* --- FIN: NUEVOS ESTILOS BOTÓN Y MODAL KANBAN --- */
-
-
-        /* Ajustes responsivos (asegúrate de tener esto) */
-        @media (max-width: 768px) {
-           /* ... otros estilos responsivos ... */
-
-            /* Ajustes Kanban modal para móviles */
-            .kanban-content { width: 95%; margin: 5% auto; padding: 15px; }
-            .kanban-board { flex-direction: column; min-height: auto; gap: 20px; }
-            .kanban-column {
-                max-height: 300px;
-                flex-direction: column; 
-                flex-wrap: nowrap; 
-            }
-            .kanban-card {
-                width: 100%;
-            }
-        }
-
-
+        /* RESPONSIVE */
         @media (max-width: 992px) {
             .top-row { flex-direction: column; }
             .strategic-column, .main-column { width: 100%; }
         }
+
         @media (max-width: 768px) {
-            .main-flow-row { flex-direction: column; align-items: stretch; }
-            .main-flow-row .arrow { margin: 8px auto; transform: rotate(90deg); }
-            .base-step, .sub-step, .base-step-long-label, .sub-step-long-label { font-size: 9px; min-height: 30px; }
+            .main-flow-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .main-flow-row .arrow {
+                margin: 8px auto;
+                transform: rotate(90deg);
+            }
+
+            .base-step,
+            .sub-step,
+            .base-step-long-label,
+            .sub-step-long-label {
+                font-size: 9px;
+                min-height: 30px;
+            }
+
             .section-title { font-size: 14px; }
             .step-container-general .container-title { font-size: 10px; }
             .progress-bar-container { width: calc(100% - 10px); }
-            #kanban-button { 
-                 top: 10px; right: 10px; font-size: 11px; padding: 4px 8px;
+
+            .modal-content {
+                width: 95%;
+                margin: 10% auto;
+                padding: 15px;
             }
 
-            /* Ajustes modales para móviles */
-            .modal-content { width: 95%; margin: 10% auto; padding: 15px; }
             .modal-table { font-size: 11px; }
-            #modal-title { font-size: 1.1em; }
-            .modal-title-stats { display: block; margin-left: 0; margin-top: 5px; font-size: 0.85em; }
 
-            /* Ajustes Kanban modal para móviles */
-            .kanban-content { width: 95%; margin: 5% auto; padding: 15px; }
-            .kanban-board { flex-direction: column; min-height: auto; gap: 20px; }
-            .kanban-column { max-height: 300px; } 
+            #modal-title,
+            #informe-modal-title { font-size: 1.1em; }
+
+            .modal-title-stats {
+                display: block;
+                margin-left: 0;
+                margin-top: 5px;
+                font-size: 0.85em;
+            }
+
+            .kanban-content {
+                width: 95%;
+                margin: 5% auto;
+                padding: 15px;
+            }
+
+            .kanban-board {
+                flex-direction: column;
+                min-height: auto;
+                gap: 20px;
+            }
+
+            .kanban-column { max-height: 300px; }
+
+            .summary-actions {
+                width: 100%;
+                justify-content: flex-end;
+                margin-left: 0;
+            }
+
+            .informe-project-header { font-size: 12px; }
+            .informe-table { font-size: 11px; }
         }
     </style>
 </head>
 <body>
-
-<button id="kanban-button">Kanban</button>
 
 <div id="error-banner" role="alert" aria-live="assertive"></div>
 <div id="loading-overlay" aria-live="polite">
@@ -469,19 +928,26 @@
 </div>
 
 <div class="main-layout-container">
-    
+
     <div class="top-row">
         <div class="process-section-box strategic-column">
-            <div class="section-title">PROCESOS ESTRATEGICOS <span class="category-progress-percentage" id="strategicCategoryPercentage"></span></div>
+            <div class="section-title">
+                PROCESOS ESTRATEGICOS
+                <span class="category-progress-percentage" id="strategicCategoryPercentage"></span>
+            </div>
             <div class="process-map">
                 <a href="#" target="_blank" class="base-step step-strategic-color" id="altaDireccion">
                     <span>ALTA DIRECCION</span>
-                    <div class="progress-bar-container"><div class="progress-bar-fill" id="altaDireccionFill"></div></div>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar-fill" id="altaDireccionFill"></div>
+                    </div>
                     <span class="progress-percentage" id="altaDireccionPercentage"></span>
                 </a>
                 <a href="#" target="_blank" class="base-step step-strategic-color" id="sostenibilidad">
                     <span>SOSTENIBILIDAD</span>
-                    <div class="progress-bar-container"><div class="progress-bar-fill" id="sostenibilidadFill"></div></div>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar-fill" id="sostenibilidadFill"></div>
+                    </div>
                     <span class="progress-percentage" id="sostenibilidadPercentage"></span>
                 </a>
                 <div class="base-step step-container-general step-strategic-color" id="planeamiento">
@@ -489,135 +955,319 @@
                     <div class="sub-steps-wrapper">
                         <a href="#" target="_blank" class="base-step sub-step sub-step-color" id="pcpTextil">
                             <span>PCP TEXTIL</span>
-                            <div class="progress-bar-container"><div class="progress-bar-fill" id="pcpTextilFill"></div></div>
+                            <div class="progress-bar-container">
+                                <div class="progress-bar-fill" id="pcpTextilFill"></div>
+                            </div>
                             <span class="progress-percentage" id="pcpTextilPercentage"></span>
                         </a>
                         <a href="#" target="_blank" class="base-step sub-step sub-step-color" id="pcpConfecciones">
                             <span>PCP CONFECCIONES</span>
-                            <div class="progress-bar-container"><div class="progress-bar-fill" id="pcpConfeccionesFill"></div></div>
+                            <div class="progress-bar-container">
+                                <div class="progress-bar-fill" id="pcpConfeccionesFill"></div>
+                            </div>
                             <span class="progress-percentage" id="pcpConfeccionesPercentage"></span>
                         </a>
                     </div>
-                    <div class="progress-bar-container" style="margin-top: 10px;"><div class="progress-bar-fill" id="planeamientoFill"></div></div>
+                    <div class="progress-bar-container" style="margin-top: 10px;">
+                        <div class="progress-bar-fill" id="planeamientoFill"></div>
+                    </div>
                     <span class="progress-percentage" id="planeamientoPercentage"></span>
                 </div>
                 <a href="#" target="_blank" class="base-step step-strategic-color" id="comercial">
                     <span>COMERCIAL</span>
-                    <div class="progress-bar-container"><div class="progress-bar-fill" id="comercialFill"></div></div>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar-fill" id="comercialFill"></div>
+                    </div>
                     <span class="progress-percentage" id="comercialPercentage"></span>
                 </a>
             </div>
         </div>
 
         <div class="main-column">
-            
+
             <div id="summary-box">
                 <div id="summary-total-count" class="summary-total-block">Total 0</div>
                 <div class="summary-divider"></div>
-                <div id="summary-terminado" class="summary-status-block summary-status-terminado">Terminado 0% [0]</div>
-                <div id="summary-en-proceso" class="summary-status-block summary-status-en-proceso">En proceso 0% [0]</div>
-                <div id="summary-estacionamiento" class="summary-status-block summary-status-estacionamiento">Estacionamiento 0% [0]</div>
+                <div id="summary-terminado" class="summary-status-block summary-status-terminado">
+                    Terminado 0% [0]
+                </div>
+                <div id="summary-en-proceso" class="summary-status-block summary-status-en-proceso">
+                    En proceso 0% [0]
+                </div>
+                <div id="summary-estacionamiento" class="summary-status-block summary-status-estacionamiento">
+                    Estacionamiento 0% [0]
+                </div>
                 <div class="summary-divider-double"></div>
                 <div class="summary-hours-block">
-                    [<span id="summary-hours-actual" class="summary-hours-actual" title="0.0 personas">0.0 hrs actual</span> - 
-                     <span id="summary-hours-proy" class="summary-hours-proy" title="0.0 personas">0 hrs proy/año</span>]
+                    [<span id="summary-hours-actual" class="summary-hours-actual" title="0.0 personas">0.0 hrs actual</span>
+                    -
+                    <span id="summary-hours-proy" class="summary-hours-proy" title="0.0 personas">0 hrs proy/año</span>]
+                </div>
+
+                <div class="summary-actions">
+                    <button id="kanban-button">Kanban</button>
+                    <button id="informe-button">Informe</button>
                 </div>
             </div>
 
             <div class="process-section-box">
-                <div class="section-title">PROCESOS PRINCIPALES <span class="category-progress-percentage" id="principalesCategoryPercentage"></span></div>
+                <div class="section-title">
+                    PROCESOS PRINCIPALES
+                    <span class="category-progress-percentage" id="principalesCategoryPercentage"></span>
+                </div>
                 <div class="process-map">
                     <div class="main-flow-container">
                         <div class="main-flow-row">
                             <a href="#" target="_blank" class="base-step step-strategic-color" id="desarrolloTextil">
                                 <span>DESARROLLO TEXTIL</span>
-                                <div class="progress-bar-container"><div class="progress-bar-fill" id="desarrolloTextilFill"></div></div>
+                                <div class="progress-bar-container">
+                                    <div class="progress-bar-fill" id="desarrolloTextilFill"></div>
+                                </div>
                                 <span class="progress-percentage" id="desarrolloTextilPercentage"></span>
                             </a>
                             <span class="arrow">&rarr;</span>
                             <div class="base-step step-container-general step-principal-container-color" id="pTextiles">
                                 <span class="container-title">TEXTIL</span>
                                 <div class="sub-steps-wrapper">
-                                    <a href="#" target="_blank" class="base-step step-default-color" id="hilanderia"><span>HILANDERIA</span><div class="progress-bar-container"><div class="progress-bar-fill" id="hilanderiaFill"></div></div><span class="progress-percentage" id="hilanderiaPercentage"></span></a>
-                                    <a href="#" target="_blank" class="base-step step-default-color" id="tejeduria"><span>TEJEDURIA</span><div class="progress-bar-container"><div class="progress-bar-fill" id="tejeduriaFill"></div></div><span class="progress-percentage" id="tejeduriaPercentage"></span></a>
-                                    <a href="#" target="_blank" class="base-step step-default-color" id="tintoreria"><span>TINTORERIA</span><div class="progress-bar-container"><div class="progress-bar-fill" id="tintoreriaFill"></div></div><span class="progress-percentage" id="tintoreriaPercentage"></span></a>
-                                    <a href="#" target="_blank" class="base-step step-default-color" id="lavanderia"><span>LAVANDERIA</span><div class="progress-bar-container"><div class="progress-bar-fill" id="lavanderiaFill"></div></div><span class="progress-percentage" id="lavanderiaPercentage"></span></a>
-                                    <a href="#" target="_blank" class="base-step step-default-color" id="estampado"><span>ESTAMPADO</span><div class="progress-bar-container"><div class="progress-bar-fill" id="estampadoFill"></div></div><span class="progress-percentage" id="estampadoPercentage"></span></a>
+                                    <a href="#" target="_blank" class="base-step step-default-color" id="hilanderia">
+                                        <span>HILANDERIA</span>
+                                        <div class="progress-bar-container">
+                                            <div class="progress-bar-fill" id="hilanderiaFill"></div>
+                                        </div>
+                                        <span class="progress-percentage" id="hilanderiaPercentage"></span>
+                                    </a>
+                                    <a href="#" target="_blank" class="base-step step-default-color" id="tejeduria">
+                                        <span>TEJEDURIA</span>
+                                        <div class="progress-bar-container">
+                                            <div class="progress-bar-fill" id="tejeduriaFill"></div>
+                                        </div>
+                                        <span class="progress-percentage" id="tejeduriaPercentage"></span>
+                                    </a>
+                                    <a href="#" target="_blank" class="base-step step-default-color" id="tintoreria">
+                                        <span>TINTORERIA</span>
+                                        <div class="progress-bar-container">
+                                            <div class="progress-bar-fill" id="tintoreriaFill"></div>
+                                        </div>
+                                        <span class="progress-percentage" id="tintoreriaPercentage"></span>
+                                    </a>
+                                    <a href="#" target="_blank" class="base-step step-default-color" id="lavanderia">
+                                        <span>LAVANDERIA</span>
+                                        <div class="progress-bar-container">
+                                            <div class="progress-bar-fill" id="lavanderiaFill"></div>
+                                        </div>
+                                        <span class="progress-percentage" id="lavanderiaPercentage"></span>
+                                    </a>
+                                    <a href="#" target="_blank" class="base-step step-default-color" id="estampado">
+                                        <span>ESTAMPADO</span>
+                                        <div class="progress-bar-container">
+                                            <div class="progress-bar-fill" id="estampadoFill"></div>
+                                        </div>
+                                        <span class="progress-percentage" id="estampadoPercentage"></span>
+                                    </a>
                                 </div>
-                                <div class="progress-bar-container" style="margin-top: 10px;"><div class="progress-bar-fill" id="pTextilesFill"></div></div>
+                                <div class="progress-bar-container" style="margin-top: 10px;">
+                                    <div class="progress-bar-fill" id="pTextilesFill"></div>
+                                </div>
                                 <span class="progress-percentage" id="pTextilesPercentage"></span>
                             </div>
                             <span class="arrow">&rarr;</span>
                             <a href="#" target="_blank" class="base-step step-quality-color" id="asgCalidadTextil">
                                 <span>ASG. CALIDAD TEXTIL</span>
-                                <div class="progress-bar-container"><div class="progress-bar-fill" id="asgCalidadTextilFill"></div></div>
+                                <div class="progress-bar-container">
+                                    <div class="progress-bar-fill" id="asgCalidadTextilFill"></div>
+                                </div>
                                 <span class="progress-percentage" id="asgCalidadTextilPercentage"></span>
                             </a>
                         </div>
+
                         <div class="vertical-connector"></div>
+
                         <div class="main-flow-row">
                             <a href="#" target="_blank" class="base-step step-strategic-color" id="desarrolloConfecciones">
                                 <span>DESARROLLO CONFECCIONES</span>
-                                <div class="progress-bar-container"><div class="progress-bar-fill" id="desarrolloConfeccionesFill"></div></div>
+                                <div class="progress-bar-container">
+                                    <div class="progress-bar-fill" id="desarrolloConfeccionesFill"></div>
+                                </div>
                                 <span class="progress-percentage" id="desarrolloConfeccionesPercentage"></span>
                             </a>
                             <span class="arrow">&rarr;</span>
                             <div class="base-step step-container-general step-principal-container-color" id="pManufactura">
                                 <span class="container-title">CONFECCIONES</span>
                                 <div class="sub-steps-wrapper">
-                                    <a href="#" target="_blank" class="base-step step-default-color" id="corteHabilitado"><span>CORTE Y HABILITADO</span><div class="progress-bar-container"><div class="progress-bar-fill" id="corteHabilitadoFill"></div></div><span class="progress-percentage" id="corteHabilitadoPercentage"></span></a>
-                                    <a href="#" target="_blank" class="base-step step-default-color" id="costura"><span>COSTURA</span><div class="progress-bar-container"><div class="progress-bar-fill" id="costuraFill"></div></div><span class="progress-percentage" id="costuraPercentage"></span></a>
-                                    <a href="#" target="_blank" class="base-step step-default-color" id="acabadoEmbalaje"><span>ACABADO Y EMBALAJE</span><div class="progress-bar-container"><div class="progress-bar-fill" id="acabadoEmbalajeFill"></div></div><span class="progress-percentage" id="acabadoEmbalajePercentage"></span></a>
-                                    <a href="#" target="_blank" class="base-step step-default-color" id="bordado"><span>BORDADO</span><div class="progress-bar-container"><div class="progress-bar-fill" id="bordadoFill"></div></div><span class="progress-percentage" id="bordadoPercentage"></span></a>
+                                    <a href="#" target="_blank" class="base-step step-default-color" id="corteHabilitado">
+                                        <span>CORTE Y HABILITADO</span>
+                                        <div class="progress-bar-container">
+                                            <div class="progress-bar-fill" id="corteHabilitadoFill"></div>
+                                        </div>
+                                        <span class="progress-percentage" id="corteHabilitadoPercentage"></span>
+                                    </a>
+                                    <a href="#" target="_blank" class="base-step step-default-color" id="costura">
+                                        <span>COSTURA</span>
+                                        <div class="progress-bar-container">
+                                            <div class="progress-bar-fill" id="costuraFill"></div>
+                                        </div>
+                                        <span class="progress-percentage" id="costuraPercentage"></span>
+                                    </a>
+                                    <a href="#" target="_blank" class="base-step step-default-color" id="acabadoEmbalaje">
+                                        <span>ACABADO Y EMBALAJE</span>
+                                        <div class="progress-bar-container">
+                                            <div class="progress-bar-fill" id="acabadoEmbalajeFill"></div>
+                                        </div>
+                                        <span class="progress-percentage" id="acabadoEmbalajePercentage"></span>
+                                    </a>
+                                    <a href="#" target="_blank" class="base-step step-default-color" id="bordado">
+                                        <span>BORDADO</span>
+                                        <div class="progress-bar-container">
+                                            <div class="progress-bar-fill" id="bordadoFill"></div>
+                                        </div>
+                                        <span class="progress-percentage" id="bordadoPercentage"></span>
+                                    </a>
                                 </div>
-                                <div class="progress-bar-container" style="margin-top: 10px;"><div class="progress-bar-fill" id="pManufacturaFill"></div></div>
+                                <div class="progress-bar-container" style="margin-top: 10px;">
+                                    <div class="progress-bar-fill" id="pManufacturaFill"></div>
+                                </div>
                                 <span class="progress-percentage" id="pManufacturaPercentage"></span>
                             </div>
                             <span class="arrow">&rarr;</span>
                             <a href="#" target="_blank" class="base-step step-quality-color" id="asgCalidadConfecciones">
                                 <span>ASG. CALIDAD CONFECCIONES</span>
-                                <div class="progress-bar-container"><div class="progress-bar-fill" id="asgCalidadConfeccionesFill"></div></div>
+                                <div class="progress-bar-container">
+                                    <div class="progress-bar-fill" id="asgCalidadConfeccionesFill"></div>
+                                </div>
                                 <span class="progress-percentage" id="asgCalidadConfeccionesPercentage"></span>
                             </a>
                         </div>
                     </div>
                 </div>
             </div>
+
         </div>
     </div>
 
     <div class="process-section-box support-section">
-        <div class="section-title">PROCESOS DE SOPORTE <span class="category-progress-percentage" id="supportCategoryPercentage"></span></div>
-        <div class="process-map">
-            <a href="#" target="_blank" class="base-step step-support-color" id="compras"><span>COMPRAS</span><div class="progress-bar-container"><div class="progress-bar-fill" id="comprasFill"></div></div><span class="progress-percentage" id="comprasPercentage"></span></a>
-            <a href="#" target="_blank" class="base-step step-support-color base-step-long-label" id="almMateriaPrima"><span>ALM. DE MATERIA PRIMA</span><div class="progress-bar-container"><div class="progress-bar-fill" id="almMateriaPrimaFill"></div></div><span class="progress-percentage" id="almMateriaPrimaPercentage"></span></a>
-            <a href="#" target="_blank" class="base-step step-support-color" id="almHilos"><span>ALM. DE HILOS</span><div class="progress-bar-container"><div class="progress-bar-fill" id="almHilosFill"></div></div><span class="progress-percentage" id="almHilosPercentage"></span></a>
-            <a href="#" target="_blank" class="base-step step-support-color base-step-long-label" id="almTelaAcabada"><span>ALM. DE TELA ACABADA</span><div class="progress-bar-container"><div class="progress-bar-fill" id="almTelaAcabadaFill"></div></div><span class="progress-percentage" id="almTelaAcabadaPercentage"></span></a>
-            <a href="#" target="_blank" class="base-step step-support-color base-step-long-label" id="almDespachoAvios"><span>ALM. Y DESPACHO DE AVIOS</span><div class="progress-bar-container"><div class="progress-bar-fill" id="almDespachoAviosFill"></div></div><span class="progress-percentage" id="almDespachoAviosPercentage"></span></a>
-            <a href="#" target="_blank" class="base-step step-support-color" id="servicios"><span>SERVICIOS</span><div class="progress-bar-container"><div class="progress-bar-fill" id="serviciosFill"></div></div><span class="progress-percentage" id="serviciosPercentage"></span></a>
-            <a href="#" target="_blank" class="base-step step-support-color base-step-long-label" id="gestionAdministrativa"><span>GESTION ADMINISTRATIVA</span><div class="progress-bar-container"><div class="progress-bar-fill" id="gestionAdministrativaFill"></div></div><span class="progress-percentage" id="gestionAdministrativaPercentage"></span></a>
+        <div class="section-title">
+            PROCESOS DE SOPORTE
+            <span class="category-progress-percentage" id="supportCategoryPercentage"></span>
         </div>
         <div class="process-map">
-            <a href="#" target="_blank" class="base-step step-support-color" id="gestionTi"><span>GESTION DE TI</span><div class="progress-bar-container"><div class="progress-bar-fill" id="gestionTiFill"></div></div><span class="progress-percentage" id="gestionTiPercentage"></span></a>
-            <a href="#" target="_blank" class="base-step step-support-color" id="mantenimiento"><span>MANTENIMIENTO</span><div class="progress-bar-container"><div class="progress-bar-fill" id="mantenimientoFill"></div></div><span class="progress-percentage" id="mantenimientoPercentage"></span></a>
-            <a href="#" target="_blank" class="base-step step-support-color base-step-long-label" id="ingTiempoMetodos"><span>ING. TIEMPO Y METODOS</span><div class="progress-bar-container"><div class="progress-bar-fill" id="ingTiempoMetodosFill"></div></div><span class="progress-percentage" id="ingTiempoMetodosPercentage"></span></a>
-            <a href="#" target="_blank" class="base-step step-support-color" id="labTintoreria"><span>LAB. DE TINTORERIA</span><div class="progress-bar-container"><div class="progress-bar-fill" id="labTintoreriaFill"></div></div><span class="progress-percentage" id="labTintoreriaPercentage"></span></a>
-            <a href="#" target="_blank" class="base-step step-support-color" id="gestionRrhh"><span>GESTION DE RRHH</span><div class="progress-bar-container"><div class="progress-bar-fill" id="gestionRrhhFill"></div></div><span class="progress-percentage" id="gestionRrhhPercentage"></span></a>
-            <a href="#" target="_blank" class="base-step step-support-color" id="ptari"><span>PTARI</span><div class="progress-bar-container"><div class="progress-bar-fill" id="ptariFill"></div></div><span class="progress-percentage" id="ptariPercentage"></span></a>
-            <a href="#" target="_blank" class="base-step step-support-color base-step-long-label" id="gestionSeguridad"><span>GESTION DE LA SEGURIDAD</span><div class="progress-bar-container"><div class="progress-bar-fill" id="gestionSeguridadFill"></div></div><span class="progress-percentage" id="gestionSeguridadPercentage"></span></a>
+            <a href="#" target="_blank" class="base-step step-support-color" id="compras">
+                <span>COMPRAS</span>
+                <div class="progress-bar-container">
+                    <div class="progress-bar-fill" id="comprasFill"></div>
+                </div>
+                <span class="progress-percentage" id="comprasPercentage"></span>
+            </a>
+            <a href="#" target="_blank" class="base-step step-support-color base-step-long-label" id="almMateriaPrima">
+                <span>ALM. DE MATERIA PRIMA</span>
+                <div class="progress-bar-container">
+                    <div class="progress-bar-fill" id="almMateriaPrimaFill"></div>
+                </div>
+                <span class="progress-percentage" id="almMateriaPrimaPercentage"></span>
+            </a>
+            <a href="#" target="_blank" class="base-step step-support-color" id="almHilos">
+                <span>ALM. DE HILOS</span>
+                <div class="progress-bar-container">
+                    <div class="progress-bar-fill" id="almHilosFill"></div>
+                </div>
+                <span class="progress-percentage" id="almHilosPercentage"></span>
+            </a>
+            <a href="#" target="_blank" class="base-step step-support-color base-step-long-label" id="almTelaAcabada">
+                <span>ALM. DE TELA ACABada</span>
+                <div class="progress-bar-container">
+                    <div class="progress-bar-fill" id="almTelaAcabadaFill"></div>
+                </div>
+                <span class="progress-percentage" id="almTelaAcabadaPercentage"></span>
+            </a>
+            <a href="#" target="_blank" class="base-step step-support-color base-step-long-label" id="almDespachoAvios">
+                <span>ALM. Y DESPACHO DE AVIOS</span>
+                <div class="progress-bar-container">
+                    <div class="progress-bar-fill" id="almDespachoAviosFill"></div>
+                </div>
+                <span class="progress-percentage" id="almDespachoAviosPercentage"></span>
+            </a>
+            <a href="#" target="_blank" class="base-step step-support-color" id="servicios">
+                <span>SERVICIOS</span>
+                <div class="progress-bar-container">
+                    <div class="progress-bar-fill" id="serviciosFill"></div>
+                </div>
+                <span class="progress-percentage" id="serviciosPercentage"></span>
+            </a>
+            <a href="#" target="_blank" class="base-step step-support-color base-step-long-label" id="gestionAdministrativa">
+                <span>GESTION ADMINISTRATIVA</span>
+                <div class="progress-bar-container">
+                    <div class="progress-bar-fill" id="gestionAdministrativaFill"></div>
+                </div>
+                <span class="progress-percentage" id="gestionAdministrativaPercentage"></span>
+            </a>
+        </div>
+        <div class="process-map">
+            <a href="#" target="_blank" class="base-step step-support-color" id="gestionTi">
+                <span>GESTION DE TI</span>
+                <div class="progress-bar-container">
+                    <div class="progress-bar-fill" id="gestionTiFill"></div>
+                </div>
+                <span class="progress-percentage" id="gestionTiPercentage"></span>
+            </a>
+            <a href="#" target="_blank" class="base-step step-support-color" id="mantenimiento">
+                <span>MANTENIMIENTO</span>
+                <div class="progress-bar-container">
+                    <div class="progress-bar-fill" id="mantenimientoFill"></div>
+                </div>
+                <span class="progress-percentage" id="mantenimientoPercentage"></span>
+            </a>
+            <a href="#" target="_blank" class="base-step step-support-color base-step-long-label" id="ingTiempoMetodos">
+                <span>ING. TIEMPO Y METODOS</span>
+                <div class="progress-bar-container">
+                    <div class="progress-bar-fill" id="ingTiempoMetodosFill"></div>
+                </div>
+                <span class="progress-percentage" id="ingTiempoMetodosPercentage"></span>
+            </a>
+            <a href="#" target="_blank" class="base-step step-support-color" id="labTintoreria">
+                <span>LAB. DE TINTORERIA</span>
+                <div class="progress-bar-container">
+                    <div class="progress-bar-fill" id="labTintoreriaFill"></div>
+                </div>
+                <span class="progress-percentage" id="labTintoreriaPercentage"></span>
+            </a>
+            <a href="#" target="_blank" class="base-step step-support-color" id="gestionRrhh">
+                <span>GESTION DE RRHH</span>
+                <div class="progress-bar-container">
+                    <div class="progress-bar-fill" id="gestionRrhhFill"></div>
+                </div>
+                <span class="progress-percentage" id="gestionRrhhPercentage"></span>
+            </a>
+            <a href="#" target="_blank" class="base-step step-support-color" id="ptari">
+                <span>PTARI</span>
+                <div class="progress-bar-container">
+                    <div class="progress-bar-fill" id="ptariFill"></div>
+                </div>
+                <span class="progress-percentage" id="ptariPercentage"></span>
+            </a>
+            <a href="#" target="_blank" class="base-step step-support-color base-step-long-label" id="gestionSeguridad">
+                <span>GESTION DE LA SEGURIDAD</span>
+                <div class="progress-bar-container">
+                    <div class="progress-bar-fill" id="gestionSeguridadFill"></div>
+                </div>
+                <span class="progress-percentage" id="gestionSeguridadPercentage"></span>
+            </a>
         </div>
     </div>
 </div>
 
-
+<!-- MODAL DETALLES -->
 <div id="details-modal">
     <div class="modal-content">
-        <span class="modal-close" id="details-modal-close-button">&times;</span> <h2 id="modal-title">Detalle de Proyectos</h2>
+        <span class="modal-close" id="details-modal-close-button">&times;</span>
+        <h2 id="modal-title">Detalle de Proyectos</h2>
         <div class="modal-table-wrapper">
             <table class="modal-table">
                 <thead>
                     <tr>
-                        <th>n</th><th>PROYECTO</th><th>TAREA</th><th>HERRAMIENTA</th><th>ESTADO</th>
+                        <th>n</th>
+                        <th>PROYECTO</th>
+                        <th>TAREA</th>
+                        <th>HERRAMIENTA</th>
+                        <th>ESTADO</th>
                     </tr>
                 </thead>
                 <tbody id="modal-table-body"></tbody>
@@ -626,6 +1276,31 @@
     </div>
 </div>
 
+<!-- MODAL INFORME (BLOQUES) -->
+<div id="informe-modal">
+    <div class="modal-content">
+        <span class="modal-close" id="informe-modal-close">&times;</span>
+        <div class="informe-header">
+            <h2 id="informe-modal-title">Informe de Proyectos</h2>
+            <div class="informe-controls">
+                <div class="informe-legend" aria-hidden="true">
+                    <div class="legend-item"><span class="legend-bullet-check legend-terminado">✔</span><span class="legend-text">Terminado</span></div>
+                    <div class="legend-item"><span class="legend-bullet-small legend-en-proceso"></span><span class="legend-text">En proceso</span></div>
+                    <div class="legend-item"><span class="legend-bullet-small legend-estacionamiento"></span><span class="legend-text">Estacionamiento</span></div>
+                </div>
+                <label class="toggle-switch" title="Mostrar sólo En proceso + Terminado recientes">
+                    <input type="checkbox" id="informe-toggle-switch">
+                    <span class="toggle-slider" aria-hidden="true"></span>
+                    <span class="toggle-label">Quick-wins</span>
+                </label>
+            </div>
+        </div>
+
+        <div class="modal-table-wrapper informe-wrapper" id="informe-modal-body"></div>
+    </div>
+</div>
+
+<!-- MODAL KANBAN -->
 <div id="kanban-modal">
     <div class="kanban-content">
         <span class="modal-close" id="kanban-modal-close-button">&times;</span>
@@ -633,47 +1308,46 @@
         <div class="kanban-board">
             <div class="kanban-column" id="kanban-col-estacionamiento">
                 <h3>Estacionamiento</h3>
-                </div>
+            </div>
             <div class="kanban-column" id="kanban-col-en-proceso">
                 <h3>En proceso</h3>
-                </div>
+            </div>
             <div class="kanban-column" id="kanban-col-terminado">
                 <h3>Terminado</h3>
-                </div>
+            </div>
         </div>
     </div>
 </div>
 
-
 <script>
-/* ========= CONFIG DEL GOOGLE SHEET ========= */
-const SHEET_ID    = '1lRBoAr2JN2elTtB9QgmvIYNIq1zsxvBENpuwzjIuZt4'; // tu ID
-const SHEET_NAME_BD = 'Bd'; // nombre de pestaña principal
-const SHEET_NAME_KANBAN = 'Kanban'; // Nombre correcto de la pestaña Kanban
+const SHEET_ID    = '1lRBoAr2JN2elTtB9QgmvIYNIq1zsxvBENpuwzjIuZt4';
+const SHEET_NAME_BD = 'Bd';
+const SHEET_NAME_KANBAN = 'Kanban';
 
-const HORAS_COLUMN_NAME = 'HRS PROY.(AÑO)'; 
+const HORAS_COLUMN_NAME = 'HRS PROY.(AÑO)';
 const HORAS_ACTUAL_COLUMN_NAME = 'HRS AHORRADO (ACTUAL)';
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Helpers de UI
     const $loading = document.getElementById('loading-overlay');
     const $error   = document.getElementById('error-banner');
     const showLoading = () => { $loading.style.display = 'flex'; };
     const hideLoading = () => { $loading.style.display = 'none'; };
     const showError = (msg) => { $error.textContent = msg; $error.style.display = 'block'; };
 
-    // Variables globales
     let allRowsData = [];
     let kanbanData = [];
     let processedStats = {};
 
-    // Referencias a Modales
     const $detailsModal = document.getElementById('details-modal');
     const $detailsModalClose = document.getElementById('details-modal-close-button');
     const $modalTitle = document.getElementById('modal-title');
     const $modalTableBody = document.getElementById('modal-table-body');
 
-    // Referencias a Modal Kanban
+    const $informeButton = document.getElementById('informe-button');
+    const $informeModal = document.getElementById('informe-modal');
+    const $informeModalClose = document.getElementById('informe-modal-close');
+    const $informeModalBody = document.getElementById('informe-modal-body');
+
     const $kanbanButton = document.getElementById('kanban-button');
     const $kanbanModal = document.getElementById('kanban-modal');
     const $kanbanModalClose = document.getElementById('kanban-modal-close-button');
@@ -681,30 +1355,111 @@ document.addEventListener('DOMContentLoaded', () => {
     const $kanbanColEnProceso = document.getElementById('kanban-col-en-proceso');
     const $kanbanColTerminado = document.getElementById('kanban-col-terminado');
 
-    // Función helper para formatear números (enteros)
     function formatNumber(num) {
-        // Redondea al entero más cercano
         return Math.round(num).toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
     }
-    
-    // Función para formatear con 1 decimal
+
     function formatNumberOneDecimal(num) {
-         return (num || 0).toFixed(1).replace(/(\d)(?=(\d{3})+\.)/g, '$1,');
+        return (num || 0).toFixed(1).replace(/(\d)(?=(\d{3})+\.)/g, '$1,');
     }
-    
-    
-    function alignColumnHeights() {
-        const mainColumn = document.querySelector('.main-column');
-        const strategicColumn = document.querySelector('.strategic-column'); 
-        
-        if (mainColumn && strategicColumn) {
-            strategicColumn.style.height = 'auto'; 
-            
-            const mainHeight = mainColumn.offsetHeight; 
-            strategicColumn.style.height = `${mainHeight}px`; 
+
+    function formatShortDate(value) {
+        if (!value && value !== 0) return '';
+        try {
+            const meses = ['ene','feb','mar','abr','may','jun','jul','ago','set','oct','nov','dic'];
+
+            if (value instanceof Date) {
+                const d = String(value.getDate()).padStart(2,'0');
+                const m = meses[value.getMonth()];
+                return `${d}/${m}`;
+            }
+
+            const str = String(value).trim();
+            if (!str) return '';
+
+            // Manejar formato especial de Google Sheets: Date(2025,7,1)
+            const dateMatch = str.match(/Date\((\d+),(\d+),(\d+)\)/);
+            if (dateMatch) {
+                const year = parseInt(dateMatch[1]);
+                const month = parseInt(dateMatch[2]); // mes en Google Sheets (0-11)
+                const day = parseInt(dateMatch[3]);
+                const d = String(day).padStart(2,'0');
+                const m = meses[month];
+                return `${d}/${m}`;
+            }
+
+            const parsed = new Date(str);
+            if (!isNaN(parsed)) {
+                const d = String(parsed.getDate()).padStart(2,'0');
+                const m = meses[parsed.getMonth()];
+                return `${d}/${m}`;
+            }
+
+            const match = str.match(/^(\d{1,2})[-/](\w{3,})/i);
+            if (match) {
+                const d = match[1].padStart(2,'0');
+                let mon = match[2].toLowerCase().replace('.','');
+                if (mon.startsWith('set')) mon = 'set';
+                return `${d}/${mon}`;
+            }
+
+            return str;
+        } catch (e) {
+            return '';
         }
     }
 
+    // Parse a variety of date formats into a Date object (or return null)
+    function parseDateValue(value) {
+        if (!value && value !== 0) return null;
+        try {
+            if (value instanceof Date) return value;
+            const str = String(value).trim();
+            if (!str) return null;
+
+            // Google Sheets JSON sometimes returns Date(YYYY,MM,DD)
+            const dateMatch = str.match(/Date\((\d+),\s*(\d+),\s*(\d+)\)/);
+            if (dateMatch) {
+                const year = parseInt(dateMatch[1], 10);
+                const month = parseInt(dateMatch[2], 10); // 0-based
+                const day = parseInt(dateMatch[3], 10);
+                return new Date(year, month, day);
+            }
+
+            // Try native parse
+            const parsed = new Date(str);
+            if (!isNaN(parsed)) return parsed;
+
+            // Try short form like 15/ago or 15-ago (assume current year)
+            const meses = ['ene','feb','mar','abr','may','jun','jul','ago','set','oct','nov','dic'];
+            const match = str.match(/^(\d{1,2})[-/](\w{3,})/i);
+            if (match) {
+                const day = parseInt(match[1], 10);
+                let mon = match[2].toLowerCase().replace('.','');
+                if (mon.startsWith('set')) mon = 'set';
+                const mIndex = meses.indexOf(mon);
+                if (mIndex >= 0) {
+                    const year = new Date().getFullYear();
+                    return new Date(year, mIndex, day);
+                }
+            }
+
+            return null;
+        } catch (e) {
+            return null;
+        }
+    }
+
+    function alignColumnHeights() {
+        const mainColumn = document.querySelector('.main-column');
+        const strategicColumn = document.querySelector('.strategic-column');
+
+        if (mainColumn && strategicColumn) {
+            strategicColumn.style.height = 'auto';
+            const mainHeight = mainColumn.offsetHeight;
+            strategicColumn.style.height = `${mainHeight}px`;
+        }
+    }
 
     const mapStructure = {
         planeamiento: ['pcpTextil', 'pcpConfecciones'],
@@ -714,6 +1469,7 @@ document.addEventListener('DOMContentLoaded', () => {
         principalesCategory: ['desarrolloTextil', 'pTextiles', 'asgCalidadTextil', 'desarrolloConfecciones', 'pManufactura', 'asgCalidadConfecciones'],
         supportCategory: ['compras','almMateriaPrima','almHilos','almTelaAcabada','almDespachoAvios','servicios','gestionAdministrativa','gestionTi','mantenimiento','ingTiempoMetodos','labTintoreria','gestionRrhh','ptari','gestionSeguridad']
     };
+
     const areaNameToIdMap = {
         'ALTA DIRECCION':'altaDireccion','SOSTENIBILIDAD':'sostenibilidad','PLANEAMIENTO':'planeamiento',
         'PCP TEXTIL':'pcpTextil','PCP CONFECCIONES':'pcpConfecciones','COMERCIAL':'comercial',
@@ -729,6 +1485,7 @@ document.addEventListener('DOMContentLoaded', () => {
         'LAB. DE TINTORERIA':'labTintoreria','GESTION DE RRHH':'gestionRrhh','PTARI':'ptari',
         'GESTION DE LA SEGURIDAD':'gestionSeguridad'
     };
+
     const idToAreaNameMap = Object.entries(areaNameToIdMap).reduce((acc, [name, id]) => {
         acc[id] = name;
         return acc;
@@ -738,59 +1495,48 @@ document.addEventListener('DOMContentLoaded', () => {
         processedStats = {};
         const globalStats = { total: 0, Terminado: 0, "En proceso": 0, "Estacionamiento": 0 };
         const allIds = new Set(Object.values(areaNameToIdMap));
-        
-        let totalHrsActualGlobal = 0; 
-        // --- INICIO: CORRECCIÓN SUMA TOTAL ---
-        let totalHrsProyGlobal = 0; // 1. Inicializar el total global de Proy.
-        // --- FIN: CORRECCIÓN SUMA TOTAL ---
 
-        allIds.forEach(id => processedStats[id] = { total: 0, Terminado: 0, "En proceso": 0, "Estacionamiento": 0, hrsProy: 0 }); 
+        let totalHrsActualGlobal = 0;
+        let totalHrsProyGlobal = 0;
+
+        allIds.forEach(id => processedStats[id] = { total: 0, Terminado: 0, "En proceso": 0, "Estacionamiento": 0, hrsProy: 0 });
 
         rows.forEach(row => {
             const rawAreaName = row.AREA ? String(row.AREA).trim().toUpperCase() : undefined;
             const id = areaNameToIdMap[rawAreaName];
             const estadoRaw = row.ESTADO ? String(row.ESTADO).trim().toLowerCase() : undefined;
 
-            // 2. Limpiar AMBAS columnas de horas
             let hrsRaw = row[HORAS_COLUMN_NAME] ? String(row[HORAS_COLUMN_NAME]) : '0';
-            hrsRaw = hrsRaw.replace(/[$,\s]/g, ''); // <-- Limpia $, comas y espacios
+            hrsRaw = hrsRaw.replace(/[$,\s]/g, '');
             const hrs = parseFloat(hrsRaw) || 0;
-            
+
             let hrsActualRaw = row[HORAS_ACTUAL_COLUMN_NAME] ? String(row[HORAS_ACTUAL_COLUMN_NAME]) : '0';
-            hrsActualRaw = hrsActualRaw.replace(/[$,\s]/g, ''); 
+            hrsActualRaw = hrsActualRaw.replace(/[$,\s]/g, '');
             const hrsActual = parseFloat(hrsActualRaw) || 0;
 
-            // Suma global de Hrs Actual (siempre)
             if (!isNaN(hrsActual)) {
                 totalHrsActualGlobal += hrsActual;
             }
-            
-            // --- INICIO: CORRECCIÓN SUMA TOTAL ---
-            // 3. Suma global de Hrs Proy (SOLO si el estado aplica)
+
             if ((estadoRaw === 'terminado' || estadoRaw === 'en proceso') && !isNaN(hrs)) {
                 totalHrsProyGlobal += hrs;
             }
-            // --- FIN: CORRECCIÓN SUMA TOTAL ---
 
-            // Lógica de Área (para las barras y tooltips de áreas)
             if (id && processedStats[id]) {
-                processedStats[id].total++; globalStats.total++;
-                let counted = false;
+                processedStats[id].total++;
+                globalStats.total++;
 
                 if (estadoRaw === 'terminado') {
                     processedStats[id].Terminado++;
                     globalStats.Terminado++;
-                    counted = true;
                 } else if (estadoRaw === 'en proceso') {
                     processedStats[id]["En proceso"]++;
                     globalStats["En proceso"]++;
-                    counted = true;
                 } else if (estadoRaw === 'estacionamiento') {
                     processedStats[id]["Estacionamiento"]++;
-                    globalStats["Estacionamiento"]++;
+                    globalStats.Estacionamiento++;
                 }
 
-                // Sumar 'hrsProy' por AREA (para las barras)
                 if ((estadoRaw === 'terminado' || estadoRaw === 'en proceso') && !isNaN(hrs)) {
                     processedStats[id].hrsProy += hrs;
                 }
@@ -804,14 +1550,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
         function calculateAverage(childrenIds) {
             let totalProjects = 0, totalFinished = 0;
-            childrenIds.forEach(id => { if (processedStats[id]) { totalProjects += processedStats[id].total; totalFinished += processedStats[id].Terminado; }});
+            childrenIds.forEach(id => {
+                const c = processedStats[id];
+                if (c) {
+                    totalProjects += c.total;
+                    totalFinished += c.Terminado;
+                }
+            });
             return totalProjects > 0 ? (totalFinished / totalProjects) * 100 : 0;
         }
-        
+
         function aggregateChildStats(childrenIds) {
             const a = { total: 0, Terminado: 0, "En proceso": 0, "Estacionamiento": 0, hrsProy: 0 };
             childrenIds.forEach(id => {
-                const c = processedStats[id]; if(c){
+                const c = processedStats[id];
+                if (c) {
                     a.total += c.total;
                     a.Terminado += c.Terminado;
                     a["En proceso"] += c["En proceso"];
@@ -822,24 +1575,25 @@ document.addEventListener('DOMContentLoaded', () => {
             return a;
         }
 
-        // Esta lógica sigue siendo necesaria para las barras de progreso de las categorías
         const planeamientoStats = aggregateChildStats(mapStructure.planeamiento);
         processedStats.planeamiento = { ...planeamientoStats, percentage: calculateAverage(mapStructure.planeamiento) };
+
         const pTextilesStats = aggregateChildStats(mapStructure.pTextiles);
         processedStats.pTextiles = { ...pTextilesStats, percentage: calculateAverage(mapStructure.pTextiles) };
+
         const pManufacturaStats = aggregateChildStats(mapStructure.pManufactura);
         processedStats.pManufactura = { ...pManufacturaStats, percentage: calculateAverage(mapStructure.pManufactura) };
+
         const strategicCategoryStats = aggregateChildStats(mapStructure.strategicCategory);
         processedStats.strategicCategoryPercentage = { ...strategicCategoryStats, percentage: calculateAverage(mapStructure.strategicCategory) };
+
         const principalesCategoryStats = aggregateChildStats(mapStructure.principalesCategory);
         processedStats.principalesCategoryPercentage = { ...principalesCategoryStats, percentage: calculateAverage(mapStructure.principalesCategory) };
+
         const supportCategoryStats = aggregateChildStats(mapStructure.supportCategory);
         processedStats.supportCategoryPercentage = { ...supportCategoryStats, percentage: calculateAverage(mapStructure.supportCategory) };
 
-        // --- INICIO: CORRECCIÓN SUMA TOTAL ---
-        // 4. Usar las nuevas variables globales
         updateSummaryBox(globalStats, totalHrsProyGlobal, totalHrsActualGlobal);
-        // --- FIN: CORRECCIÓN SUMA TOTAL ---
 
         function updateElementUI(id, stats) {
             const rounded = Math.round(stats.percentage || 0);
@@ -850,9 +1604,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (id.includes('CategoryPercentage')) {
                 const catEl = document.getElementById(id);
-                if (catEl) catEl.textContent = `${rounded}% (${finished}/${totalProjects}) [${formattedHours}hrs]`;
+                if (catEl) {
+                    catEl.textContent = `${rounded}% (${finished}/${totalProjects}) [${formattedHours}hrs]`;
+                }
                 return;
             }
+
             const element = document.getElementById(id);
             if (!element) return;
 
@@ -865,17 +1622,21 @@ document.addEventListener('DOMContentLoaded', () => {
             const titleSpan = element.querySelector('span:first-child');
             if (!titleSpan) return;
 
-            const areaName = titleSpan.textContent;
+            const areaName = titleSpan.textContent || '';
             let tooltipText = `${areaName} (${rounded}%)\n`;
+
             if (stats.total > 0) {
-                 tooltipText += `En proceso: ${stats["En proceso"]}\nEstacionamiento: ${stats["Estacionamiento"]}\nTerminado: ${stats.Terminado}\nHoras Sumadas: ${formattedHours}`;
+                tooltipText += `En proceso: ${stats["En proceso"]}\nEstacionamiento: ${stats["Estacionamiento"]}\nTerminado: ${stats.Terminado}\nHoras Sumadas: ${formattedHours}`;
             } else {
-                 tooltipText += `0 proyectos`;
+                tooltipText += `0 proyectos`;
             }
+
             element.setAttribute('title', tooltipText);
         }
 
-        for (const id in processedStats) updateElementUI(id, processedStats[id]);
+        for (const id in processedStats) {
+            updateElementUI(id, processedStats[id]);
+        }
     }
 
     function updateSummaryBox(stats, totalHrs, totalHrsActual) {
@@ -883,18 +1644,16 @@ document.addEventListener('DOMContentLoaded', () => {
         const t = total ? Math.round((stats.Terminado / total) * 100) : 0;
         const p = total ? Math.round((stats["En proceso"] / total) * 100) : 0;
         const e = total ? Math.round((stats.Estacionamiento / total) * 100) : 0;
-        
-        // totalHrs (proy) ahora es la suma global correcta
-        // totalHrsActual es la suma global correcta
-        const formattedTotalHrs = formatNumber(totalHrs || 0); 
+
+        const formattedTotalHrs = formatNumber(totalHrs || 0);
         const formattedTotalHrsActual = formatNumberOneDecimal(totalHrsActual || 0);
-        
+
         const personasActual = (totalHrsActual || 0) / 2304;
         const personasProy = (totalHrs || 0) / 2304;
-        
+
         const formattedPersonasActual = personasActual.toFixed(1) + ' personas';
         const formattedPersonasProy = personasProy.toFixed(1) + ' personas';
-        
+
         const summaryTotalCount = document.getElementById('summary-total-count');
         if (summaryTotalCount) {
             summaryTotalCount.textContent = `Total ${total}`;
@@ -907,17 +1666,16 @@ document.addEventListener('DOMContentLoaded', () => {
         const summaryHoursActual = document.getElementById('summary-hours-actual');
         if (summaryHoursActual) {
             summaryHoursActual.textContent = `${formattedTotalHrsActual} hrs actual`;
-            summaryHoursActual.setAttribute('title', formattedPersonasActual); 
+            summaryHoursActual.setAttribute('title', formattedPersonasActual);
         }
-        
+
         const summaryHoursProy = document.getElementById('summary-hours-proy');
         if (summaryHoursProy) {
             summaryHoursProy.textContent = `${formattedTotalHrs} hrs proy/año`;
-            summaryHoursProy.setAttribute('title', formattedPersonasProy); 
+            summaryHoursProy.setAttribute('title', formattedPersonasProy);
         }
     }
 
-    // === Carga automática desde Google Sheets vía JSONP ===
     function gvizToObjects(resp) {
         if (!resp || !resp.table) return [];
         const cols = (resp.table.cols || []).map(c => String(c.label || c.id || '').trim().toUpperCase());
@@ -936,50 +1694,48 @@ document.addEventListener('DOMContentLoaded', () => {
 
         return new Promise((resolve, reject) => {
             const cbName = 'GVIZ_CB_' + Math.random().toString(36).slice(2);
-            let script = document.createElement('script'); 
-            let timer = null; 
+            let script = document.createElement('script');
+            let timer = null;
 
             function cleanup() {
                 if (timer) {
-                    clearTimeout(timer); 
+                    clearTimeout(timer);
                     timer = null;
                 }
-                delete window[cbName]; 
+                delete window[cbName];
                 if (script && script.parentNode) {
-                    script.parentNode.removeChild(script); 
+                    script.parentNode.removeChild(script);
                     script = null;
                 }
             }
 
             timer = setTimeout(() => {
-                cleanup(); 
-                reject(new Error(`Tiempo de espera agotado (>${TIMEOUT_MS / 1000}s) al cargar "${sheetName}". El navegador (Safari/iOS) puede estar bloqueando la solicitud.`));
+                cleanup();
+                reject(new Error(`Tiempo de espera agotado al cargar "${sheetName}".`));
             }, TIMEOUT_MS);
 
             window[cbName] = function (resp) {
-                cleanup(); 
+                cleanup();
                 try {
-                    resolve(gvizToObjects(resp)); 
+                    resolve(gvizToObjects(resp));
                 } catch (e) {
-                    reject(e); 
+                    reject(e);
                 }
             };
-            
+
             script.onerror = (err) => {
-                cleanup(); 
-                console.error(`Error de script al cargar: ${sheetName}`, err);
-                reject(new Error(`No se pudo cargar la hoja "${sheetName}" (revisa permisos, nombre o bloqueo del navegador).`));
+                cleanup();
+                reject(new Error(`No se pudo cargar la hoja "${sheetName}".`));
             };
 
             const base = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq`;
-            const url  = `${base}?sheet=${encodeURIComponent(sheetName)}&headers=1&tq=${encodeURIComponent('select *')}&tqx=out:json;responseHandler:${cbName}&nocache=${new Date().getTime()}`;
-            
+            const url  = `${base}?sheet=${encodeURIComponent(sheetName)}&headers=1&tq=${encodeURIComponent('select *')}&tqx=out:json;responseHandler:${cbName}&nocache=${Date.now()}`;
+
             script.src = url;
             document.head.appendChild(script);
         });
     }
 
-    // *** --- INICIO: FUNCIONES MODAL DETALLES --- ***
     const statusOrder = { 'terminado': 1, 'en proceso': 2, 'estacionamiento': 3 };
 
     function openDetailsModal(areaId) {
@@ -1020,7 +1776,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (estadoLower === 'terminado') statusClass = 'status-terminado';
                 else if (estadoLower === 'en proceso') statusClass = 'status-en-proceso';
                 else if (estadoLower === 'estacionamiento') statusClass = 'status-estacionamiento';
-                tableHtml += `<tr><td>${n++}</td><td>${row.PROYECTO || ''}</td><td>${row.TAREA || ''}</td><td>${row.HERRAMIENTA || ''}</td><td class="${statusClass}">${row.ESTADO || ''}</td></tr>`;
+
+                tableHtml += `
+                    <tr>
+                        <td>${n++}</td>
+                        <td>${row.PROYECTO || ''}</td>
+                        <td>${row.TAREA || ''}</td>
+                        <td>${row.HERRAMIENTA || ''}</td>
+                        <td class="${statusClass}">${row.ESTADO || ''}</td>
+                    </tr>`;
             });
         }
         $modalTableBody.innerHTML = tableHtml;
@@ -1034,14 +1798,268 @@ document.addEventListener('DOMContentLoaded', () => {
                 openDetailsModal(areaElement.id);
             });
         });
+
         $detailsModalClose.addEventListener('click', () => $detailsModal.style.display = 'none');
-        $detailsModal.addEventListener('click', (e) => { if (e.target === $detailsModal) $detailsModal.style.display = 'none'; });
+        $detailsModal.addEventListener('click', (e) => {
+            if (e.target === $detailsModal) $detailsModal.style.display = 'none';
+        });
     }
-    // *** --- FIN: FUNCIONES MODAL DETALLES --- ***
 
+    // === MODAL INFORME EN BLOQUES ===
+    function openInformeModal() {
+        if (!allRowsData || allRowsData.length === 0) {
+            showError("No hay datos para generar el informe.");
+            return;
+        }
 
-    // *** --- INICIO: FUNCIONES MODAL KANBAN --- ***
+        // Debug: mostrar las columnas disponibles en consola
+        if (allRowsData.length > 0) {
+            console.log('Columnas disponibles:', Object.keys(allRowsData[0]));
+            console.log('Ejemplo de fila:', allRowsData[0]);
+        }
 
+        // Build a normalized map of projects (keyed by uppercase name) so we can order them
+        const proyectosMap = new Map();
+        allRowsData.forEach(row => {
+            const proyecto = (row.PROYECTO || '').toString().trim();
+            if (!proyecto) return;
+            const key = proyecto.toUpperCase();
+            if (!proyectosMap.has(key)) proyectosMap.set(key, { name: proyecto, rows: [] });
+            proyectosMap.get(key).rows.push(row);
+        });
+
+        // Desired order (uppercase keys)
+        const desiredOrder = [
+            'AUTOMATIZAR LA CREACION DE OPS',
+            'LIQUIDACION PRENDAS',
+            'CONTROL DE PISO COSTURA',
+            'CONTROL PRODUCCION TINTORERIA',
+            'FLUJO DE OC',
+            'PROCESO DE PAGOS',
+            'REDISEÑO TEJEDURIA (ITP)',
+            'DASHBOAR ASEG. CAL. CONF (ITP)',
+            'ANALIZADOR PCP TEXTIL (ITP)',
+            'COTIZACION 2.0 (ITP)',
+            'OTROS'
+        ];
+
+        // Build ordered list: follow desiredOrder; insert any other projects between
+        // 'COTIZACION 2.0 (ITP)' and 'OTROS'
+        const orderedProjects = [];
+        // Helper set for quick lookup
+        const desiredSet = new Set(desiredOrder.map(s => s.toUpperCase()));
+
+        for (let i = 0; i < desiredOrder.length; i++) {
+            const key = desiredOrder[i];
+            if (key === 'COTIZACION 2.0 (ITP)') {
+                // push Cotizacion if exists
+                if (proyectosMap.has(key)) {
+                    orderedProjects.push(proyectosMap.get(key));
+                    proyectosMap.delete(key);
+                }
+                // insert any remaining projects that are not in desiredOrder (these are "otros nombres")
+                const others = Array.from(proyectosMap.keys()).filter(k => !desiredSet.has(k) && k !== 'OTROS');
+                others.sort();
+                others.forEach(k => {
+                    orderedProjects.push(proyectosMap.get(k));
+                    proyectosMap.delete(k);
+                });
+                continue;
+            }
+            if (proyectosMap.has(key)) {
+                orderedProjects.push(proyectosMap.get(key));
+                proyectosMap.delete(key);
+            }
+        }
+
+        // If OTROS remains, push it at the end
+        if (proyectosMap.has('OTROS')) {
+            orderedProjects.push(proyectosMap.get('OTROS'));
+            proyectosMap.delete('OTROS');
+        }
+
+        // Any remaining projects (unlikely) push before OTROS (already placed) — append at end
+        const remainingKeys = Array.from(proyectosMap.keys()).sort();
+        remainingKeys.forEach(k => orderedProjects.push(proyectosMap.get(k)));
+
+        let html = '';
+
+        orderedProjects.forEach(projectItem => {
+            const proyectoName = (projectItem.name || '').toString().toUpperCase();
+            const rows = projectItem.rows || [];
+
+            html += `
+            <div class="informe-project-block">
+              <div class="informe-project-header">
+                ${proyectoName}
+              </div>
+              <table class="informe-table">
+                <thead>
+                  <tr>
+                    <th style="width: 4%;"></th>
+                    <th style="width: 25%;">TAREA</th>
+                    <th style="width: 8%;">%AVANCE</th>
+                    <th style="width: 8%;">F.INICIO</th>
+                    <th style="width: 8%;">F.FIN</th>
+                    <th style="width: 30%;">OBSERVACION</th>
+                    <th style="width: 10%;">HRS PROY.(AÑO)</th>
+                  </tr>
+                </thead>
+                <tbody>
+            `;
+
+            rows.forEach(r => {
+                const estado = (r.ESTADO || '').toString();
+                const estadoLower = estado.toLowerCase();
+                // Filtrado según el estado del toggle
+                try {
+                    const ffinDate = parseDateValue(r['F.FIN']);
+                    const toggle = document.getElementById('informe-toggle-switch');
+                    const switchOn = toggle ? toggle.checked : false;
+                    const now = new Date();
+
+                    if (switchOn) {
+                        // Modo toggle activo: mostrar sólo 'en proceso' (todos)
+                        // y 'terminado' solo si F.FIN existe y es <= 7 días
+                        if (estadoLower === 'en proceso') {
+                            // show
+                        } else if (estadoLower === 'terminado') {
+                            if (!ffinDate) return; // exclude if no finish date
+                            const diffDays = (now - ffinDate) / (1000 * 60 * 60 * 24);
+                            if (diffDays > 7) return; // exclude older than 7 days
+                        } else {
+                            return; // exclude other statuses
+                        }
+                    } else {
+                        // Modo normal: exclude 'terminado' only if F.FIN > 14 días (keep other rows)
+                        if (estadoLower === 'terminado' && ffinDate) {
+                            const diffDays = (now - ffinDate) / (1000 * 60 * 60 * 24);
+                            if (diffDays > 14) {
+                                return; // saltar esta fila
+                            }
+                        }
+                    }
+                } catch (e) {
+                    // ignore parsing errors and show the row
+                }
+
+                let statusClass = '';
+                                if (estadoLower === 'terminado') statusClass = 'status-terminado';
+                                else if (estadoLower === 'en proceso') statusClass = 'status-en-proceso';
+                                else if (estadoLower === 'estacionamiento') statusClass = 'status-estacionamiento';
+
+                                // Icona / viñeta para estado
+                                let estadoIcon = '';
+                                if (estadoLower === 'terminado') {
+                                        estadoIcon = `<span class="estado-bullet estado-terminado" title="Terminado">&#10003;</span>`; // check
+                                } else if (estadoLower === 'en proceso') {
+                                        estadoIcon = `<span class="estado-bullet estado-en-proceso" title="En proceso"></span>`;
+                                } else if (estadoLower === 'estacionamiento') {
+                                        estadoIcon = `<span class="estado-bullet estado-estacionamiento" title="Estacionamiento"></span>`;
+                                } else {
+                                        estadoIcon = `<span class="estado-bullet" title="${estado}"></span>`;
+                                }
+
+                                // Format %AVANCE as percentage (treat 1 as 100%) and prepare a visual bar
+                                let avance = '';
+                                let avanceHtml = '';
+                                const avanceValue = r['%AVANCE'];
+                                let avancePercent = null;
+                                if (avanceValue !== undefined && avanceValue !== null && avanceValue !== '') {
+                                    const avanceNum = parseFloat(avanceValue);
+                                    if (!isNaN(avanceNum)) {
+                                        if (avanceNum <= 1 && avanceNum >= 0) {
+                                            avancePercent = Math.round(avanceNum * 100);
+                                        } else {
+                                            avancePercent = Math.round(avanceNum);
+                                        }
+                                        // clamp 0..100
+                                        avancePercent = Math.max(0, Math.min(100, avancePercent));
+                                        avance = avancePercent + '%';
+                                    } else {
+                                        avance = String(avanceValue);
+                                    }
+                                }
+
+                                if (avancePercent !== null) {
+                                    avanceHtml = `<div class="avance-cell"><div class="avance-bar-container"><div class="avance-bar-fill" style="width:${avancePercent}%;"></div></div><div class="avance-label">${avancePercent}%</div></div>`;
+                                } else {
+                                    avanceHtml = `<div class="avance-cell"><div class="avance-bar-container"></div><div class="avance-label">${avance}</div></div>`;
+                                }
+
+                                const fInicio = formatShortDate(r['F.INICIO']) || '';
+                                const fFin    = formatShortDate(r['F.FIN']) || '';
+                                const observ  = r.OBSERVACION || '';
+                                const tarea = r.TAREA || '';
+
+                                let hrs = r['HRS PROY.(AÑO)'];
+                                if (hrs === null || hrs === undefined || hrs === '') {
+                                        hrs = '';
+                                } else {
+                                        // Si es un número, formatearlo
+                                        const hrsNum = parseFloat(String(hrs).replace(/[$,\s]/g, ''));
+                                        if (!isNaN(hrsNum)) {
+                                                hrs = formatNumber(hrsNum);
+                                        }
+                                }
+
+                                html += `
+                                    <tr>
+                                        <td style="text-align: center;">${estadoIcon}</td>
+                                        <td>${tarea}</td>
+                                        <td style="text-align: center;">${avanceHtml}</td>
+                                        <td style="text-align: center;">${fInicio}</td>
+                                        <td style="text-align: center;">${fFin}</td>
+                                        <td>${observ}</td>
+                                        <td style="text-align: right;">${hrs}</td>
+                                    </tr>
+                                `;
+                        });
+
+                        html += `
+                                </tbody>
+                            </table>
+                        </div>
+                        `;
+                });
+
+        if (!html) {
+            html = '<div style="text-align:center;padding:10px;">No hay datos para mostrar.</div>';
+        }
+
+        $informeModalBody.innerHTML = html;
+        $informeModal.style.display = 'block';
+    }
+
+    function setupInformeModalListeners() {
+        if ($informeButton) {
+            $informeButton.addEventListener('click', openInformeModal);
+        }
+        if ($informeModalClose) {
+            $informeModalClose.addEventListener('click', () => $informeModal.style.display = 'none');
+        }
+        if ($informeModal) {
+            $informeModal.addEventListener('click', (e) => {
+                if (e.target === $informeModal) $informeModal.style.display = 'none';
+            });
+        }
+
+        // Toggle switch listener: re-render informe when changed and toggle modal background
+        const $toggle = document.getElementById('informe-toggle-switch');
+        if ($toggle) {
+            $toggle.addEventListener('change', () => {
+                if ($toggle.checked) $informeModal.classList.add('filter-active');
+                else $informeModal.classList.remove('filter-active');
+
+                // If modal is open, re-render report with new filter
+                if ($informeModal.style.display === 'block') {
+                    openInformeModal();
+                }
+            });
+        }
+    }
+
+    // === KANBAN ===
     function displayKanbanModal() {
         if (!kanbanData || kanbanData.length === 0) {
             showError("No se encontraron datos en la hoja 'Kanban' o aún no se han cargado.");
@@ -1065,7 +2083,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const card = document.createElement('div');
             card.className = `kanban-card color-${colorIndex}`;
-            
+
             card.innerHTML = `
                 <div class="card-title">${row.TAREA || 'Sin Tarea'}</div>
                 <div class="card-detail">Area: ${row.AREA || 'N/A'}</div>
@@ -1082,43 +2100,39 @@ document.addEventListener('DOMContentLoaded', () => {
     function setupKanbanModalListeners() {
         $kanbanButton.addEventListener('click', displayKanbanModal);
         $kanbanModalClose.addEventListener('click', () => $kanbanModal.style.display = 'none');
-        $kanbanModal.addEventListener('click', (e) => { if (e.target === $kanbanModal) $kanbanModal.style.display = 'none'; });
+        $kanbanModal.addEventListener('click', (e) => {
+            if (e.target === $kanbanModal) $kanbanModal.style.display = 'none';
+        });
     }
 
-    // *** --- FIN: FUNCIONES MODAL KANBAN --- ***
-
-
-    // --- Flujo Principal de Carga ---
+    // --- FLUJO PRINCIPAL ---
     showLoading();
     loadSheetJSONP(SHEET_ID, SHEET_NAME_BD)
         .then(rowsBd => {
-            if (!Array.isArray(rowsBd)) {
-                 throw new Error(`La hoja "${SHEET_NAME_BD}" no devolvió datos válidos.`);
-            }
+            if (!Array.isArray(rowsBd)) throw new Error(`La hoja "${SHEET_NAME_BD}" no devolvió datos válidos.`);
             allRowsData = rowsBd;
             updateMapWithData(allRowsData);
             setupDetailsModalListeners();
-
+            setupInformeModalListeners();
             return loadSheetJSONP(SHEET_ID, SHEET_NAME_KANBAN);
         })
         .then(rowsKanban => {
-             if (!Array.isArray(rowsKanban)) {
-                 console.warn(`La hoja "${SHEET_NAME_KANBAN}" no devolvió datos válidos o está vacía.`);
-                 kanbanData = [];
-             } else {
-                 kanbanData = rowsKanban;
-             }
-             setupKanbanModalListeners();
-             hideLoading();
-             alignColumnHeights(); 
+            if (!Array.isArray(rowsKanban)) {
+                kanbanData = [];
+            } else {
+                kanbanData = rowsKanban;
+            }
+            setupKanbanModalListeners();
+            hideLoading();
+            alignColumnHeights();
         })
         .catch(err => {
             hideLoading();
-            alignColumnHeights(); 
+            alignColumnHeights();
             console.error('[GViz JSONP Error]', err);
-            showError(err.message || 'No se pudo leer una de las Google Sheets. Verifica permisos y nombres de pestañas.');
+            showError(err.message || 'No se pudo leer una de las Google Sheets.');
         });
-        
+
     window.addEventListener('resize', alignColumnHeights);
 });
 </script>
