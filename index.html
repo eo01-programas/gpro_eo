@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -6,6 +7,51 @@
     <title>MAPA DE PROYECTOS CON AVANCE</title>
 
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style id="gantt-embedded-styles">
+        /* Gantt embedded styles (from gantt.html) */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+        .gantt-grid { display: grid; grid-template-columns: 40px 140px 100px 100px 200px 200px 100px 120px repeat(13, 1fr); min-width: 1200px; background-color: white; border: 1px solid #e2e8f0; }
+        .sticky-1 { position: sticky; left: 0; z-index: 50; background: inherit; border-right: 1px solid #e2e8f0; }
+        .sticky-2 { position: sticky; left: 40px; z-index: 49; background: inherit; border-right: 1px solid #e2e8f0; }
+        .header-cell { background-color: #0f172a; color: white; padding: 12px 8px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; text-align: center; border: 1px solid #1e293b; display: flex; align-items: center; justify-content: center; }
+        .data-cell { padding: 12px 10px; border: 1px solid #e2e8f0; font-size: 0.85rem; min-height: 55px; display: flex; align-items: center; background-color: white; }
+        .project-row-bg { background-color: #f8fafc; font-weight: 700; }
+        .task-row-bg { background-color: white; }
+        .gantt-block { height: 24px; background-color: #2563eb; border-radius: 4px; width: 80%; margin: auto; }
+        .gantt-dot { height: 8px; width: 8px; background-color: #cbd5e1; border-radius: 50%; margin: auto; }
+        .gantt-master-part { height: 28px; background: linear-gradient(90deg,#0ea5e9,#2563eb); border-radius: 2px; margin: 6px auto; width: 90%; box-shadow: 0 1px 0 rgba(255,255,255,0.08) inset; }
+        .gantt-master-start { border-top-left-radius: 6px; border-bottom-left-radius: 6px; }
+        .gantt-master-end { border-top-right-radius: 6px; border-bottom-right-radius: 6px; }
+        .gantt-master-label { color: white; font-weight: 600; font-size: 12px; text-align: center; line-height: 28px; }
+        .week-cell { height: 46px; display:flex; align-items:center; justify-content:center; cursor:pointer; user-select: none; color: transparent; }
+        .week-cell:hover { background-color: #f1f5f9; }
+        .week-on { background-color: transparent; }
+        .week-on .gantt-block { width: 90%; }
+        /* Stable indicator for painted week: exists always, toggling only class to avoid DOM reflow */
+        .gantt-block-indicator { height: 24px; width: 80%; border-radius: 4px; background: transparent; transition: background 0.12s ease, opacity 0.12s ease; pointer-events: none; display:block; }
+        .gantt-block-indicator.on { background: linear-gradient(90deg,#60a5fa,#2563eb); }
+        /* when a week cell is painted, color the cell background (not text) */
+        .week-cell.on { background: linear-gradient(90deg,#60a5fa,#2563eb); }
+        .week-cell.on .gantt-block-indicator { background: transparent; }
+        /* Master container variant: always present, toggle classes instead of replacing innerHTML */
+        .gantt-master-container { height: 28px; display:flex; align-items:center; justify-content:center; }
+        .gantt-master-inner { height: 28px; width: 90%; border-radius: 2px; display:flex; align-items:center; justify-content:center; transition: background 0.12s ease; background: transparent; }
+        .gantt-master-inner.on { background: linear-gradient(90deg,#0ea5e9,#2563eb); }
+        .gantt-master-inner.start { border-top-left-radius: 6px; border-bottom-left-radius: 6px; }
+        .gantt-master-inner.end { border-top-right-radius: 6px; border-bottom-right-radius: 6px; }
+        .gantt-master-label { color: white; font-weight: 600; font-size: 12px; text-align: center; line-height: 28px; opacity: 1; transition: opacity 0.12s ease; pointer-events: none; }
+        .gantt-master-label.hidden { opacity: 0; }
+        /* Status select styles */
+        .status-select { padding: 4px 6px; border-radius: 6px; border: 1px solid #cbd5e1; font-weight: 700; font-size: 12px; background: transparent; color: #0f172a; }
+        .status-select.status-en-proceso { background: linear-gradient(90deg,#60a5fa,#2563eb); color: #fff; border-color: rgba(37,99,235,0.6); }
+        .status-select.status-terminado { background: linear-gradient(90deg,#86efac,#16a34a); color: #06361a; border-color: rgba(16,185,129,0.6); }
+        .status-select.status-pendiente { background: #f1f5f9; color: #475569; border-color: #cbd5e1; }
+        .truncate-text { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; }
+        /* viewport used to scale/fit the gantt grid into available width */
+        .gantt-viewport { width: 100%; overflow: auto; }
+        .gantt-grid { transform-origin: top left; }
+    </style>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -343,7 +389,8 @@
         }
 
         #kanban-button,
-        #informe-button {
+        #informe-button,
+        #gantt-button {
             padding: 5px 10px;
             font-size: 12px;
             font-weight: bold;
@@ -371,6 +418,16 @@
 
         #informe-button:hover {
             filter: brightness(0.95);
+            transform: translateY(-1px);
+        }
+
+        #gantt-button {
+            background-color: #0d6efd;
+            color: white;
+        }
+
+        #gantt-button:hover {
+            background-color: #0b5ed7;
             transform: translateY(-1px);
         }
 
@@ -758,6 +815,17 @@
             background-color: rgba(0,0,0,0.6);
         }
 
+        /* Gantt modal shares kanban-content styling but needs its own overlay id */
+        #gantt-modal {
+            display: none;
+            position: fixed;
+            z-index: 5000;
+            left: 0; top: 0;
+            width: 100%; height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.6);
+        }
+
         .kanban-content {
             background-color: #fefefe;
             margin: 3% auto;
@@ -1005,6 +1073,7 @@
                 </div>
 
                 <div class="summary-actions">
+                    <button id="gantt-button">Gantt</button>
                     <button id="kanban-button">Kanban</button>
                     <button id="informe-button">Informe</button>
                 </div>
@@ -1317,6 +1386,38 @@
             </div>
         </div>
     </div>
+
+            <!-- MODAL CREAR REQUERIMIENTO -->
+            <div id="create-req-modal" style="display:none;" class="modal-overlay">
+                <div class="modal-content">
+                    <span class="modal-close" id="create-req-close">&times;</span>
+                    <h2 id="create-req-title">Crear Requerimiento</h2>
+                    <div style="display:flex;flex-direction:column;gap:8px;padding-top:8px;">
+                        <label>Area
+                            <select id="req-area" class="table-input"></select>
+                        </label>
+                        <label>Proyecto
+                            <select id="req-project" class="table-input"></select>
+                        </label>
+                        <label>Tarea
+                            <input id="req-task" class="table-input" placeholder="Nombre de la tarea">
+                        </label>
+                        <label>Tipo
+                            <select id="req-tipo" class="table-input"></select>
+                        </label>
+                        <label>F. Inicio
+                            <input id="req-inicio" class="table-input" placeholder="DD/MM/AAAA" value="14/01">
+                        </label>
+                        <label>Ejecutor
+                            <select id="req-ejecutor" class="table-input"></select>
+                        </label>
+                        <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:6px;">
+                            <button id="req-cancel" class="modal-close" style="padding:6px 10px;">Cancelar</button>
+                            <button id="req-save" style="padding:6px 10px;background:#0d6efd;color:#fff;border-radius:6px;border:none;">Guardar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
 </div>
 
 <script>
@@ -1349,6 +1450,155 @@ document.addEventListener('DOMContentLoaded', () => {
     const $informeModalBody = document.getElementById('informe-modal-body');
 
     const $kanbanButton = document.getElementById('kanban-button');
+    const $ganttButton = document.getElementById('gantt-button');
+    // Open standalone Gantt page (external file)
+    if ($ganttButton) {
+        $ganttButton.addEventListener('click', () => {
+            const url = 'gantt.html';
+            window.location.href = url;
+        });
+    }
+    // Create Requirement UI
+    const $createReqButton = document.getElementById('create-req-button');
+    const $createReqModal = document.getElementById('create-req-modal');
+    const $createReqClose = document.getElementById('create-req-close');
+    const $reqArea = document.getElementById('req-area');
+    const $reqProject = document.getElementById('req-project');
+    const $reqTask = document.getElementById('req-task');
+    const $reqTipo = document.getElementById('req-tipo');
+    const $reqInicio = document.getElementById('req-inicio');
+    const $reqEjecutor = document.getElementById('req-ejecutor');
+    const $reqSave = document.getElementById('req-save');
+    const $reqCancel = document.getElementById('req-cancel');
+
+    function parseGvizJsonText(t) {
+        try {
+            const jsonText = t.replace(/^.*?(\{[\s\S]*\})\;?$/,'$1');
+            return JSON.parse(jsonText);
+        } catch(e){ return null; }
+    }
+
+    async function fetchBdAreas() {
+        try {
+            const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(SHEET_NAME_BD)}`;
+            const res = await fetch(url);
+            const txt = await res.text();
+            const obj = parseGvizJsonText(txt);
+            if(!obj || !obj.table || !obj.table.rows) return [];
+            const rows = obj.table.rows.map(r => (r.c && r.c[0] && r.c[0].v) ? String(r.c[0].v).trim() : '').filter(x=>x);
+            // unique
+            return Array.from(new Set(rows));
+        } catch (e) {
+            console.warn('fetchBdAreas err', e);
+            return [];
+        }
+    }
+
+    async function fetchBdColumnValues(colName) {
+        try {
+            const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(SHEET_NAME_BD)}`;
+            const res = await fetch(url);
+            const txt = await res.text();
+            const obj = parseGvizJsonText(txt);
+            if(!obj || !obj.table || !obj.table.cols || !obj.table.rows) return [];
+            const cols = obj.table.cols;
+            let idx = -1;
+            const target = String(colName||'').trim().toLowerCase();
+            for(let i=0;i<cols.length;i++){ const lbl = String(cols[i].label||cols[i].id||'').trim().toLowerCase(); if(lbl === target) { idx = i; break; } }
+            if(idx === -1) { for(let i=0;i<cols.length;i++){ const lbl = String(cols[i].label||'').toLowerCase(); if(lbl.includes(target)) { idx = i; break; } } }
+            if(idx === -1) return [];
+            const rows = obj.table.rows.map(rw => (rw.c && rw.c[idx] && rw.c[idx].v) ? String(rw.c[idx].v).trim() : '').filter(x=>x);
+            return Array.from(new Set(rows));
+        } catch (e) { console.warn('fetchBdColumnValues err', e); return []; }
+    }
+
+    async function openCreateReqModal() {
+        showLoading();
+        const areas = await fetchBdAreas();
+        hideLoading();
+
+        // Area
+        $reqArea.innerHTML = '';
+        const optEmpty = document.createElement('option'); optEmpty.value = ''; optEmpty.text = '-- Seleccione area --'; $reqArea.appendChild(optEmpty);
+        areas.forEach(a=>{ const o=document.createElement('option'); o.value=a; o.text=a; $reqArea.appendChild(o); });
+
+        // Proyecto (existing projects + option to create new)
+        const $reqProj = document.getElementById('req-project');
+        if($reqProj) {
+            $reqProj.innerHTML = '';
+            const newOpt = document.createElement('option'); newOpt.value = 'new'; newOpt.text = '+ Nuevo Proyecto'; $reqProj.appendChild(newOpt);
+            if (typeof projectData !== 'undefined' && Array.isArray(projectData)) {
+                const uniqueProjects = Array.from(new Set(projectData.map(p => p.nombre)));
+                uniqueProjects.forEach(pn => { const o=document.createElement('option'); o.value = pn; o.text = pn; $reqProj.appendChild(o); });
+            }
+        }
+
+        // Tipo
+        const $reqTipo = document.getElementById('req-tipo');
+        if($reqTipo) {
+            $reqTipo.innerHTML = '';
+            const tiposArr = ['Proceso','Digital','Maquina','Digital + IA'];
+            tiposArr.forEach(t=>{ const o=document.createElement('option'); o.value=t; o.text=t; $reqTipo.appendChild(o); });
+        }
+
+        // Ejecutor (prefer from Bd sheet column 'Ejecutor', fallback to projectData)
+        const $reqExec = document.getElementById('req-ejecutor');
+        if($reqExec) {
+            $reqExec.innerHTML = '';
+            const emptyExec = document.createElement('option'); emptyExec.value=''; emptyExec.text='-- Seleccione ejecutor --'; $reqExec.appendChild(emptyExec);
+            const execsFromSheet = await fetchBdColumnValues('ejecutor');
+            if (execsFromSheet && execsFromSheet.length) {
+                execsFromSheet.forEach(e=>{ const o=document.createElement('option'); o.value=e; o.text=e; $reqExec.appendChild(o); });
+            } else if (typeof projectData !== 'undefined' && Array.isArray(projectData)) {
+                const uniqueExecs = Array.from(new Set(projectData.flatMap(p => [p.ejecutor, ...p.tasks.map(t=>t.ejecutor)])));
+                uniqueExecs.filter(x=>x).forEach(e=>{ const o=document.createElement('option'); o.value=e; o.text=e; $reqExec.appendChild(o); });
+            }
+        }
+
+        $createReqModal.style.display = 'flex';
+    }
+
+    if($createReqButton) $createReqButton.addEventListener('click', () => openCreateReqModal());
+    if($createReqClose) $createReqClose.addEventListener('click', ()=> $createReqModal.style.display='none');
+    if($reqCancel) $reqCancel.addEventListener('click', ()=> $createReqModal.style.display='none');
+
+    $reqSave && $reqSave.addEventListener('click', () => {
+        const area = $reqArea.value || 'GENERAL';
+        let proyecto = ($reqProject.value || 'Proyecto sin nombre').trim();
+        const tarea = ($reqTask.value || 'Tarea sin nombre').trim();
+        const tipo = ($reqTipo.value || 'Proceso').trim();
+        const inicio = ($reqInicio.value || '14/01').trim();
+        const ejecutor = ($reqEjecutor.value || 'Equipo').trim();
+
+        if (proyecto === 'new') {
+            proyecto = prompt('Ingrese nombre del nuevo proyecto:') || 'Proyecto sin nombre';
+        }
+
+        if (typeof projectData !== 'undefined' && Array.isArray(projectData)) {
+            const existingProject = projectData.find(p => p.nombre === proyecto);
+            const ganttArr = new Array(13).fill(0); ganttArr[0] = 1;
+            if (existingProject) {
+                const newTaskId = existingProject.id + 't' + (existingProject.tasks.length + 1);
+                existingProject.tasks.push({ id: newTaskId, nombre: tarea, tipo: tipo, ejecutor: ejecutor, status: 1, gantt: ganttArr });
+            } else {
+                const newId = 'u' + Date.now();
+                const newTaskId = newId + 't1';
+                const newProject = {
+                    id: newId,
+                    area: area,
+                    tipo: tipo,
+                    inicio: inicio,
+                    nombre: proyecto,
+                    ejecutor: ejecutor,
+                    expanded: true,
+                    tasks: [ { id: newTaskId, nombre: tarea, tipo: tipo, ejecutor: ejecutor, status: 1, gantt: ganttArr } ]
+                };
+                projectData.push(newProject);
+            }
+            if(window.ganttRender) window.ganttRender();
+        }
+        $createReqModal.style.display = 'none';
+    });
     const $kanbanModal = document.getElementById('kanban-modal');
     const $kanbanModalClose = document.getElementById('kanban-modal-close-button');
     const $kanbanColEstacionamiento = document.getElementById('kanban-col-estacionamiento');
@@ -2136,6 +2386,455 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('resize', alignColumnHeights);
 });
 </script>
+
+<!-- Embebido: vista Gantt (ahora modal) -->
+<div id="gantt-modal" style="display:none;">
+    <div class="kanban-content" style="max-width:1200px;width:95%;padding:20px;background:#ffffff;position:relative;max-height:86vh;overflow:auto;border-radius:10px;">
+        <span class="modal-close" id="gantt-close">&times;</span>
+    <div class="mb-6 flex justify-between items-center">
+        <div>
+            <h1 class="text-2xl font-bold text-slate-800">Panel de Control Maestro (Gantt)</h1>
+            <p class="text-slate-500">Gestión por Áreas y Cronograma Q1</p>
+        </div>
+        <div class="space-x-2">
+            <button id="gantt-back" class="bg-white border border-slate-200 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-slate-50">Volver</button>
+            <button id="gantt-open-window" class="bg-white border border-slate-200 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-slate-50">Abrir en ventana</button>
+            <button id="gantt-fit" class="bg-white border border-slate-200 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-slate-50">Ajustar ancho</button>
+            <button onclick="toggleAll(true)" class="bg-white border border-slate-200 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-slate-50">Expandir</button>
+            <button onclick="toggleAll(false)" class="bg-white border border-slate-200 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-slate-50">Contraer</button>
+        </div>
+    </div>
+
+    <div class="gantt-viewport overflow-x-auto shadow-xl rounded-xl border border-slate-200">
+        <div class="gantt-grid" id="mainGrid">
+            <!-- FILA 1: CABECERAS DE MESES -->
+            <div class="header-cell sticky-1"></div>
+            <div class="header-cell sticky-2">DATOS</div>
+            <div class="header-cell">GENERALES</div>
+            <div class="header-cell">DEL</div>
+            <div class="header-cell">PROYECTO</div>
+            <div class="header-cell">TAREA</div>
+            <div class="header-cell"> </div>
+            <div class="header-cell bg-blue-900" style="grid-column: span 4;">ENERO</div>
+            <div class="header-cell bg-indigo-900" style="grid-column: span 4;">FEBRERO</div>
+            <div class="header-cell bg-slate-800" style="grid-column: span 5;">MARZO</div>
+
+            <!-- FILA 2: TITULOS DE COLUMNAS REQUERIDOS -->
+            <div class="header-cell sticky-1 bg-slate-100 !text-slate-800"></div>
+            <div class="header-cell sticky-2 bg-slate-100 !text-slate-800">AREA</div>
+            <div class="header-cell bg-slate-100 !text-slate-800">TIPO</div>
+            <div class="header-cell bg-slate-100 !text-slate-800">F. INICIO</div>
+            <div class="header-cell bg-slate-100 !text-slate-800">PROYECTO</div>
+            <div class="header-cell bg-slate-100 !text-slate-800">TAREA</div>
+            <div class="header-cell bg-slate-100 !text-slate-800">EJECUTOR</div>
+            <div class="header-cell bg-slate-100 !text-slate-800">ESTADO</div>
+            <!-- Semanas S01 a S13 -->
+            <script>
+                for(let i=1; i<=13; i++) {
+                    document.write(`<div class="header-cell bg-slate-50 !text-slate-500 !font-medium border-slate-200">S${i.toString().padStart(2, '0')}</div>`);
+                }
+            </script>
+
+            <!-- CONTENIDO DINÁMICO -->
+        </div>
+    </div>
+
+    <script>
+        // Gantt embedded script (based on gantt.html) - adjusted to expose render as window.ganttRender
+        const projectData = [
+            {
+                id: "p1",
+                area: "HILANDERIA",
+                tipo: "PROYECTO",
+                inicio: "14/01",
+                nombre: "Digitalización y sistematización de planta",
+                ejecutor: "EO",
+                expanded: true,
+                tasks: [
+                    { tipo: "Proceso", inicio: "14/01", nombre: "Revisión y análisis de situación actual", ejecutor: "EO", gantt: [1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] },
+                    { tipo: "Digital", inicio: "21/01", nombre: "App capacidades de producción", ejecutor: "EO", gantt: [0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0] },
+                    { tipo: "Digital", inicio: "04/02", nombre: "Gantt de producción por máquinas", ejecutor: "EO", gantt: [0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0] },
+                    { tipo: "Digital", inicio: "18/02", nombre: "Sistematización de Hoja de Ruta", ejecutor: "EO", gantt: [0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0] },
+                    { tipo: "Digital", inicio: "25/02", nombre: "Control de piso (Continuas)", ejecutor: "EO", gantt: [0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0] }
+                ]
+            }
+            ,
+            {
+                id: "p2",
+                area: "HILANDERIA",
+                tipo: "PROYECTO",
+                inicio: "14/01",
+                nombre: "Optimizacion flujo de produccion",
+                ejecutor: "Equipo",
+                expanded: true,
+                tasks: [
+                    { tipo: "Proceso", inicio: "14/01", nombre: "Revision y analisis de la situacion actual (Mapeo de proceso)", ejecutor: "Equipo", gantt: [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] },
+                    { tipo: "Proceso", inicio: "14/01", nombre: "Revision de tiempos, métodos (gemba walk)", ejecutor: "Equipo", gantt: [0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] }
+                ]
+            }
+            ,
+            {
+                id: "p3",
+                area: "PCP CONFECCIONES",
+                tipo: "PROYECTO",
+                inicio: "14/01",
+                nombre: "Programacion corte/habilitado",
+                ejecutor: "Equipo",
+                expanded: true,
+                tasks: [
+                    { tipo: "Proceso", inicio: "14/01", nombre: "Revision y analisis de la situacion actual (Mapeo de proceso)", ejecutor: "Equipo", gantt: [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] },
+                    { tipo: "Proceso", inicio: "14/01", nombre: "Sistematización del método de trabajo en corte (Aplicacion de corte)", ejecutor: "Equipo", gantt: [0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] },
+                    { tipo: "Proceso", inicio: "14/01", nombre: "Sistematización del método de trabajo en habilitado (Aplicacion de habilitado)", ejecutor: "Equipo", gantt: [0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] }
+                ]
+            }
+            ,
+            {
+                id: "p4",
+                area: "CONFECCIONES",
+                tipo: "PROYECTO",
+                inicio: "14/01",
+                nombre: "ANALIZADOR DE LIQUIDACIÓN",
+                ejecutor: "Equipo",
+                expanded: true,
+                tasks: [
+                    { tipo: "Proceso", inicio: "14/01", nombre: "Revision y analisis de la situacion actual (Mapeo de proceso)", ejecutor: "Equipo", gantt: [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] },
+                    { tipo: "Proceso", inicio: "14/01", nombre: "Localizar donde se encuentra las prendas no reportadas (Aplicacion de liquidación)", ejecutor: "Equipo", gantt: [0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] },
+                    { tipo: "Proceso", inicio: "14/01", nombre: "Reportes en tiempo real (Aplicacion de liquidación)", ejecutor: "Equipo", gantt: [0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] }
+                ]
+            }
+        ];
+
+        let isPainting = false;
+        let paintValue = true;
+        let lastPaintedProject = null;
+
+        window.addEventListener('mouseup', () => {
+            if(isPainting) {
+                isPainting = false;
+                if(lastPaintedProject) {
+                            // restore user-select and refresh master visually
+                            document.body.style.userSelect = '';
+                            refreshMasterForProject(lastPaintedProject);
+                    lastPaintedProject = null;
+                }
+            }
+        });
+
+        function createWeekCellDirect(cell, isOn, pId, taskIndex, weekIndex) {
+            // Populate a pre-created div element with week cell content
+            cell.className = 'data-cell task-row-bg week-cell';
+            cell.dataset.projectId = pId;
+            cell.dataset.taskIndex = taskIndex;
+            cell.dataset.weekIndex = weekIndex;
+            // stable indicator element (no text) to toggle painted state without changing layout
+            const indicator = document.createElement('div');
+            indicator.className = 'gantt-block-indicator';
+            if(isOn) { indicator.classList.add('on'); cell.classList.add('on'); }
+            cell.appendChild(indicator);
+
+            cell.addEventListener('mousedown', (e) => {
+                e.preventDefault();
+                // prevent text selection while painting
+                document.body.style.userSelect = 'none';
+                const p = projectData.find(x => x.id === pId);
+                const current = !!p.tasks[taskIndex].gantt[weekIndex];
+                paintValue = !current;
+                p.tasks[taskIndex].gantt[weekIndex] = paintValue ? 1 : 0;
+                isPainting = true;
+                lastPaintedProject = pId;
+                if(paintValue) { indicator.classList.add('on'); cell.classList.add('on'); } else { indicator.classList.remove('on'); cell.classList.remove('on'); }
+            });
+
+            cell.addEventListener('mouseenter', () => {
+                if(!isPainting) return;
+                const p = projectData.find(x => x.id === pId);
+                p.tasks[taskIndex].gantt[weekIndex] = paintValue ? 1 : 0;
+                lastPaintedProject = pId;
+                if(paintValue) { indicator.classList.add('on'); cell.classList.add('on'); } else { indicator.classList.remove('on'); cell.classList.remove('on'); }
+            });
+        }
+
+        function updateStatusSelectClass(select, value) {
+            select.classList.remove('status-en-proceso','status-terminado','status-pendiente');
+            const v = (value || '').toString().toUpperCase();
+            if(v === 'EN PROCESO') select.classList.add('status-en-proceso');
+            else if(v === 'TERMINADO') select.classList.add('status-terminado');
+            else select.classList.add('status-pendiente');
+        }
+
+        function getProjectSpan(p) {
+            let min = 13, max = -1;
+            p.tasks.forEach(t => {
+                let first = -1, last = -1;
+                for(let i=0;i<t.gantt.length;i++) if(t.gantt[i] === 1) { first = i; break; }
+                for(let i=t.gantt.length-1;i>=0;i--) if(t.gantt[i] === 1) { last = i; break; }
+                if(first !== -1 && first < min) min = first;
+                if(last !== -1 && last > max) max = last;
+            });
+            if(min === 13 || max === -1) return null;
+            return { start: min, end: max };
+        }
+
+        function render() {
+            const grid = document.getElementById('mainGrid');
+            const cols = 21; // 8 fixed cols + 13 weeks
+            const headersCount = cols * 2;
+            while (grid.children.length > headersCount) {
+                grid.removeChild(grid.lastChild);
+            }
+
+            projectData.forEach((p, pIdx) => {
+                const span = getProjectSpan(p);
+
+                const arrowDiv = createCell(grid, p.expanded ? '▼' : '▶', `sticky-1 project-row-bg cursor-pointer justify-center`, () => toggle(p.id));
+                arrowDiv.dataset.projectId = p.id;
+                createCell(grid, p.area, `sticky-2 project-row-bg text-blue-700 font-bold`, () => toggle(p.id));
+                createCell(grid, p.tipo, `project-row-bg text-slate-400 font-medium`, () => toggle(p.id));
+                createCell(grid, p.inicio, `project-row-bg justify-center font-bold`, () => toggle(p.id));
+                const proyectoLabel = p.nombre;
+                createCell(grid, proyectoLabel, `project-row-bg truncate-text`, () => toggle(p.id));
+                const tareaDiv = document.createElement('div');
+                tareaDiv.className = 'data-cell project-row-bg';
+                const select = document.createElement('select');
+                select.className = 'w-full bg-transparent text-slate-800';
+                p.tasks.forEach((t, i) => {
+                    const opt = document.createElement('option');
+                    opt.value = i;
+                    opt.text = t.nombre;
+                    select.appendChild(opt);
+                });
+                tareaDiv.appendChild(select);
+                tareaDiv.onclick = () => toggle(p.id);
+                grid.appendChild(tareaDiv);
+
+                // project status cell (before weeks)
+                createCell(grid, p.ejecutor, `project-row-bg justify-center font-bold`, () => toggle(p.id));
+                const statusCell = createCell(grid, '', `project-row-bg justify-center`, () => toggle(p.id));
+                const projStatus = p.status || 'PENDIENTE';
+                const projSelect = document.createElement('select');
+                projSelect.className = 'status-select';
+                ['PENDIENTE','EN PROCESO','TERMINADO'].forEach(sv => {
+                    const o = document.createElement('option'); o.value = sv; o.text = sv; if(sv === projStatus) o.selected = true; projSelect.appendChild(o);
+                });
+                updateStatusSelectClass(projSelect, projStatus);
+                projSelect.addEventListener('change', (e) => { p.status = e.target.value; updateStatusSelectClass(projSelect, e.target.value); refreshMasterForProject(p.id); });
+                statusCell.appendChild(projSelect);
+
+                // compute project completion % based on tasks status
+                const totalTasks = p.tasks.length || 0;
+                const completedTasks = p.tasks.filter(t => (t.status || '').toString().toUpperCase() === 'TERMINADO').length;
+                const percent = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+
+                for(let i=0; i<13; i++) {
+                    const cell = createCell(grid, '', `project-row-bg`);
+                    // create stable master container inside the cell to avoid reflows when toggling
+                    const mc = document.createElement('div');
+                    mc.className = 'gantt-master-container';
+                    const inner = document.createElement('div');
+                    inner.className = 'gantt-master-inner';
+                    const label = document.createElement('div');
+                    label.className = 'gantt-master-label';
+                    // show percent on the first week cell, keep project name as tooltip
+                    label.textContent = `${percent}%`;
+                    label.title = p.nombre;
+                    inner.appendChild(label);
+                    mc.appendChild(inner);
+                    cell.appendChild(mc);
+                    // Render master bar fully across weeks (complete bar for project)
+                    inner.classList.add('on');
+                    // show label only on first week
+                    if(i === 0) label.classList.remove('hidden'); else label.classList.add('hidden');
+                }
+
+                // Always render task rows (will toggle visibility by hiding their cells)
+                p.tasks.forEach((t, tIdx) => {
+                    for(let cellIdx = 0; cellIdx < 21; cellIdx++) {
+                        const cell = document.createElement('div');
+                        // annotate for toggling
+                        cell.dataset.projectId = p.id;
+                        cell.dataset.taskIndex = tIdx;
+                        if(cellIdx === 0) { cell.className = 'data-cell sticky-1 task-row-bg'; }
+                        else if(cellIdx === 1) { cell.className = 'data-cell sticky-2 task-row-bg text-slate-400 text-xs'; cell.textContent = p.area; }
+                        else if(cellIdx === 2) { cell.className = 'data-cell task-row-bg text-slate-500 font-medium'; cell.textContent = t.tipo; }
+                        else if(cellIdx === 3) { cell.className = 'data-cell task-row-bg justify-center text-slate-500'; cell.textContent = t.inicio; }
+                        else if(cellIdx === 4) { cell.className = 'data-cell task-row-bg pl-2 text-slate-500 text-sm'; cell.textContent = p.nombre; }
+                        else if(cellIdx === 5) { cell.className = 'data-cell task-row-bg pl-6 text-blue-600 font-medium italic'; cell.textContent = t.nombre; }
+                        else if(cellIdx === 6) { cell.className = 'data-cell task-row-bg justify-center'; cell.textContent = t.ejecutor; }
+                        else if(cellIdx === 7) {
+                            // status select per task
+                            cell.className = 'data-cell task-row-bg justify-center';
+                            const taskStatus = t.status || 'PENDIENTE';
+                            const sel = document.createElement('select');
+                            sel.className = 'status-select';
+                            ['PENDIENTE','EN PROCESO','TERMINADO'].forEach(sv => { const o = document.createElement('option'); o.value = sv; o.text = sv; if(sv===taskStatus) o.selected = true; sel.appendChild(o); });
+                            updateStatusSelectClass(sel, taskStatus);
+                            sel.addEventListener('change', (e) => { t.status = e.target.value; updateStatusSelectClass(sel, e.target.value); refreshMasterForProject(p.id); });
+                            cell.appendChild(sel);
+                        } else {
+                            // Week cells (indices 8-20)
+                            const weekIdx = cellIdx - 8;
+                            createWeekCellDirect(cell, !!t.gantt[weekIdx], p.id, tIdx, weekIdx);
+                        }
+                        // hide task cells if collapsed
+                        if(!p.expanded) cell.style.display = 'none';
+                        grid.appendChild(cell);
+                    }
+                });
+            });
+        }
+
+        function createCell(parent, content, className, clickFn) {
+            const div = document.createElement('div');
+            div.className = `data-cell ${className}`;
+            div.innerHTML = content;
+            if(clickFn) div.onclick = clickFn;
+            parent.appendChild(div);
+            return div;
+        }
+
+        function refreshMasterForProject(pId) {
+            const grid = document.getElementById('mainGrid');
+            const cols = 21;
+            let idx = -1;
+            for(let i=0;i<grid.children.length;i++){
+                const ch = grid.children[i];
+                if(ch.dataset && ch.dataset.projectId === pId) { idx = i; break; }
+            }
+            if(idx === -1) return;
+            const rowStart = Math.floor(idx / cols) * cols;
+            const p = projectData.find(x => x.id === pId);
+            // recompute percent and update master bar (we render full bar across weeks)
+            const totalTasks = p.tasks.length || 0;
+            const completedTasks = p.tasks.filter(t => (t.status || '').toString().toUpperCase() === 'TERMINADO').length;
+            const percent = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+            for(let w=0; w<13; w++) {
+                const cell = grid.children[rowStart + 8 + w];
+                if(!cell) continue;
+                const inner = cell.querySelector('.gantt-master-inner');
+                const label = cell.querySelector('.gantt-master-label');
+                if(!inner) continue;
+                // ensure master bar is shown
+                inner.classList.add('on');
+                inner.classList.remove('start','end');
+                if(label) {
+                    label.textContent = `${percent}%`;
+                    label.title = p.nombre || '';
+                    if(w === 0) label.classList.remove('hidden'); else label.classList.add('hidden');
+                }
+            }
+        }
+
+        function toggle(id) {
+            const p = projectData.find(x => x.id === id);
+            p.expanded = !p.expanded;
+            const grid = document.getElementById('mainGrid');
+            // Update arrow in master row
+            for(let i=0; i<grid.children.length; i++) {
+                const ch = grid.children[i];
+                if(ch.dataset && ch.dataset.projectId === id && ch.classList.contains('sticky-1')) {
+                    ch.textContent = p.expanded ? '▼' : '▶';
+                    break;
+                }
+            }
+            // Toggle visibility of all task cells for this project
+            const taskCells = grid.querySelectorAll(`[data-project-id="${id}"][data-task-index]`);
+            taskCells.forEach(cell => {
+                cell.style.display = p.expanded ? '' : 'none';
+            });
+        }
+        function toggleAll(val) {
+            projectData.forEach(p => p.expanded = val);
+            const grid = document.getElementById('mainGrid');
+            // Update all master row arrows
+            projectData.forEach(p => {
+                for(let i=0; i<grid.children.length; i++) {
+                    const ch = grid.children[i];
+                    if(ch.dataset && ch.dataset.projectId === p.id && ch.classList.contains('sticky-1')) {
+                        ch.textContent = p.expanded ? '▼' : '▶';
+                        break;
+                    }
+                }
+                // Toggle visibility of all task cells for this project
+                const taskCells = grid.querySelectorAll(`[data-project-id="${p.id}"][data-task-index]`);
+                taskCells.forEach(cell => {
+                    cell.style.display = p.expanded ? '' : 'none';
+                });
+            });
+        }
+
+        // Fit-to-width control
+        let ganttFitEnabled = true;
+        function fitGanttToWidth() {
+            const viewport = document.querySelector('#gantt-modal .gantt-viewport');
+            const grid = document.querySelector('#gantt-modal .gantt-grid');
+            if(!viewport || !grid) return;
+            // reset transform to measure
+            grid.style.transform = 'none';
+            const vw = viewport.clientWidth;
+            const gw = grid.scrollWidth;
+            let scale = 1;
+            if (gw > 0) scale = Math.min(1, vw / gw);
+            grid.style.transform = `scale(${scale})`;
+            // adjust viewport height to scaled grid height so scroll behaves
+            const gridHeight = grid.getBoundingClientRect().height;
+            viewport.style.height = (gridHeight * scale) + 'px';
+        }
+
+        // Exponer la función render para llamarla desde la página principal
+        window.ganttRender = function(){ render(); if (ganttFitEnabled) fitGanttToWidth(); };
+
+        // Toggle fit button
+        document.addEventListener('click', (e) => {
+            if(e.target && e.target.id === 'gantt-fit'){
+                ganttFitEnabled = !ganttFitEnabled;
+                if(ganttFitEnabled) fitGanttToWidth(); else {
+                    const grid = document.querySelector('#gantt-modal .gantt-grid');
+                    const viewport = document.querySelector('#gantt-modal .gantt-viewport');
+                    if(grid) grid.style.transform = 'none';
+                    if(viewport) viewport.style.height = 'auto';
+                }
+            }
+        });
+
+        window.addEventListener('resize', () => {
+            const gv = document.getElementById('gantt-modal');
+            if(gv && gv.style.display !== 'none' && ganttFitEnabled) fitGanttToWidth();
+        });
+
+        // Back button handler
+        const closeGantt = () => {
+            const main = document.querySelector('.main-layout-container');
+            const ganttModal = document.getElementById('gantt-modal');
+            if (ganttModal) ganttModal.style.display = 'none';
+            if (main) main.style.display = '';
+        };
+        document.getElementById('gantt-back').addEventListener('click', closeGantt);
+        const gc = document.getElementById('gantt-close');
+        if(gc) gc.addEventListener('click', closeGantt);
+        // Open Gantt in a new window (static snapshot of rendered grid)
+        const openBtn = document.getElementById('gantt-open-window');
+        if(openBtn) openBtn.addEventListener('click', () => {
+            try {
+                const headStyles = Array.from(document.querySelectorAll('head style')).map(s => s.outerHTML).join('\n');
+                const headLinks = '<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">\n<script src="https://cdn.tailwindcss.com"></' + 'script>';
+                const grid = document.getElementById('mainGrid');
+                if(!grid) return alert('Gantt no renderizado aún. Abre el Gantt primero.');
+                const gridHtml = grid.outerHTML;
+                const html = `<!doctype html><html><head><meta charset="utf-8">${headLinks}${headStyles}<title>Gantt - Ventana</title></head><body style="margin:0;padding:18px;background:#f3f4f6;">${gridHtml}</body></html>`;
+                const w = window.open('', '_blank', 'width=1200,height=800,scrollbars=yes');
+                w.document.open();
+                w.document.write(html);
+                w.document.close();
+            } catch (e) { alert('No se pudo abrir la ventana: '+e.message); }
+        });
+        // Close when clicking outside the content
+        const ganttOverlay = document.getElementById('gantt-modal');
+        if(ganttOverlay) {
+            ganttOverlay.addEventListener('click', (e) => { if(e.target === ganttOverlay) closeGantt(); });
+        }
+    </script>
+    </div>
+</div>
 
 </body>
 </html>
