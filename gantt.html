@@ -31,7 +31,7 @@
         .col-area { width: 90px; color: #475569; font-size: 0.75rem; flex-shrink: 0; font-weight: 700; }
         .col-tipo { width: 90px; flex-shrink: 0; }
         .col-estado { width: 120px; flex-shrink: 0; }
-        .col-inicio { width: 85px; font-size: 0.75rem; text-align: center; justify-content: center; flex-shrink: 0; }
+        .col-inicio { width: 120px; font-size: 0.75rem; text-align: center; justify-content: center; flex-shrink: 0; }
         .col-nombre { flex: 1; color: #334155; position: relative; min-width: 150px; padding-left: 10px; }
         .col-gestor { width: 80px; justify-content: center; color: #475569; font-size: 0.7rem; font-weight: 600; flex-shrink: 0; text-align: center; }
         .col-ejecutor { width: 70px; justify-content: center; color: #64748b; font-size: 0.75rem; flex-shrink: 0; }
@@ -45,7 +45,7 @@
         .sb-proceso { background-color: #fef3c7; color: #92400e; border-color: #fde68a; }
         .sb-terminado { background-color: #dcfce7; color: #166534; border-color: #bbf7d0; }
         .gantt-header-month { display: flex; justify-content: center; align-items: center; border-right: 1px solid #e2e8f0; font-weight: 700; color: white; }
-        .gantt-week-col { min-width: 30px; border-right: 1px dashed #e2e8f0; display: flex; justify-content: center; align-items: center; cursor: pointer; position: relative; flex-shrink: 0; height: 100%; transition: background 0.1s; }
+        .gantt-week-col { min-width: 20px; border-right: 1px dashed #e2e8f0; display: flex; justify-content: center; align-items: center; cursor: pointer; position: relative; flex-shrink: 0; height: 100%; transition: background 0.1s; }
         .gantt-week-col:hover { background-color: rgba(0,0,0,0.03); }
         .status-pill { height: 22px; width: 26px; border-radius: 4px; display: flex; justify-content: center; align-items: center; font-size: 9px; font-weight: 700; color: white; box-shadow: 0 1px 2px rgba(0,0,0,0.1); transition: transform 0.1s; pointer-events: none; }
         .st-1 { background: #ef4444; } .st-2 { background: #f59e0b; } .st-3 { background: #10b981; }
@@ -86,7 +86,6 @@
                 </div>
                 <div>
                     <h1 class="text-lg font-bold text-slate-800 leading-tight">Gestor de Proyectos Maestro</h1>
-                    <p class="text-xs text-slate-500 font-medium">Plan Anual 2026 &bull; Planta Hilandería</p>
                 </div>
             </div>
 
@@ -104,6 +103,7 @@
                 <button id="btn-priority" onclick="togglePriority()" class="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-50 transition" title="Mostrar solo proyectos prioritarios">
                     <i class="fa-solid fa-star"></i> Prioridad
                 </button>
+                <button id="btn-show-complete" onclick="toggleShowCompleted()" class="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-50 transition" title="Mostrar proyectos terminados">Ver completo</button>
                 <div class="h-6 w-px bg-slate-200"></div>
                 <button onclick="toggleAll(false)" class="text-slate-500 hover:text-blue-600 transition" title="Contraer Todo"><i class="fa-solid fa-compress-alt"></i></button>
                 <button onclick="toggleAll(true)" class="text-slate-500 hover:text-blue-600 transition" title="Expandir Todo"><i class="fa-solid fa-expand-alt"></i></button>
@@ -257,6 +257,8 @@
         let currentKpiProject = null;
         let activeKpiIndex = 0;
         let SHOW_PRIORITY = false;
+        let SHOW_COMPLETED = false;
+        let SHOW_ALL_TASKS = true; // when true, list every task in the left panel regardless of GANTT view range
         const FILTERS = { month: 'all', area: '', project: '' };
         let currentEdit = null;
         let confirmCallback = null;
@@ -272,51 +274,60 @@
         ];
 
         // --- DYNAMIC DATE CALCULATIONS ---
+        // Start view: begin from the current month and show next 4 months (wrap year)
         const today = new Date();
-        const startMonthIndex = today.getMonth(); // 0-based
-        const visibleCount = 4;
-        
-        // Generate Dynamic VISIBLE_MONTHS (Current + 3)
-        // Note: Simplification - we take slice. If end of year, stop at Dec.
-        const endIndex = Math.min(startMonthIndex + visibleCount, 12);
-        const VISIBLE_MONTHS = FULL_MONTHS_CONFIG.slice(startMonthIndex, endIndex);
-        
-        // Calculate weeks before start month to offset rendering
-        let offsetWeeks = 0;
-        for(let i=0; i<startMonthIndex; i++) {
-            offsetWeeks += FULL_MONTHS_CONFIG[i].weeks;
+        let startMonthIndex = today.getMonth(); // start at current month (0-based)
+        const visibleCount = 4; // show current month + 3 following months
+
+        // Generate VISIBLE_MONTHS allowing wrap-around at year end
+        const VISIBLE_MONTHS = [];
+        for (let i = 0; i < visibleCount; i++) {
+            VISIBLE_MONTHS.push(FULL_MONTHS_CONFIG[(startMonthIndex + i) % 12]);
         }
 
+        // Calculate weeks before start month to offset rendering (weeks from Jan to month-1)
+        let offsetWeeks = 0;
+        for (let i = 0; i < startMonthIndex; i++) offsetWeeks += FULL_MONTHS_CONFIG[i].weeks;
+
         // Global constants for this view
-        const OFFSET_WEEKS_INDEX = offsetWeeks; 
+        const OFFSET_WEEKS_INDEX = offsetWeeks;
         const VISIBLE_TOTAL_WEEKS = VISIBLE_MONTHS.reduce((acc, m) => acc + m.weeks, 0);
         const MAX_YEAR_WEEKS = 52; // Total weeks in full year for data array
 
         // Get global references
         const taskContainer = document.getElementById('taskListContainer');
         const ganttContainer = document.getElementById('ganttGridContainer');
+        let _scrollSyncInitialized = false;
 
         // ========= HELPER FUNCTIONS =========
         function initHeaders() {
             const mHeader = document.getElementById('ganttMonthsHeader');
             const wHeader = document.getElementById('ganttWeeksHeader');
-            let weekCount = 1;
             mHeader.innerHTML = ''; wHeader.innerHTML = '';
-            
+
+            // columnIndex is the zero-based index relative to the visible grid start
+            let columnIndex = 0;
+
             VISIBLE_MONTHS.forEach(m => {
                 const monthDiv = document.createElement('div');
                 monthDiv.className = `gantt-header-month ${m.color} text-xs tracking-wider`;
-                monthDiv.style.width = `${m.weeks * 30}px`; monthDiv.textContent = m.name;
+                monthDiv.style.width = `${m.weeks * 20}px`;
+                monthDiv.textContent = m.name;
                 mHeader.appendChild(monthDiv);
-                for(let i=0; i<m.weeks; i++) {
+
+                for (let i = 0; i < m.weeks; i++) {
                     const weekDiv = document.createElement('div');
                     weekDiv.className = 'flex items-center justify-center text-[9px] text-slate-400 font-medium border-r border-slate-200';
-                    weekDiv.style.width = '30px'; 
-                    weekDiv.textContent = `${weekCount}`;
-                    wHeader.appendChild(weekDiv); weekCount++;
+                    weekDiv.style.width = '20px';
+                    // Calculate absolute week index from start of year (0-based), then display 1-based week number
+                    const absoluteWeek = (OFFSET_WEEKS_INDEX + columnIndex) % MAX_YEAR_WEEKS;
+                    const displayWeek = absoluteWeek + 1; // week numbers: 1..52
+                    weekDiv.textContent = `${displayWeek}`;
+                    wHeader.appendChild(weekDiv);
+                    columnIndex++;
                 }
             });
-            const fullWidth = VISIBLE_TOTAL_WEEKS * 30;
+            const fullWidth = VISIBLE_TOTAL_WEEKS * 20;
             mHeader.style.minWidth = `${fullWidth}px`; wHeader.style.minWidth = `${fullWidth}px`;
             return fullWidth;
         }
@@ -324,14 +335,40 @@
         const FULL_WIDTH_PX = initHeaders();
 
         function syncRowHeights() {
-            const leftRows = taskContainer.querySelectorAll('.data-row');
-            const rightRows = ganttContainer.querySelectorAll('.data-row');
+            const leftScroll = taskContainer;
+            const rightScroll = ganttContainer;
+            const leftRows = leftScroll.querySelectorAll('.data-row');
+            const rightRows = rightScroll.querySelectorAll('.data-row');
+
+            // Reset heights before recalculating
             leftRows.forEach(r => r.style.height = 'auto');
             rightRows.forEach(r => r.style.height = 'auto');
+
+            // Align row heights
             for (let i = 0; i < Math.min(leftRows.length, rightRows.length); i++) {
-                const h = Math.max(leftRows[i].offsetHeight, rightRows[i].offsetHeight, 48); 
+                const h = Math.max(leftRows[i].offsetHeight, rightRows[i].offsetHeight, 48);
                 leftRows[i].style.height = `${h}px`;
                 rightRows[i].style.height = `${h}px`;
+            }
+
+            // Attach scroll sync listeners once to avoid many handlers
+            if (!_scrollSyncInitialized) {
+                let isSyncingScroll = false;
+                rightScroll.addEventListener('scroll', () => {
+                    if (isSyncingScroll) return;
+                    isSyncingScroll = true;
+                    leftScroll.scrollTop = rightScroll.scrollTop;
+                    requestAnimationFrame(() => { isSyncingScroll = false; });
+                }, { passive: true });
+
+                leftScroll.addEventListener('scroll', () => {
+                    if (isSyncingScroll) return;
+                    isSyncingScroll = true;
+                    rightScroll.scrollTop = leftScroll.scrollTop;
+                    requestAnimationFrame(() => { isSyncingScroll = false; });
+                }, { passive: true });
+
+                _scrollSyncInitialized = true;
             }
         }
 
@@ -344,6 +381,18 @@
         }
 
         function dateToWeekNumber(dateStr) {
+            if (!dateStr) return -1;
+            const parts = dateStr.split('/');
+            if (parts.length !== 3) return -1;
+            const d = new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
+            const startOfYear = new Date(d.getFullYear(), 0, 1);
+            const diff = d - startOfYear;
+            // Return 1-based week number (weeks starting at day 1..7 => week 1)
+            return Math.floor(diff / (1000 * 60 * 60 * 24 * 7)) + 1;
+        }
+
+        // Zero-based week index for internal array indexing (0..51)
+        function dateToWeekIndex(dateStr) {
             if (!dateStr) return -1;
             const parts = dateStr.split('/');
             if (parts.length !== 3) return -1;
@@ -367,6 +416,32 @@
             if (!isoStr) return '';
             const [year, month, day] = isoStr.split('-');
             return `${day}/${month}/${year}`;
+        }
+        function formatDateDMY(str) {
+            if (!str) return '';
+            // ISO format: yyyy-mm-dd
+            if (str.includes('-')) {
+                const parts = str.split('-');
+                if (parts.length === 3) {
+                    const [y, m, d] = parts;
+                    return `${String(d).padStart(2, '0')}/${String(m).padStart(2, '0')}/${y}`;
+                }
+            }
+            // Slash format: try dd/mm/yyyy or yyyy/mm/dd
+            if (str.includes('/')) {
+                const parts = str.split('/');
+                if (parts.length === 3) {
+                    // if first part is 4 chars treat as yyyy/mm/dd
+                    if (parts[0].length === 4) {
+                        return `${String(parts[2]).padStart(2, '0')}/${String(parts[1]).padStart(2, '0')}/${parts[0]}`;
+                    }
+                    return `${String(parts[0]).padStart(2, '0')}/${String(parts[1]).padStart(2, '0')}/${parts[2]}`;
+                }
+            }
+            // Fallback: try Date parse
+            const d = new Date(str);
+            if (!isNaN(d)) return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
+            return str;
         }
         function padGantt(arr) {
             // Ensure data array is full year length (52)
@@ -437,15 +512,15 @@
 
         function matchesFilters(p) {
             const status = calculateProjectStatus(p.tasks);
-            if (status === 3) return false; 
+            if (!SHOW_COMPLETED && status === 3) return false; 
             if (SHOW_PRIORITY && !isPriorityProject(p)) return false;
             
             // Month Filter Check (Range Overlap)
             if (FILTERS.month !== 'all') {
                 const mi = parseInt(FILTERS.month, 10);
                 const { start: mStart, end: mEnd } = getMonthRange(mi);
-                
-                const pStartW = dateToWeekNumber(p.inicio);
+
+                const pStartW = dateToWeekIndex(p.inicio);
                 // Calculate Project Duration based on Tasks
                 let pEndW = -1;
                 
@@ -482,6 +557,19 @@
                 document.getElementById('filter-project').value = '';
                 FILTERS.area = ''; FILTERS.project = '';
             } else { btn.classList.remove('btn-priority-active'); }
+            render();
+        }
+
+        function toggleShowCompleted() {
+            SHOW_COMPLETED = !SHOW_COMPLETED;
+            const btn = document.getElementById('btn-show-complete');
+            if (SHOW_COMPLETED) {
+                btn.classList.add('btn-priority-active');
+                btn.textContent = 'Ocultar completados';
+            } else {
+                btn.classList.remove('btn-priority-active');
+                btn.textContent = 'Ver completo';
+            }
             render();
         }
 
@@ -522,7 +610,10 @@
                     <div class="cell col-area text-blue-700">${p.area}</div>
                     <div class="cell col-tipo text-xs font-bold text-slate-700">${calculatedType}</div>
                     <div class="cell col-estado"><div class="status-badge-select ${statusClass}" style="cursor: default; pointer-events: none;">${statusText}</div></div>
-                    <div class="cell col-inicio"><input type="date" class="table-input text-center font-bold" value="${dateToISO(p.inicio)}" onchange="updateProjectDate('${p.id}', dateFromISO(this.value))" onclick="event.stopPropagation()"></div>
+                    <div class="cell col-inicio">
+                        <input type="date" class="table-input text-center font-bold" value="${dateToISO(p.inicio)}" onchange="updateProjectDate('${p.id}', dateFromISO(this.value))" onclick="event.stopPropagation()">
+                        <div class="text-xs text-slate-500 mt-1">${formatDateDMY(p.inicio)}</div>
+                    </div>
                     <div class="cell col-nombre font-bold text-slate-700 group-hover:text-blue-800 transition"><span onclick="toggleProject('${p.id}')">${p.nombre}</span></div>
                     <div class="cell col-gestor">${p.gestor || ''}</div>
                     <div class="cell col-ejecutor font-bold text-slate-600"></div>
@@ -564,8 +655,8 @@
                 if (minStart <= maxEnd && maxEnd >= viewStartIdx && minStart <= viewEndIdx) {
                     const drawStart = Math.max(minStart, viewStartIdx);
                     const drawEnd = Math.min(maxEnd, viewEndIdx);
-                    const leftPx = (drawStart - viewStartIdx) * 30;
-                    const widthPx = (drawEnd - drawStart + 1) * 30;
+                    const leftPx = (drawStart - viewStartIdx) * 20;
+                    const widthPx = (drawEnd - drawStart + 1) * 20;
                     
                     const barContainer = document.createElement('div');
                     barContainer.className = 'absolute top-1/2 -translate-y-1/2 h-5 bg-slate-200 rounded text-xs font-bold text-slate-700 flex items-center justify-center z-20 pointer-events-none overflow-visible whitespace-nowrap shadow-sm border border-slate-300';
@@ -573,8 +664,9 @@
                     barContainer.style.width = `${widthPx}px`;
                     
                     barContainer.innerHTML = `
-                        <div class="absolute left-0 top-0 h-full bg-blue-400 rounded-l transition-all duration-700 opacity-60" style="width: ${progressPct}%; border-radius: inherit;"></div>
-                        <span class="relative z-10 px-2 drop-shadow-md text-[10px]">${completedCount}/${totalCount} &bull; ${progressPct}%</span>
+                        <div class="absolute left-0 top-0 h-full bg-blue-400 rounded-l transition-all duration-700 opacity-80 flex items-center justify-center overflow-hidden" style="width: ${progressPct}%; border-radius: inherit;">
+                            <span class="z-10 px-2 drop-shadow-md text-[10px] text-white font-semibold truncate">${completedCount}/${totalCount} • ${progressPct}%</span>
+                        </div>
                     `;
                     pRowRight.appendChild(barContainer);
                 }
@@ -594,20 +686,25 @@
                 if (p.expanded) {
                     p.tasks.forEach((t, tIndex) => {
                         // TASK VISIBILITY FILTER (Inside Project)
+                        // Hide finished tasks unless SHOW_COMPLETED is enabled
+                        if (t.status === 3 && !SHOW_COMPLETED) return;
                         let showTask = true;
                         
                         const viewStartIdx = OFFSET_WEEKS_INDEX;
                         const viewEndIdx = OFFSET_WEEKS_INDEX + VISIBLE_TOTAL_WEEKS - 1;
                         
-                        const taskStartW = dateToWeekNumber(t.inicio);
+                        const taskStartW = dateToWeekIndex(t.inicio);
                         let taskEndW = t.gantt.lastIndexOf(1);
                         if (taskEndW < taskStartW) taskEndW = taskStartW;
                         
-                        if (taskEndW < viewStartIdx || taskStartW > viewEndIdx) {
-                            showTask = false;
+                        // If SHOW_ALL_TASKS is true we always list the task in the left panel
+                        if (!SHOW_ALL_TASKS) {
+                            if (taskEndW < viewStartIdx || taskStartW > viewEndIdx) {
+                                showTask = false;
+                            }
                         }
 
-                        if (!showTask) return; 
+                        if (!showTask) return;
 
                         const tRowLeft = document.createElement('div');
                         tRowLeft.className = 'data-row hover:bg-slate-50';
@@ -619,7 +716,7 @@
                         tRowLeft.innerHTML = `
                             <div class="cell col-icon"></div><div class="cell col-area"></div>
                             <div class="cell col-tipo">${tipoSelectTask}</div><div class="cell col-estado">${statusSelectTask}</div>
-                            <div class="cell col-inicio"><input type="date" class="table-input text-center font-bold text-xs" value="${dateToISO(t.inicio || p.inicio)}" onchange="updateTaskDate('${p.id}', ${tIndex}, dateFromISO(this.value))" onclick="event.stopPropagation()"></div>
+                            <div class="cell col-inicio"><input type="date" class="table-input text-center font-bold text-xs" value="${dateToISO(t.inicio || p.inicio)}" onchange="updateTaskDate('${p.id}', ${tIndex}, dateFromISO(this.value))" onclick="event.stopPropagation()"><div class="text-xs text-slate-500 mt-1">${formatDateDMY(t.inicio || p.inicio)}</div></div>
                             <div class="cell col-nombre pl-6 text-sm"><span class="tree-line-v"></span><span class="tree-line-h"></span><div class="tree-connector"></div>${t.nombre}</div>
                             <div class="cell col-gestor"></div>
                             <div class="cell col-ejecutor text-xs text-slate-500">${t.ejecutor}</div>
@@ -640,8 +737,8 @@
                         if (tMin <= tMax && tMax >= viewStartIdx && tMin <= viewEndIdx) {
                             const drawStart = Math.max(tMin, viewStartIdx);
                             const drawEnd = Math.min(tMax, viewEndIdx);
-                            const leftPx = (drawStart - viewStartIdx) * 30;
-                            const widthPx = (drawEnd - drawStart + 1) * 30;
+                            const leftPx = (drawStart - viewStartIdx) * 20;
+                            const widthPx = (drawEnd - drawStart + 1) * 20;
                             
                             const barColorClass = STATE_COLORS[tStatus] || 'bg-blue-400';
 
@@ -672,8 +769,62 @@
         // ========= INTERACTION FUNCTIONS (Saving/Updating) =========
         function updateTaskStatus(pid, tidx, val) { const p = projectData.find(x => x.id === pid); if(p && p.tasks[tidx]) { p.tasks[tidx].status = parseInt(val); saveToSheetAsync(pid, tidx); render(); } }
         function updateTaskType(pid, tidx, val) { const p = projectData.find(x => x.id === pid); if(p && p.tasks[tidx]) { p.tasks[tidx].tipo = val; saveToSheetAsync(pid, tidx); } }
-        function updateTaskDate(pid, tidx, val) { const p = projectData.find(x => x.id === pid); if(p && p.tasks[tidx]) { p.tasks[tidx].inicio = val; const startWeek = dateToWeekNumber(val); if (startWeek >= 0 && startWeek < MAX_YEAR_WEEKS) p.tasks[tidx].gantt[startWeek] = 1; saveToSheetAsync(pid, tidx); render(); } }
-        function updateProjectDate(pid, val) { const p = projectData.find(x => x.id === pid); if(p) { p.inicio = val; const startWeek = dateToWeekNumber(val); if (startWeek >= 0 && startWeek < MAX_YEAR_WEEKS) { if (!p.gantt) p.gantt = new Array(MAX_YEAR_WEEKS).fill(0); p.gantt[startWeek] = 1; } render(); } }
+        function updateTaskDate(pid, tidx, val) {
+            const p = projectData.find(x => x.id === pid);
+            if (p && p.tasks[tidx]) {
+                const t = p.tasks[tidx];
+                t.inicio = val;
+            const startWeek = dateToWeekIndex(val);
+                if (!(startWeek >= 0 && startWeek < MAX_YEAR_WEEKS)) { saveToSheetAsync(pid, tidx); render(); return; }
+
+                // Determine current painted length (continuous block) to preserve duration
+                let curMin = -1, curMax = -1;
+                for (let i = 0; i < MAX_YEAR_WEEKS; i++) {
+                    if (t.gantt && t.gantt[i] > 0) {
+                        if (curMin === -1) curMin = i;
+                        curMax = i;
+                    }
+                }
+                let length = 1;
+                if (curMin !== -1 && curMax !== -1) length = Math.max(1, curMax - curMin + 1);
+
+                const newGantt = new Array(MAX_YEAR_WEEKS).fill(0);
+                const endIdx = Math.min(MAX_YEAR_WEEKS - 1, startWeek + length - 1);
+                for (let i = startWeek; i <= endIdx; i++) newGantt[i] = 1;
+                t.gantt = newGantt;
+
+                saveToSheetAsync(pid, tidx);
+                render();
+            }
+        }
+        function updateProjectDate(pid, val) {
+            const p = projectData.find(x => x.id === pid);
+            if (p) {
+                const oldInicio = p.inicio;
+                p.inicio = val;
+                const startWeek = dateToWeekIndex(val);
+                if (!(startWeek >= 0 && startWeek < MAX_YEAR_WEEKS)) { render(); return; }
+
+                // Preserve existing painted span length for project gantt
+                if (!p.gantt) p.gantt = new Array(MAX_YEAR_WEEKS).fill(0);
+                let curMin = -1, curMax = -1;
+                for (let i = 0; i < MAX_YEAR_WEEKS; i++) {
+                    if (p.gantt[i] > 0) {
+                        if (curMin === -1) curMin = i;
+                        curMax = i;
+                    }
+                }
+                let length = 1;
+                if (curMin !== -1 && curMax !== -1) length = Math.max(1, curMax - curMin + 1);
+
+                const newGantt = new Array(MAX_YEAR_WEEKS).fill(0);
+                const endIdx = Math.min(MAX_YEAR_WEEKS - 1, startWeek + length - 1);
+                for (let i = startWeek; i <= endIdx; i++) newGantt[i] = 1;
+                p.gantt = newGantt;
+
+                render();
+            }
+        }
         
         function toggleCell(pid, tidx, wIndex) {
             const p = projectData.find(x => x.id === pid); if (!p) return;
@@ -848,11 +999,11 @@
 
             // Format date
             if (inicio.includes('-')) { const [y, m, d] = inicio.split('-'); inicio = `${d}/${m}/${y}`; }
-            const semanaInicio = dateToWeekNumber(inicio);
+            const semanaInicioIdx = dateToWeekIndex(inicio);
             
             // Local Update
             const ganttArr = padGantt([1]); 
-            const fFinCalculada = semanaInicio + 1; 
+            const fFinCalculada = semanaInicioIdx + 1; 
 
             if (createMode === 'project') {
                 const newId = 'u' + Date.now();
@@ -1002,21 +1153,57 @@
         }
 
         function renderKpiForm() {
-            const kpi = currentKpiProject.kpis[activeKpiIndex]; const monthly = kpi.monthly || {};
-            const container = document.getElementById('kpiFormContainer'); const months = ['ENE', 'FEB', 'MAR', 'ABR', 'MAY', 'JUN', 'JUL', 'AGO', 'SEP', 'OCT', 'NOV', 'DIC'];
-            container.innerHTML = `
+            const kpi = currentKpiProject.kpis[activeKpiIndex];
+            const monthly = kpi.monthly || {};
+            const container = document.getElementById('kpiFormContainer');
+            const months = ['ENE', 'FEB', 'MAR', 'ABR', 'MAY', 'JUN', 'JUL', 'AGO', 'SEP', 'OCT', 'NOV', 'DIC'];
+            
+            let fieldsHTML = `
                 <div class="mb-6 grid grid-cols-2 gap-4">
-                     <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Objetivo</label><input class="w-full border border-slate-300 rounded p-2 text-sm" value="${kpi.objetivo || ''}" placeholder="Ej: Reducir costos..." oninput="updateKpiField('objetivo', this.value)"></div>
-                     <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Indicador</label><input class="w-full border border-slate-300 rounded p-2 text-sm" value="${kpi.indicador || ''}" placeholder="Ej: % Defectos" oninput="updateKpiField('indicador', this.value)"></div>
-                     <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Línea Base</label><input class="w-full border border-slate-300 rounded p-2 text-sm" value="${kpi.l_base || ''}" oninput="updateKpiField('l_base', this.value)"></div>
-                     <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Meta</label><input class="w-full border border-slate-300 rounded p-2 text-sm" value="${kpi.meta || ''}" oninput="updateKpiField('meta', this.value)"></div>
-                     <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Numerador</label><input class="w-full border border-slate-300 rounded p-2 text-sm" value="${kpi.numerador || ''}" oninput="updateKpiField('numerador', this.value)"></div>
-                     <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Denominador</label><input class="w-full border border-slate-300 rounded p-2 text-sm" value="${kpi.denominador || ''}" oninput="updateKpiField('denominador', this.value)"></div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Objetivo</label>
+                        <input class="w-full border border-slate-300 rounded p-2 text-sm" value="${kpi.objetivo || ''}" placeholder="Ej: Reducir costos..." oninput="updateKpiField('objetivo', this.value)">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Indicador</label>
+                        <input class="w-full border border-slate-300 rounded p-2 text-sm" value="${kpi.indicador || ''}" placeholder="Ej: % Defectos" oninput="updateKpiField('indicador', this.value)">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Línea Base</label>
+                        <input class="w-full border border-slate-300 rounded p-2 text-sm" value="${kpi.l_base || ''}" placeholder="Valor base inicial" oninput="updateKpiField('l_base', this.value)">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Meta</label>
+                        <input class="w-full border border-slate-300 rounded p-2 text-sm" value="${kpi.meta || ''}" placeholder="Valor objetivo" oninput="updateKpiField('meta', this.value)">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Numerador</label>
+                        <input class="w-full border border-slate-300 rounded p-2 text-sm" value="${kpi.numerador || ''}" oninput="updateKpiField('numerador', this.value)">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Denominador</label>
+                        <input class="w-full border border-slate-300 rounded p-2 text-sm" value="${kpi.denominador || ''}" oninput="updateKpiField('denominador', this.value)">
+                    </div>
                 </div>
+            `;
+            
+            let tableHTML = `
                 <div class="bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden overflow-x-auto">
-                    <table class="kpi-table w-full"><thead><tr><th class="text-left w-32 bg-slate-100">MES</th>${months.map(m => `<th>${m}</th>`).join('')}</tr></thead>
-                        <tbody><tr><td class="font-bold bg-slate-50 text-left pl-3">Valor</td>${months.map(m => `<td class="p-0"><input class="text-center w-full h-full py-2 hover:bg-slate-50" data-month="${m.toLowerCase()}" value="${monthly[m.toLowerCase()] || ''}" placeholder="-" oninput="updateKpiMonth('${m.toLowerCase()}', this.value)"></td>`).join('')}</tr></tbody></table>
-                </div>`;
+                    <table class="kpi-table w-full">
+                        <thead>
+                            <tr><th class="text-left w-32 bg-slate-100">MES</th>${months.map(m => `<th>${m}</th>`).join('')}</tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="font-bold bg-slate-50 text-left pl-3">Valor</td>
+                                ${months.map(m => `<td class="p-0"><input class="text-center w-full h-full py-2 hover:bg-slate-50" data-month="${m.toLowerCase()}" value="${monthly[m.toLowerCase()] || ''}" placeholder="-" oninput="updateKpiMonth('${m.toLowerCase()}', this.value)"></td>`).join('')}
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            
+            container.innerHTML = fieldsHTML + tableHTML;
         }
 
         async function saveCurrentKpi() {
@@ -1079,7 +1266,7 @@
                 if (taskName.trim()) {
                     let taskGantt = padGantt([]);
                     if(row['F.INICIO'] && row['F. FIN']) {
-                        const startW = dateToWeekNumber(row['F.INICIO']); const endW = parseInt(row['F. FIN'], 10) - 1;
+                                const startW = dateToWeekIndex(row['F.INICIO']); const endW = parseInt(row['F. FIN'], 10) - 1;
                         if(startW >=0 && endW >= startW) { for(let i=startW; i<=endW; i++) { if(i < MAX_YEAR_WEEKS) taskGantt[i] = 1; } }
                     }
                     proyectosMap.get(projName).tasks.push({
