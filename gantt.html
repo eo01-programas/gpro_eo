@@ -612,7 +612,6 @@
                     <div class="cell col-estado"><div class="status-badge-select ${statusClass}" style="cursor: default; pointer-events: none;">${statusText}</div></div>
                     <div class="cell col-inicio">
                         <input type="date" class="table-input text-center font-bold" value="${dateToISO(p.inicio)}" onchange="updateProjectDate('${p.id}', dateFromISO(this.value))" onclick="event.stopPropagation()">
-                        <div class="text-xs text-slate-500 mt-1">${formatDateDMY(p.inicio)}</div>
                     </div>
                     <div class="cell col-nombre font-bold text-slate-700 group-hover:text-blue-800 transition"><span onclick="toggleProject('${p.id}')">${p.nombre}</span></div>
                     <div class="cell col-gestor">${p.gestor || ''}</div>
@@ -716,7 +715,7 @@
                         tRowLeft.innerHTML = `
                             <div class="cell col-icon"></div><div class="cell col-area"></div>
                             <div class="cell col-tipo">${tipoSelectTask}</div><div class="cell col-estado">${statusSelectTask}</div>
-                            <div class="cell col-inicio"><input type="date" class="table-input text-center font-bold text-xs" value="${dateToISO(t.inicio || p.inicio)}" onchange="updateTaskDate('${p.id}', ${tIndex}, dateFromISO(this.value))" onclick="event.stopPropagation()"><div class="text-xs text-slate-500 mt-1">${formatDateDMY(t.inicio || p.inicio)}</div></div>
+                            <div class="cell col-inicio"><input type="date" class="table-input text-center font-bold text-xs" value="${dateToISO(t.inicio || p.inicio)}" onchange="updateTaskDate('${p.id}', ${tIndex}, dateFromISO(this.value))" onclick="event.stopPropagation()"></div>
                             <div class="cell col-nombre pl-6 text-sm"><span class="tree-line-v"></span><span class="tree-line-h"></span><div class="tree-connector"></div>${t.nombre}</div>
                             <div class="cell col-gestor"></div>
                             <div class="cell col-ejecutor text-xs text-slate-500">${t.ejecutor}</div>
@@ -831,31 +830,34 @@
             
             const target = (tidx === -1) ? p : p.tasks[tidx];
             let startDate = target.inicio;
-            if (tidx >= 0 && !startDate) startDate = p.inicio; 
+            if (tidx >= 0 && !startDate) startDate = p.inicio;
             if (!startDate) { showToast('Establece fecha inicio primero', 'error'); return; }
-            
-            // Map visual click (0..17) to actual year week (0..52)
+
+            // Map visual click (0..N) to actual year week (0..51)
             const actualClickWeek = OFFSET_WEEKS_INDEX + wIndex;
-            let startWeek = dateToWeekNumber(startDate);
-            
-            if (actualClickWeek < startWeek) { 
-                showToast('No puedes programar antes de la fecha de inicio', 'error'); 
-                return; 
+
+            // Use zero-based week index helper to avoid 0/1-based mismatch
+            let startWeek = dateToWeekIndex(startDate);
+            if (startWeek === -1) startWeek = 0;
+
+            if (actualClickWeek < startWeek) {
+                showToast('No puedes programar antes de la fecha de inicio', 'error');
+                return;
             }
 
             // Continuous bar: reset and fill range
             const newGantt = new Array(MAX_YEAR_WEEKS).fill(0);
-            
+
             const startIdx = Math.max(0, startWeek);
             const endIdx = Math.min(MAX_YEAR_WEEKS - 1, actualClickWeek);
-            
-            for(let i = startIdx; i <= endIdx; i++) {
+
+            for (let i = startIdx; i <= endIdx; i++) {
                 newGantt[i] = 1;
             }
             target.gantt = newGantt;
 
-            if (tidx !== -1) { 
-                saveToSheetAsync(pid, tidx); 
+            if (tidx !== -1) {
+                saveToSheetAsync(pid, tidx);
             }
             render();
         }
