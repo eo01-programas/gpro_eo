@@ -1386,38 +1386,6 @@
             </div>
         </div>
     </div>
-
-            <!-- MODAL CREAR REQUERIMIENTO -->
-            <div id="create-req-modal" style="display:none;" class="modal-overlay">
-                <div class="modal-content">
-                    <span class="modal-close" id="create-req-close">&times;</span>
-                    <h2 id="create-req-title">Crear Requerimiento</h2>
-                    <div style="display:flex;flex-direction:column;gap:8px;padding-top:8px;">
-                        <label>Area
-                            <select id="req-area" class="table-input"></select>
-                        </label>
-                        <label>Proyecto
-                            <select id="req-project" class="table-input"></select>
-                        </label>
-                        <label>Tarea
-                            <input id="req-task" class="table-input" placeholder="Nombre de la tarea">
-                        </label>
-                        <label>Tipo
-                            <select id="req-tipo" class="table-input"></select>
-                        </label>
-                        <label>F. Inicio
-                            <input id="req-inicio" class="table-input" placeholder="DD/MM/AAAA" value="14/01">
-                        </label>
-                        <label>Ejecutor
-                            <select id="req-ejecutor" class="table-input"></select>
-                        </label>
-                        <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:6px;">
-                            <button id="req-cancel" class="modal-close" style="padding:6px 10px;">Cancelar</button>
-                            <button id="req-save" style="padding:6px 10px;background:#0d6efd;color:#fff;border-radius:6px;border:none;">Guardar</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
 </div>
 
 <script>
@@ -1454,151 +1422,21 @@ document.addEventListener('DOMContentLoaded', () => {
     // Open standalone Gantt page (external file)
     if ($ganttButton) {
         $ganttButton.addEventListener('click', () => {
-            const url = 'gantt.html';
-            window.location.href = url;
+            try {
+                const url = 'gantt.html';
+                window.open(url, '_blank');
+            } catch (e) {
+                // fallback to embedded modal if popups are blocked
+                const main = document.querySelector('.main-layout-container');
+                const ganttModal = document.getElementById('gantt-modal');
+                if (main) main.style.display = 'none';
+                if (ganttModal) {
+                    ganttModal.style.display = 'block';
+                    if (typeof window.ganttRender === 'function') window.ganttRender();
+                }
+            }
         });
     }
-    // Create Requirement UI
-    const $createReqButton = document.getElementById('create-req-button');
-    const $createReqModal = document.getElementById('create-req-modal');
-    const $createReqClose = document.getElementById('create-req-close');
-    const $reqArea = document.getElementById('req-area');
-    const $reqProject = document.getElementById('req-project');
-    const $reqTask = document.getElementById('req-task');
-    const $reqTipo = document.getElementById('req-tipo');
-    const $reqInicio = document.getElementById('req-inicio');
-    const $reqEjecutor = document.getElementById('req-ejecutor');
-    const $reqSave = document.getElementById('req-save');
-    const $reqCancel = document.getElementById('req-cancel');
-
-    function parseGvizJsonText(t) {
-        try {
-            const jsonText = t.replace(/^.*?(\{[\s\S]*\})\;?$/,'$1');
-            return JSON.parse(jsonText);
-        } catch(e){ return null; }
-    }
-
-    async function fetchBdAreas() {
-        try {
-            const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(SHEET_NAME_BD)}`;
-            const res = await fetch(url);
-            const txt = await res.text();
-            const obj = parseGvizJsonText(txt);
-            if(!obj || !obj.table || !obj.table.rows) return [];
-            const rows = obj.table.rows.map(r => (r.c && r.c[0] && r.c[0].v) ? String(r.c[0].v).trim() : '').filter(x=>x);
-            // unique
-            return Array.from(new Set(rows));
-        } catch (e) {
-            console.warn('fetchBdAreas err', e);
-            return [];
-        }
-    }
-
-    async function fetchBdColumnValues(colName) {
-        try {
-            const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(SHEET_NAME_BD)}`;
-            const res = await fetch(url);
-            const txt = await res.text();
-            const obj = parseGvizJsonText(txt);
-            if(!obj || !obj.table || !obj.table.cols || !obj.table.rows) return [];
-            const cols = obj.table.cols;
-            let idx = -1;
-            const target = String(colName||'').trim().toLowerCase();
-            for(let i=0;i<cols.length;i++){ const lbl = String(cols[i].label||cols[i].id||'').trim().toLowerCase(); if(lbl === target) { idx = i; break; } }
-            if(idx === -1) { for(let i=0;i<cols.length;i++){ const lbl = String(cols[i].label||'').toLowerCase(); if(lbl.includes(target)) { idx = i; break; } } }
-            if(idx === -1) return [];
-            const rows = obj.table.rows.map(rw => (rw.c && rw.c[idx] && rw.c[idx].v) ? String(rw.c[idx].v).trim() : '').filter(x=>x);
-            return Array.from(new Set(rows));
-        } catch (e) { console.warn('fetchBdColumnValues err', e); return []; }
-    }
-
-    async function openCreateReqModal() {
-        showLoading();
-        const areas = await fetchBdAreas();
-        hideLoading();
-
-        // Area
-        $reqArea.innerHTML = '';
-        const optEmpty = document.createElement('option'); optEmpty.value = ''; optEmpty.text = '-- Seleccione area --'; $reqArea.appendChild(optEmpty);
-        areas.forEach(a=>{ const o=document.createElement('option'); o.value=a; o.text=a; $reqArea.appendChild(o); });
-
-        // Proyecto (existing projects + option to create new)
-        const $reqProj = document.getElementById('req-project');
-        if($reqProj) {
-            $reqProj.innerHTML = '';
-            const newOpt = document.createElement('option'); newOpt.value = 'new'; newOpt.text = '+ Nuevo Proyecto'; $reqProj.appendChild(newOpt);
-            if (typeof projectData !== 'undefined' && Array.isArray(projectData)) {
-                const uniqueProjects = Array.from(new Set(projectData.map(p => p.nombre)));
-                uniqueProjects.forEach(pn => { const o=document.createElement('option'); o.value = pn; o.text = pn; $reqProj.appendChild(o); });
-            }
-        }
-
-        // Tipo
-        const $reqTipo = document.getElementById('req-tipo');
-        if($reqTipo) {
-            $reqTipo.innerHTML = '';
-            const tiposArr = ['Proceso','Digital','Maquina','Digital + IA'];
-            tiposArr.forEach(t=>{ const o=document.createElement('option'); o.value=t; o.text=t; $reqTipo.appendChild(o); });
-        }
-
-        // Ejecutor (prefer from Bd sheet column 'Ejecutor', fallback to projectData)
-        const $reqExec = document.getElementById('req-ejecutor');
-        if($reqExec) {
-            $reqExec.innerHTML = '';
-            const emptyExec = document.createElement('option'); emptyExec.value=''; emptyExec.text='-- Seleccione ejecutor --'; $reqExec.appendChild(emptyExec);
-            const execsFromSheet = await fetchBdColumnValues('ejecutor');
-            if (execsFromSheet && execsFromSheet.length) {
-                execsFromSheet.forEach(e=>{ const o=document.createElement('option'); o.value=e; o.text=e; $reqExec.appendChild(o); });
-            } else if (typeof projectData !== 'undefined' && Array.isArray(projectData)) {
-                const uniqueExecs = Array.from(new Set(projectData.flatMap(p => [p.ejecutor, ...p.tasks.map(t=>t.ejecutor)])));
-                uniqueExecs.filter(x=>x).forEach(e=>{ const o=document.createElement('option'); o.value=e; o.text=e; $reqExec.appendChild(o); });
-            }
-        }
-
-        $createReqModal.style.display = 'flex';
-    }
-
-    if($createReqButton) $createReqButton.addEventListener('click', () => openCreateReqModal());
-    if($createReqClose) $createReqClose.addEventListener('click', ()=> $createReqModal.style.display='none');
-    if($reqCancel) $reqCancel.addEventListener('click', ()=> $createReqModal.style.display='none');
-
-    $reqSave && $reqSave.addEventListener('click', () => {
-        const area = $reqArea.value || 'GENERAL';
-        let proyecto = ($reqProject.value || 'Proyecto sin nombre').trim();
-        const tarea = ($reqTask.value || 'Tarea sin nombre').trim();
-        const tipo = ($reqTipo.value || 'Proceso').trim();
-        const inicio = ($reqInicio.value || '14/01').trim();
-        const ejecutor = ($reqEjecutor.value || 'Equipo').trim();
-
-        if (proyecto === 'new') {
-            proyecto = prompt('Ingrese nombre del nuevo proyecto:') || 'Proyecto sin nombre';
-        }
-
-        if (typeof projectData !== 'undefined' && Array.isArray(projectData)) {
-            const existingProject = projectData.find(p => p.nombre === proyecto);
-            const ganttArr = new Array(13).fill(0); ganttArr[0] = 1;
-            if (existingProject) {
-                const newTaskId = existingProject.id + 't' + (existingProject.tasks.length + 1);
-                existingProject.tasks.push({ id: newTaskId, nombre: tarea, tipo: tipo, ejecutor: ejecutor, status: 1, gantt: ganttArr });
-            } else {
-                const newId = 'u' + Date.now();
-                const newTaskId = newId + 't1';
-                const newProject = {
-                    id: newId,
-                    area: area,
-                    tipo: tipo,
-                    inicio: inicio,
-                    nombre: proyecto,
-                    ejecutor: ejecutor,
-                    expanded: true,
-                    tasks: [ { id: newTaskId, nombre: tarea, tipo: tipo, ejecutor: ejecutor, status: 1, gantt: ganttArr } ]
-                };
-                projectData.push(newProject);
-            }
-            if(window.ganttRender) window.ganttRender();
-        }
-        $createReqModal.style.display = 'none';
-    });
     const $kanbanModal = document.getElementById('kanban-modal');
     const $kanbanModalClose = document.getElementById('kanban-modal-close-button');
     const $kanbanColEstacionamiento = document.getElementById('kanban-col-estacionamiento');
@@ -2456,50 +2294,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     { tipo: "Digital", inicio: "04/02", nombre: "Gantt de producción por máquinas", ejecutor: "EO", gantt: [0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0] },
                     { tipo: "Digital", inicio: "18/02", nombre: "Sistematización de Hoja de Ruta", ejecutor: "EO", gantt: [0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0] },
                     { tipo: "Digital", inicio: "25/02", nombre: "Control de piso (Continuas)", ejecutor: "EO", gantt: [0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0] }
-                ]
-            }
-            ,
-            {
-                id: "p2",
-                area: "HILANDERIA",
-                tipo: "PROYECTO",
-                inicio: "14/01",
-                nombre: "Optimizacion flujo de produccion",
-                ejecutor: "Equipo",
-                expanded: true,
-                tasks: [
-                    { tipo: "Proceso", inicio: "14/01", nombre: "Revision y analisis de la situacion actual (Mapeo de proceso)", ejecutor: "Equipo", gantt: [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] },
-                    { tipo: "Proceso", inicio: "14/01", nombre: "Revision de tiempos, métodos (gemba walk)", ejecutor: "Equipo", gantt: [0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] }
-                ]
-            }
-            ,
-            {
-                id: "p3",
-                area: "PCP CONFECCIONES",
-                tipo: "PROYECTO",
-                inicio: "14/01",
-                nombre: "Programacion corte/habilitado",
-                ejecutor: "Equipo",
-                expanded: true,
-                tasks: [
-                    { tipo: "Proceso", inicio: "14/01", nombre: "Revision y analisis de la situacion actual (Mapeo de proceso)", ejecutor: "Equipo", gantt: [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] },
-                    { tipo: "Proceso", inicio: "14/01", nombre: "Sistematización del método de trabajo en corte (Aplicacion de corte)", ejecutor: "Equipo", gantt: [0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] },
-                    { tipo: "Proceso", inicio: "14/01", nombre: "Sistematización del método de trabajo en habilitado (Aplicacion de habilitado)", ejecutor: "Equipo", gantt: [0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] }
-                ]
-            }
-            ,
-            {
-                id: "p4",
-                area: "CONFECCIONES",
-                tipo: "PROYECTO",
-                inicio: "14/01",
-                nombre: "ANALIZADOR DE LIQUIDACIÓN",
-                ejecutor: "Equipo",
-                expanded: true,
-                tasks: [
-                    { tipo: "Proceso", inicio: "14/01", nombre: "Revision y analisis de la situacion actual (Mapeo de proceso)", ejecutor: "Equipo", gantt: [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] },
-                    { tipo: "Proceso", inicio: "14/01", nombre: "Localizar donde se encuentra las prendas no reportadas (Aplicacion de liquidación)", ejecutor: "Equipo", gantt: [0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] },
-                    { tipo: "Proceso", inicio: "14/01", nombre: "Reportes en tiempo real (Aplicacion de liquidación)", ejecutor: "Equipo", gantt: [0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] }
                 ]
             }
         ];
