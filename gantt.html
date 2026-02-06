@@ -73,6 +73,8 @@
         .kpi-sidebar-item.active { background-color: #eff6ff; border-color: #bfdbfe; color: #1d4ed8; font-weight: 600; }
         .action-btn { padding: 4px; border-radius: 4px; transition: all 0.2s; }
         .action-btn:hover { background-color: #f1f5f9; }
+        .refresh-spinning { animation: spin 1s linear infinite; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
@@ -99,6 +101,15 @@
                         <option value="">Buscar proyecto (todos)</option>
                     </select>
                 </div>
+                <div class="h-6 w-px bg-slate-200"></div>
+                <!-- Timestamp de última actualización -->
+                <div class="flex items-center gap-2 text-xs text-slate-500 bg-slate-100 px-3 py-1.5 rounded-lg">
+                    <i class="fa-solid fa-clock text-slate-400"></i>
+                    <span id="lastUpdateTime">Cargando...</span>
+                </div>
+                <button id="btn-refresh" onclick="refreshDataManual()" class="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-50 transition" title="Refrescar datos ahora">
+                    <i id="refresh-icon" class="fa-solid fa-redo"></i> Refrescar
+                </button>
                 <div class="h-6 w-px bg-slate-200"></div>
                 <button id="btn-priority" onclick="togglePriority()" class="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-50 transition" title="Mostrar solo proyectos prioritarios">
                     <i class="fa-solid fa-star"></i> Prioridad
@@ -247,16 +258,17 @@
 
     <script>
         // ========= CONFIG & GLOBALS =========
-        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzcCIS3vp7aCHGM9OQdJvXi5LfyuE05cJhWXaWKHUNjW5vKuAbBzzxnKCwgDraFWzdx/exec';
+        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxmzcp8_6h51NAihkIE04ZA_JPBghNuCRGKik2XlGlp4uRMbVIpjXEc2u07TiIhOWB_/exec';
         const PROJECT_TYPES = ['Digital', 'Digital + IA', 'Maquina', 'Proceso'];
         const STATUS_BADGE_CLASSES = { 1: 'sb-pendiente', 2: 'sb-proceso', 3: 'sb-terminado' };
         const STATE_ICONS = { 0: '', 1: '!', 2: '►', 3: '✓' };
         const STATE_COLORS = { 1: 'bg-red-500', 2: 'bg-amber-500', 3: 'bg-emerald-500' };
         
         let projectData = [];
+        let projectMap = new Map(); // Fast lookup by ID
         let currentKpiProject = null;
         let activeKpiIndex = 0;
-        let SHOW_PRIORITY = false;
+        let SHOW_PRIORITY = true;
         let SHOW_COMPLETED = false;
         let SHOW_ALL_TASKS = true; // when true, list every task in the left panel regardless of GANTT view range
         const FILTERS = { month: 'all', area: '', project: '' };
@@ -264,6 +276,20 @@
         let confirmCallback = null;
         let createMode = 'project'; 
         let targetProjectId = null;
+        let renderScheduled = false; // Debounce render
+        const ganttMinMaxCache = new Map(); // Cache min/max for gantt arrays
+        
+        // === AUTO-REFRESH CONFIGURATION ===
+        let lastUpdateTime = null;
+        const AUTO_REFRESH_INTERVAL = 5 * 60 * 1000; // 5 minutos en milisegundos
+        let autoRefreshTimerId = null;
+        let isLoadingData = false;
+
+        // Reflect default priority button state in UI (script runs after DOM)
+        if (SHOW_PRIORITY) {
+            const _btn = document.getElementById('btn-priority');
+            if (_btn) _btn.classList.add('btn-priority-active');
+        }
 
         // 12 Months Config (Master)
         const FULL_MONTHS_CONFIG = [
@@ -340,15 +366,16 @@
             const leftRows = leftScroll.querySelectorAll('.data-row');
             const rightRows = rightScroll.querySelectorAll('.data-row');
 
-            // Reset heights before recalculating
-            leftRows.forEach(r => r.style.height = 'auto');
-            rightRows.forEach(r => r.style.height = 'auto');
-
-            // Align row heights
+            // Batch all reads first, then all writes to avoid layout thrashing
+            const heights = [];
             for (let i = 0; i < Math.min(leftRows.length, rightRows.length); i++) {
                 const h = Math.max(leftRows[i].offsetHeight, rightRows[i].offsetHeight, 48);
-                leftRows[i].style.height = `${h}px`;
-                rightRows[i].style.height = `${h}px`;
+                heights.push(h);
+            }
+            // Now batch write all at once
+            for (let i = 0; i < heights.length; i++) {
+                leftRows[i].style.height = `${heights[i]}px`;
+                rightRows[i].style.height = `${heights[i]}px`;
             }
 
             // Attach scroll sync listeners once to avoid many handlers
@@ -499,15 +526,9 @@
         document.getElementById('confirmBtnAction').addEventListener('click', () => { if (confirmCallback) confirmCallback(); closeConfirmModal(); });
 
         function isPriorityProject(p) {
-            const name = p.nombre.toLowerCase();
-            const area = (p.area || '').toLowerCase();
-            if (area.includes('confecciones') && name.includes('programacion corte')) return true; 
-            if (area.includes('hilanderia') && name.includes('digitaliz')) return true; 
-            if (area.includes('hilanderia') && name.includes('optimizacion')) return true; 
-            if (area.includes('costura') && (name.includes('liquidaci') || name.includes('analizador'))) return true; 
-            if (area.includes('comercial') && name.includes('cotizacion')) return true; 
-            if (area.includes('comercial') && name.includes('seguimiento de proto')) return true; 
-            return false;
+            // Un proyecto es prioridad si su campo PRIORIDAD es "ALTA" (case-insensitive)
+            const prioridad = (p.prioridad || '').toUpperCase().trim();
+            return prioridad === 'ALTA';
         }
 
         function matchesFilters(p) {
@@ -595,7 +616,10 @@
             
             const ganttContent = document.createElement('div');
             ganttContent.style.minWidth = `${FULL_WIDTH_PX}px`;
-            ganttContainer.appendChild(ganttContent);
+            
+            // Use DocumentFragment for batch insertion
+            const taskFragment = document.createDocumentFragment();
+            const ganttFragment = document.createDocumentFragment();
 
             projectData.filter(p => matchesFilters(p)).forEach(p => {
                 const calculatedStatus = calculateProjectStatus(p.tasks);
@@ -636,26 +660,23 @@
                         if (t.status === 2) earnedPoints += 0.5;
                         if (t.status === 3) earnedPoints += 1;
                     }
-                    t.gantt.forEach((v, idx) => { 
-                         if (v > 0) { 
-                             if (idx < minStart) minStart = idx; 
-                             if (idx > maxEnd) maxEnd = idx; 
-                         } 
-                    });
+                    const mm = getGanttMinMax(t.gantt);
+                    if (mm.max > -1) {
+                        if (mm.min < minStart) minStart = mm.min;
+                        if (mm.max > maxEnd) maxEnd = mm.max;
+                    }
                 });
-                
-                const progressPct = totalPoints === 0 ? 0 : Math.round((earnedPoints / totalPoints) * 100);
-                const totalCount = p.tasks.length;
-                
-                // Draw Project Bar only if it falls within view
-                const viewStartIdx = OFFSET_WEEKS_INDEX;
-                const viewEndIdx = OFFSET_WEEKS_INDEX + VISIBLE_TOTAL_WEEKS - 1;
-                
-                if (minStart <= maxEnd && maxEnd >= viewStartIdx && minStart <= viewEndIdx) {
+
+                // Render progress bar for project if there are tasks with gantt data
+                if (totalPoints > 0 && minStart <= maxEnd && maxEnd >= OFFSET_WEEKS_INDEX && minStart <= (OFFSET_WEEKS_INDEX + VISIBLE_TOTAL_WEEKS - 1)) {
+                    const viewStartIdx = OFFSET_WEEKS_INDEX;
+                    const viewEndIdx = OFFSET_WEEKS_INDEX + VISIBLE_TOTAL_WEEKS - 1;
                     const drawStart = Math.max(minStart, viewStartIdx);
                     const drawEnd = Math.min(maxEnd, viewEndIdx);
                     const leftPx = (drawStart - viewStartIdx) * 20;
                     const widthPx = (drawEnd - drawStart + 1) * 20;
+                    const totalCount = p.tasks.length;
+                    const progressPct = Math.round((completedCount / totalCount) * 100);
                     
                     const barContainer = document.createElement('div');
                     barContainer.className = 'absolute top-1/2 -translate-y-1/2 h-5 bg-slate-200 rounded text-xs font-bold text-slate-700 flex items-center justify-center z-20 pointer-events-none overflow-visible whitespace-nowrap shadow-sm border border-slate-300';
@@ -680,7 +701,8 @@
                     cell.onclick = (e) => toggleCell(p.id, -1, i); 
                     pRowRight.appendChild(cell);
                 }
-                ganttContent.appendChild(pRowRight);
+                taskFragment.appendChild(pRowLeft);
+                ganttFragment.appendChild(pRowRight);
 
                 if (p.expanded) {
                     p.tasks.forEach((t, tIndex) => {
@@ -724,7 +746,7 @@
                                 <button onclick="event.stopPropagation(); deleteTaskConfirm('${p.id}', ${tIndex})" class="text-slate-400 hover:text-red-500 p-1.5 transition"><i class="fa-solid fa-trash"></i></button>
                             </div>
                         `;
-                        taskContainer.appendChild(tRowLeft);
+                        taskFragment.appendChild(tRowLeft);
 
                         const tRowRight = document.createElement('div');
                         tRowRight.className = 'data-row hover:bg-slate-50 relative';
@@ -758,23 +780,27 @@
                             cell.onclick = (e) => toggleCell(p.id, tIndex, i);
                             tRowRight.appendChild(cell);
                         }
-                        ganttContent.appendChild(tRowRight);
+                        ganttFragment.appendChild(tRowRight);
                     });
                 }
             });
+            // Batch append fragments to avoid multiple reflows
+            ganttContent.appendChild(ganttFragment);
+            ganttContainer.appendChild(ganttContent);
+            taskContainer.appendChild(taskFragment);
             setTimeout(syncRowHeights, 0); 
         }
 
         // ========= INTERACTION FUNCTIONS (Saving/Updating) =========
-        function updateTaskStatus(pid, tidx, val) { const p = projectData.find(x => x.id === pid); if(p && p.tasks[tidx]) { p.tasks[tidx].status = parseInt(val); saveToSheetAsync(pid, tidx); render(); } }
-        function updateTaskType(pid, tidx, val) { const p = projectData.find(x => x.id === pid); if(p && p.tasks[tidx]) { p.tasks[tidx].tipo = val; saveToSheetAsync(pid, tidx); } }
+        function updateTaskStatus(pid, tidx, val) { const p = projectMap.get(pid); if(p && p.tasks[tidx]) { p.tasks[tidx].status = parseInt(val); saveToSheetAsync(pid, tidx); scheduleRender(); } }
+        function updateTaskType(pid, tidx, val) { const p = projectMap.get(pid); if(p && p.tasks[tidx]) { p.tasks[tidx].tipo = val; saveToSheetAsync(pid, tidx); } }
         function updateTaskDate(pid, tidx, val) {
-            const p = projectData.find(x => x.id === pid);
+            const p = projectMap.get(pid);
             if (p && p.tasks[tidx]) {
                 const t = p.tasks[tidx];
                 t.inicio = val;
             const startWeek = dateToWeekIndex(val);
-                if (!(startWeek >= 0 && startWeek < MAX_YEAR_WEEKS)) { saveToSheetAsync(pid, tidx); render(); return; }
+                if (!(startWeek >= 0 && startWeek < MAX_YEAR_WEEKS)) { saveToSheetAsync(pid, tidx); scheduleRender(); return; }
 
                 // Determine current painted length (continuous block) to preserve duration
                 let curMin = -1, curMax = -1;
@@ -793,16 +819,16 @@
                 t.gantt = newGantt;
 
                 saveToSheetAsync(pid, tidx);
-                render();
+                scheduleRender();
             }
         }
         function updateProjectDate(pid, val) {
-            const p = projectData.find(x => x.id === pid);
+            const p = projectMap.get(pid);
             if (p) {
                 const oldInicio = p.inicio;
                 p.inicio = val;
                 const startWeek = dateToWeekIndex(val);
-                if (!(startWeek >= 0 && startWeek < MAX_YEAR_WEEKS)) { render(); return; }
+                if (!(startWeek >= 0 && startWeek < MAX_YEAR_WEEKS)) { scheduleRender(); return; }
 
                 // Preserve existing painted span length for project gantt
                 if (!p.gantt) p.gantt = new Array(MAX_YEAR_WEEKS).fill(0);
@@ -821,12 +847,12 @@
                 for (let i = startWeek; i <= endIdx; i++) newGantt[i] = 1;
                 p.gantt = newGantt;
 
-                render();
+                scheduleRender();
             }
         }
         
         function toggleCell(pid, tidx, wIndex) {
-            const p = projectData.find(x => x.id === pid); if (!p) return;
+            const p = projectMap.get(pid); if (!p) return;
             
             const target = (tidx === -1) ? p : p.tasks[tidx];
             let startDate = target.inicio;
@@ -859,11 +885,40 @@
             if (tidx !== -1) {
                 saveToSheetAsync(pid, tidx);
             }
-            render();
+            scheduleRender();
         }
 
-        function toggleProject(pid) { const p = projectData.find(x => x.id === pid); if (p) { p.expanded = !p.expanded; render(); } }
-        function toggleAll(expand) { projectData.forEach(p => p.expanded = expand); render(); }
+        function toggleProject(pid) { const p = projectMap.get(pid); if (p) { p.expanded = !p.expanded; scheduleRender(); } }
+        function toggleAll(expand) { projectData.forEach(p => p.expanded = expand); scheduleRender(); }
+        
+        // Debounced render to avoid multiple renders in quick succession
+        function scheduleRender() {
+            if (renderScheduled) return;
+            renderScheduled = true;
+            requestAnimationFrame(() => { renderScheduled = false; render(); });
+        }
+        
+        // Fast gantt min/max calculator with caching
+        function getGanttMinMax(gantt) {
+            const key = gantt.join(',');
+            if (ganttMinMaxCache.has(key)) return ganttMinMaxCache.get(key);
+            let min = 9999, max = -1;
+            for (let i = 0; i < gantt.length; i++) {
+                if (gantt[i] > 0) {
+                    if (i < min) min = i;
+                    if (i > max) max = i;
+                }
+            }
+            const result = { min, max };
+            ganttMinMaxCache.set(key, result);
+            return result;
+        }
+
+        // Update project lookup map for fast O(1) access
+        function updateProjectMap() {
+            projectMap.clear();
+            projectData.forEach(p => projectMap.set(p.id, p));
+        }
 
         async function fetchColumnFromSheet(columnName) {
             try { const response = await fetch(APPS_SCRIPT_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'fetchColumnValues', columnName: columnName }) });
@@ -871,14 +926,25 @@
         }
 
         async function saveToSheetAsync(pid, tidx) {
-            const p = projectData.find(x => x.id === pid); if (!p) return;
+            const p = projectMap.get(pid); if (!p) return;
             const task = tidx >= 0 ? p.tasks[tidx] : null;
             const statusText = task ? {1: 'PENDIENTE', 2: 'EN PROCESO', 3: 'TERMINADO'}[task.status] : {1: 'PENDIENTE', 2: 'EN PROCESO', 3: 'TERMINADO'}[p.status];
             const currentGantt = task ? task.gantt : p.gantt;
             const currentStart = task ? dateToISO(task.inicio) : dateToISO(p.inicio);
             const calculatedEndWeek = calculateEndWeekFromGantt(currentGantt);
             const calculatedStartSheet = dateFromISO(currentStart); 
-            const taskObj = { area: p.area, proyecto: p.nombre, tarea: task ? task.nombre : '', tipo: task ? task.tipo : p.tipo, estado: statusText, ejecutor: task ? task.ejecutor : p.ejecutor, gestor: p.gestor, f_inicio: calculatedStartSheet, f_fin: calculatedEndWeek };
+            const taskObj = { 
+              area: p.area, 
+              proyecto: p.nombre, 
+              tarea: task ? task.nombre : '', 
+              prioridad: task ? task.prioridad : p.prioridad || '',
+              tipo: task ? task.tipo : p.tipo, 
+              estado: statusText, 
+              gestor: p.gestor,
+              ejecutor: task ? task.ejecutor : p.ejecutor, 
+              f_inicio: calculatedStartSheet, 
+              f_fin: calculatedEndWeek 
+            };
             try { await fetch(APPS_SCRIPT_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'saveTaskData', payload: taskObj }) }); } catch(e) { console.error('Error guardando en Sheet:', e); }
         }
 
@@ -964,7 +1030,7 @@
         
         // --- Trigger for New Task (called from render loop) ---
         function openCreateTaskModal(projectId) {
-            const p = projectData.find(x => x.id === projectId);
+            const p = projectMap.get(projectId);
             if (p) openModal('task', p);
         }
 
@@ -1009,32 +1075,34 @@
 
             if (createMode === 'project') {
                 const newId = 'u' + Date.now();
-                projectData.push({
-                    id: newId, area, tipo, inicio, nombre: proyecto, ejecutor: "", gestor: gestor, expanded: true, 
+                const newProject = {
+                    id: newId, area, tipo, prioridad: '', inicio, nombre: proyecto, ejecutor: "", gestor: gestor, expanded: false, 
                     tasks: [], gantt: ganttArr, kpis: []
-                });
+                };
+                projectData.push(newProject);
+                projectMap.set(newId, newProject);
             } else {
-                const p = projectData.find(x => x.id === targetProjectId);
+                const p = projectMap.get(targetProjectId);
                 if (p) {
                     const newTaskId = p.id + 't' + (p.tasks.length + 1);
-                    p.tasks.push({ id: newTaskId, nombre: tarea, tipo, ejecutor, status: 1, gantt: ganttArr, inicio: inicio });
+                    p.tasks.push({ id: newTaskId, nombre: tarea, tipo, prioridad: '', ejecutor, status: 1, gantt: ganttArr, inicio: inicio });
                 }
             }
 
-            const taskObj = { AREA: area, PROYECTO: proyecto, TAREA: tarea, TIPO: tipo, F_INICIO: inicio, EJECUTOR: ejecutor, GESTOR: gestor, ESTADO: 'Pendiente', F_FIN: fFinCalculada };
+            const taskObj = { AREA: area, PROYECTO: proyecto, TAREA: tarea, PRIORIDAD: '', TIPO: tipo, F_INICIO: inicio, EJECUTOR: ejecutor, GESTOR: gestor, ESTADO: 'Pendiente', F_FIN: fFinCalculada };
             
             try { 
                 await fetch(APPS_SCRIPT_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'saveTaskData', payload: taskObj }) }); 
                 showToast(createMode === 'project' ? 'Proyecto creado' : 'Tarea agregada', 'success'); 
             } catch(e) { console.error(e); }
 
-            render(); 
+            scheduleRender(); 
             document.getElementById('createFieldModal').style.display = 'none';
         });
 
         // 2. Edit Task Modal (Existing Logic)
         function openEditTaskModal(pid, tidx) {
-            const p = projectData.find(x => x.id === pid); if (!p) return;
+            const p = projectMap.get(pid); if (!p) return;
             const t = p.tasks[tidx]; if (!t) return;
             currentEdit = { pid, tidx };
             document.getElementById('edit-task-name').value = t.nombre;
@@ -1047,22 +1115,22 @@
         function closeEditTaskModal() { document.getElementById('editTaskModal').style.display = 'none'; currentEdit = null; }
         function saveEditedTask() {
             if (!currentEdit) return;
-            const { pid, tidx } = currentEdit; const p = projectData.find(x => x.id === pid); if (!p) return; const t = p.tasks[tidx];
+            const { pid, tidx } = currentEdit; const p = projectMap.get(pid); if (!p) return; const t = p.tasks[tidx];
             t.nombre = document.getElementById('edit-task-name').value.trim() || t.nombre; t.tipo = document.getElementById('edit-task-tipo').value || t.tipo;
             t.status = parseInt(document.getElementById('edit-task-estado').value, 10) || t.status; t.inicio = dateFromISO(document.getElementById('edit-task-inicio').value) || t.inicio;
             t.ejecutor = document.getElementById('edit-task-ejecutor').value || t.ejecutor;
-            saveToSheetAsync(pid, tidx); closeEditTaskModal(); render(); showToast('Tarea actualizada', 'success');
+            saveToSheetAsync(pid, tidx); closeEditTaskModal(); scheduleRender(); showToast('Tarea actualizada', 'success');
         }
         function deleteTaskConfirm(pid, tidx) {
-            const p = projectData.find(x => x.id === pid); if (!p) return; const t = p.tasks[tidx]; if (!t) return;
+            const p = projectMap.get(pid); if (!p) return; const t = p.tasks[tidx]; if (!t) return;
             showConfirm(`¿Eliminar la tarea "${t.nombre}"?`, () => {
-                p.tasks.splice(tidx, 1); deleteTaskAsync(p.area, p.nombre, t.nombre); render(); showToast('Tarea eliminada', 'success');
+                p.tasks.splice(tidx, 1); deleteTaskAsync(p.area, p.nombre, t.nombre); scheduleRender(); showToast('Tarea eliminada', 'success');
             });
         }
 
         // 3. KPI Modal (Multi-KPI Reactivo)
         function openKpiModal(projectId) {
-            const project = projectData.find(p => p.id === projectId); if (!project) return;
+            const project = projectMap.get(projectId); if (!project) return;
             currentKpiProject = project;
             document.getElementById('kpiModalProjectTitle').innerText = `${project.nombre}`;
             if (!project.kpis || project.kpis.length === 0) {
@@ -1217,7 +1285,53 @@
         }
 
         // ========= LOAD DATA =========
+        
+        // Actualizar el timestamp visible en el UI
+        function updateLastUpdateTime() {
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            const timeStr = `${hours}:${minutes}:${seconds}`;
+            lastUpdateTime = timeStr;
+            document.getElementById('lastUpdateTime').textContent = `Última actualización: ${timeStr}`;
+        }
+        
+        // Refrescar datos manualmente
+        async function refreshDataManual() {
+            if (isLoadingData) return; // Evitar múltiples clicks
+            
+            const btn = document.getElementById('btn-refresh');
+            const icon = document.getElementById('refresh-icon');
+            icon.classList.add('refresh-spinning');
+            btn.disabled = true;
+            
+            showToast('Refrescando datos...', 'info');
+            await loadDataFromSheet();
+            
+            updateLastUpdateTime();
+            icon.classList.remove('refresh-spinning');
+            btn.disabled = false;
+            showToast('Datos actualizados', 'success');
+        }
+        
+        // Inicializar auto-refresh cada 5 minutos
+        function initAutoRefresh() {
+            // Actualizar time display inmediatamente
+            updateLastUpdateTime();
+            
+            // Auto-refresh cada 5 minutos
+            if (autoRefreshTimerId) clearInterval(autoRefreshTimerId);
+            autoRefreshTimerId = setInterval(async () => {
+                console.log('Auto-refreshing datos...');
+                await loadDataFromSheet();
+                updateLastUpdateTime();
+            }, AUTO_REFRESH_INTERVAL);
+        }
+        
+        // ========= LOAD DATA =========
         async function loadDataFromSheet() {
+            isLoadingData = true;
             try {
                 console.log('Cargando datos...');
                 const response = await fetch(APPS_SCRIPT_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'fetchAllData' }) });
@@ -1228,25 +1342,34 @@
                 
                 if (result.datosData) {
                     projectData = transformSheetDataToGantt(result.datosData, result.kpiData);
+                    // Ensure all projects start collapsed by default
+                    projectData.forEach(p => p.expanded = false);
+                    updateProjectMap();
                     showToast('Datos cargados', 'success');
                 } else { projectData = []; } 
                 populateFilterOptions(); render();
             } catch (e) {
                 console.error('Error cargando:', e);
                 // Demo fallback
-                const DEMO = [{ id: 'p1', area: 'HILANDERIA', tipo: 'Digital', inicio: '14/01/2026', nombre: 'Digitalización y sistematización', ejecutor: 'EO', gestor: 'JP', expanded: true, status: 2, gantt: padGantt([]), kpis: [], tasks: [] }];
-                projectData = DEMO; render();
+                const DEMO = [{ id: 'p1', area: 'HILANDERIA', tipo: 'Digital', prioridad: 'Alta', inicio: '14/01/2026', nombre: 'Digitalización y sistematización', ejecutor: 'EO', gestor: 'JP', expanded: false, status: 2, gantt: padGantt([]), kpis: [], tasks: [] }];
+                projectData = DEMO; 
+                updateProjectMap();
+                render();
                 showToast(`Error: ${e.message}`, 'error');
+            } finally {
+                isLoadingData = false;
             }
         }
 
         function transformSheetDataToGantt(datosData, kpiData) {
             const proyectosMap = new Map();
             const kpiMap = new Map(); 
+            
+            // Mapeo de KPIs por proyecto
             if (kpiData) {
                 kpiData.forEach(k => {
                     const pname = k['PROYECTO'];
-                    if(pname) {
+                    if(pname && String(pname).trim()) {
                         if(!kpiMap.has(pname)) kpiMap.set(pname, []);
                         kpiMap.get(pname).push({
                             id: k['ID'] || ('k_' + Math.random().toString(36).substr(2, 5)),
@@ -1256,36 +1379,95 @@
                     }
                 });
             }
+            
+            // Procesar datos de Datos sheet
             datosData.forEach(row => {
-                const projName = row['PROYECTO'] || ''; const taskName = row['TAREA'] || '';
-                if (!projName.trim()) return;
+                const projName = row['PROYECTO'] || ''; 
+                const taskName = row['TAREA'] || '';
+                
+                // Validar que proyecto tenga nombre
+                if (!String(projName).trim()) return;
+                
+                // Crear proyecto solo si no existe (usar primer registro como referencia)
                 if (!proyectosMap.has(projName)) {
                     proyectosMap.set(projName, {
-                        id: 'p_' + projName.replace(/\s+/g, ''), area: row['AREA'] || '', tipo: row['TIPO'] || 'Proceso', inicio: row['F.INICIO'] && row['F.INICIO'].trim() !== '' ? row['F.INICIO'] : getTodayFormatted(),
-                        nombre: projName, ejecutor: row['EJECUTOR'] || '', gestor: row['GESTOR'] || '', expanded: true, status: getStatusFromText(row['ESTADO'] || ''), gantt: padGantt([]), kpis: kpiMap.get(projName) || [], tasks: []
+                        id: 'p_' + projName.replace(/\s+/g, '_').toLowerCase(), 
+                        area: row['AREA'] || '', 
+                        tipo: row['TIPO'] || 'Proceso', 
+                        prioridad: row['PRIORIDAD'] || '', 
+                        inicio: row['F.INICIO'] && String(row['F.INICIO']).trim() !== '' ? row['F.INICIO'] : getTodayFormatted(),
+                        nombre: projName, 
+                        ejecutor: '', // Los proyectos NO tienen ejecutor directo (es para tareas)
+                        gestor: row['GESTOR'] || '', 
+                        expanded: false, 
+                        status: getStatusFromText(row['ESTADO'] || ''), 
+                        gantt: padGantt([]), 
+                        kpis: kpiMap.get(projName) || [], 
+                        tasks: []
                     });
                 }
-                if (taskName.trim()) {
+                
+                // Agregar tarea si existe nombre de tarea
+                if (String(taskName).trim()) {
                     let taskGantt = padGantt([]);
+                    
+                    // Calcular rango gantt desde F.INICIO y F. FIN
                     if(row['F.INICIO'] && row['F. FIN']) {
-                                const startW = dateToWeekIndex(row['F.INICIO']); const endW = parseInt(row['F. FIN'], 10) - 1;
-                        if(startW >=0 && endW >= startW) { for(let i=startW; i<=endW; i++) { if(i < MAX_YEAR_WEEKS) taskGantt[i] = 1; } }
+                        const startW = dateToWeekIndex(row['F.INICIO']); 
+                        const endW = parseInt(row['F. FIN'], 10) - 1;
+                        
+                        if(startW >= 0 && endW >= startW && startW < MAX_YEAR_WEEKS) { 
+                            for(let i = startW; i <= Math.min(MAX_YEAR_WEEKS - 1, endW); i++) { 
+                                taskGantt[i] = 1; 
+                            } 
+                        }
                     }
-                    proyectosMap.get(projName).tasks.push({
-                        id: 't_' + taskName.replace(/\s+/g, '') + '_' + Math.random().toString(36).substr(2, 5),
-                        nombre: taskName, tipo: row['TIPO'] || 'Proceso', ejecutor: row['EJECUTOR'] || '', inicio: row['F.INICIO'] && row['F.INICIO'].trim() !== '' ? row['F.INICIO'] : getTodayFormatted(), status: getStatusFromText(row['ESTADO'] || ''), gantt: taskGantt
+                    
+                    // Crear objeto tarea
+                    const proyecto = proyectosMap.get(projName);
+                    proyecto.tasks.push({
+                        id: 't_' + projName.replace(/\s+/g, '_') + '_' + taskName.replace(/\s+/g, '_') + '_' + Math.random().toString(36).substr(2, 5),
+                        nombre: taskName, 
+                        tipo: row['TIPO'] || 'Proceso', 
+                        prioridad: row['PRIORIDAD'] || '', 
+                        ejecutor: row['EJECUTOR'] || '', 
+                        inicio: row['F.INICIO'] && String(row['F.INICIO']).trim() !== '' ? row['F.INICIO'] : getTodayFormatted(), 
+                        status: getStatusFromText(row['ESTADO'] || ''), 
+                        gantt: taskGantt
                     });
                 }
             });
-            // Recalc proj gantt
+            
+            // Recalcular gantt del proyecto basado en tareas
             const projs = Array.from(proyectosMap.values());
-            projs.forEach(p => { const pGantt = new Array(MAX_YEAR_WEEKS).fill(0); p.tasks.forEach(t => t.gantt.forEach((v,i) => {if(v>0) pGantt[i]=1})); p.gantt = pGantt; });
+            projs.forEach(p => { 
+                const pGantt = new Array(MAX_YEAR_WEEKS).fill(0); 
+                
+                // El gantt del proyecto es la unión de todos los gantts de las tareas
+                p.tasks.forEach(t => { 
+                    t.gantt.forEach((v, i) => {
+                        if(v > 0) pGantt[i] = 1;
+                    });
+                }); 
+                
+                p.gantt = pGantt;
+                
+                // Recalcular estado del proyecto basado en tareas
+                p.status = calculateProjectStatus(p.tasks);
+                
+                // Recalcular tipo del proyecto basado en tareas
+                p.tipo = calculateProjectType(p.tasks);
+            });
+            
             return projs;
         }
 
         window.addEventListener('resize', syncRowHeights);
         // Start app
-        loadDataFromSheet();
+        (async () => {
+            await loadDataFromSheet();
+            initAutoRefresh();
+        })();
     </script>
 </body>
 </html>
