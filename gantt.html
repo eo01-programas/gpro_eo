@@ -34,8 +34,12 @@
         .col-inicio { width: 120px; font-size: 0.75rem; text-align: center; justify-content: center; flex-shrink: 0; }
         .col-nombre { flex: 1; color: #334155; position: relative; min-width: 150px; padding-left: 10px; }
         .col-gestor { width: 80px; justify-content: center; color: #475569; font-size: 0.7rem; font-weight: 600; flex-shrink: 0; text-align: center; }
+        .col-prioridad { width: 50px; justify-content: center; flex-shrink: 0; }
         .col-ejecutor { width: 70px; justify-content: center; color: #64748b; font-size: 0.75rem; flex-shrink: 0; }
         .col-acciones { width: 80px; justify-content: center; gap: 4px; flex-shrink: 0; }
+        .priority-indicator { font-size: 1.1rem; cursor: pointer; }
+        .priority-alta { color: #f59e0b; }
+        .priority-baja { color: #cbd5e1; }
         .table-input { width: 100%; background: transparent; border: 1px solid #cbd5e1; border-radius: 4px; padding: 4px; font-size: 0.75rem; color: inherit; transition: all 0.2s; text-align: center; cursor: pointer; }
         .table-input:hover { background: white; border-color: #94a3b8; }
         .table-input:focus { background: white; border-color: #3b82f6; outline: none; box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1); }
@@ -131,6 +135,7 @@
                     <div class="col-estado">ESTADO</div>
                     <div class="col-inicio">F. INICIO</div>
                     <div class="col-nombre">PROYECTO / TAREA</div>
+                    <div class="col-prioridad">PRIORIDAD</div>
                     <div class="col-gestor">GESTOR</div>
                     <div class="col-ejecutor">EJECUTOR</div>
                     <div class="col-acciones"></div>
@@ -214,8 +219,14 @@
                         <label class="block"><span class="text-xs font-bold text-slate-500 uppercase mb-1 block">Gestor (Proyecto)</span><input id="cf-gestor" class="w-full border border-slate-300 rounded p-2 text-sm outline-none" placeholder="Gestor del proyecto"></label>
                     </div>
                     <label class="block"><span class="text-xs font-bold text-slate-500 uppercase mb-1 block">Tipo</span><select id="cf-tipo" class="w-full border border-slate-300 rounded p-2 text-sm bg-white outline-none"></select></label>
+                    <div id="div-cf-prioridad">
+                        <label class="block"><span class="text-xs font-bold text-slate-500 uppercase mb-1 block">Prioridad</span><select id="cf-prioridad" class="w-full border border-slate-300 rounded p-2 text-sm bg-white outline-none"><option value="BAJA">BAJA</option><option value="ALTA">ALTA</option></select></label>
+                    </div>
                     <div id="div-cf-task" class="block col-span-2">
                         <label class="block"><span class="text-xs font-bold text-slate-500 uppercase mb-1 block">Nombre de la Tarea</span><input id="cf-task" class="w-full border border-slate-300 rounded p-2 text-sm outline-none" placeholder="Nombre de la tarea"></label>
+                    </div>
+                    <div id="div-cf-task-readonly" class="block col-span-2" style="display:none;">
+                        <label class="block"><span class="text-xs font-bold text-slate-500 uppercase mb-1 block">Nombre de la Tarea</span><input id="cf-task-readonly" class="w-full border border-slate-300 rounded p-2 text-sm bg-slate-100 text-slate-500 outline-none" readonly></label>
                     </div>
                     <label class="block"><span class="text-xs font-bold text-slate-500 uppercase mb-1 block">F. Inicio</span><input id="cf-inicio" type="date" class="w-full border border-slate-300 rounded p-2 text-sm outline-none"></label>
                     <div id="div-cf-ejecutor">
@@ -284,6 +295,10 @@
         const AUTO_REFRESH_INTERVAL = 5 * 60 * 1000; // 5 minutos en milisegundos
         let autoRefreshTimerId = null;
         let isLoadingData = false;
+        
+        // === CACHED COLUMNS DATA (Para optimizar modal) ===
+        let cachedColumns = { areas: [], ejecutores: [], tipos: PROJECT_TYPES };
+        let columnsCacheLoaded = false;
 
         // Reflect default priority button state in UI (script runs after DOM)
         if (SHOW_PRIORITY) {
@@ -638,6 +653,7 @@
                         <input type="date" class="table-input text-center font-bold" value="${dateToISO(p.inicio)}" onchange="updateProjectDate('${p.id}', dateFromISO(this.value))" onclick="event.stopPropagation()">
                     </div>
                     <div class="cell col-nombre font-bold text-slate-700 group-hover:text-blue-800 transition"><span onclick="toggleProject('${p.id}')">${p.nombre}</span></div>
+                    <div class="cell col-prioridad"><i class="fa-solid fa-star priority-indicator ${isPriorityProject(p) ? 'priority-alta' : 'priority-baja'}" title="${p.prioridad || 'BAJA'}"></i></div>
                     <div class="cell col-gestor">${p.gestor || ''}</div>
                     <div class="cell col-ejecutor font-bold text-slate-600"></div>
                     <div class="cell col-acciones">
@@ -739,6 +755,7 @@
                             <div class="cell col-tipo">${tipoSelectTask}</div><div class="cell col-estado">${statusSelectTask}</div>
                             <div class="cell col-inicio"><input type="date" class="table-input text-center font-bold text-xs" value="${dateToISO(t.inicio || p.inicio)}" onchange="updateTaskDate('${p.id}', ${tIndex}, dateFromISO(this.value))" onclick="event.stopPropagation()"></div>
                             <div class="cell col-nombre pl-6 text-sm"><span class="tree-line-v"></span><span class="tree-line-h"></span><div class="tree-connector"></div>${t.nombre}</div>
+                            <div class="cell col-prioridad"></div>
                             <div class="cell col-gestor"></div>
                             <div class="cell col-ejecutor text-xs text-slate-500">${t.ejecutor}</div>
                             <div class="cell col-acciones">
@@ -924,6 +941,26 @@
             try { const response = await fetch(APPS_SCRIPT_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'fetchColumnValues', columnName: columnName }) });
             if (!response.ok) return []; const result = await response.json(); return result || []; } catch(e) { console.warn(e); return []; }
         }
+        
+        // Extraer columnas directamente de los datos ya cargados (sin fetch adicional)
+        function refreshCachedColumns() {
+            const areasSet = new Set();
+            const ejecutoresSet = new Set();
+            
+            projectData.forEach(p => {
+                if (p.area && String(p.area).trim()) areasSet.add(String(p.area).trim());
+                if (p.tasks) {
+                    p.tasks.forEach(t => {
+                        if (t.ejecutor && String(t.ejecutor).trim()) ejecutoresSet.add(String(t.ejecutor).trim());
+                    });
+                }
+            });
+            
+            cachedColumns.areas = Array.from(areasSet);
+            cachedColumns.ejecutores = ejecutoresSet.size > 0 ? Array.from(ejecutoresSet) : ['EO', 'Equipo', 'Externo'];
+            columnsCacheLoaded = true;
+            console.log('Columnas extraídas de datos:', cachedColumns);
+        }
 
         async function saveToSheetAsync(pid, tidx) {
             const p = projectMap.get(pid); if (!p) return;
@@ -955,7 +992,7 @@
         // ========= MODALS LOGIC =========
         
         // --- Open Modal Wrapper ---
-        async function openModal(mode, projectObj = null) {
+        function openModal(mode, projectObj = null) {
             createMode = mode; // 'project' or 'task'
             targetProjectId = projectObj ? projectObj.id : null;
             
@@ -963,25 +1000,31 @@
             const titleEl = document.getElementById('cf-modal-title');
             const subtitleEl = document.getElementById('cf-modal-subtitle');
             
-            // Populate Dropdowns
-            const $area = document.getElementById('cf-area'); $area.innerHTML = '<option value="">-- Seleccione área --</option>';
-            const areas = await fetchColumnFromSheet('AREA');
-            if (areas && areas.length) areas.forEach(a => { if (String(a||'').trim()) { const o = document.createElement('option'); o.value = a; o.text = a; $area.appendChild(o); } });
+            // Refrescar columnas desde datos ya cargados (instantáneo, sin fetch)
+            refreshCachedColumns();
             
-            const $exec = document.getElementById('cf-ejecutor'); $exec.innerHTML = '<option value="">-- Seleccione --</option>';
-            const executors = await fetchColumnFromSheet('EJECUTOR');
-            if(executors.length) executors.forEach(e => { if(e.trim()){ const o = document.createElement('option'); o.value = e; o.text = e; $exec.appendChild(o); } });
-            else ['EO', 'Equipo', 'Externo'].forEach(e => { const o = document.createElement('option'); o.value = e; o.text = e; $exec.appendChild(o); });
+            // Poblar dropdown de AREA desde datos del Excel (columna AREA de hoja Datos)
+            const $area = document.getElementById('cf-area');
+            $area.innerHTML = '<option value="">-- Seleccione área --</option>' + 
+                cachedColumns.areas.map(a => `<option value="${a}">${a}</option>`).join('');
+            
+            // Poblar dropdown de EJECUTOR desde datos del Excel (columna EJECUTOR de hoja Datos)
+            const $exec = document.getElementById('cf-ejecutor');
+            $exec.innerHTML = '<option value="">-- Seleccione --</option>' + 
+                cachedColumns.ejecutores.map(e => `<option value="${e}">${e}</option>`).join('');
 
-            const $tipo = document.getElementById('cf-tipo'); $tipo.innerHTML = ''; 
-            PROJECT_TYPES.forEach(t => { const o = document.createElement('option'); o.value = t; o.text = t; $tipo.appendChild(o); });
+            // Poblar dropdown de TIPO
+            const $tipo = document.getElementById('cf-tipo');
+            $tipo.innerHTML = PROJECT_TYPES.map(t => `<option value="${t}">${t}</option>`).join('');
 
             // Toggle visibility based on mode
             const divProjInput = document.getElementById('div-cf-project-input');
             const divProjReadonly = document.getElementById('div-cf-project-select');
             const divGestor = document.getElementById('div-cf-gestor');
             const divTask = document.getElementById('div-cf-task');
+            const divTaskReadonly = document.getElementById('div-cf-task-readonly');
             const divExec = document.getElementById('div-cf-ejecutor');
+            const divPrioridad = document.getElementById('div-cf-prioridad');
             
             if (mode === 'project') {
                 titleEl.textContent = "CREAR NUEVO PROYECTO";
@@ -990,12 +1033,15 @@
                 divProjInput.style.display = 'block';
                 divProjReadonly.style.display = 'none';
                 divGestor.style.display = 'block'; // Show Gestor
-                divTask.style.display = 'none';    // Hide Task name
+                divTask.style.display = 'block';    // Show editable Task name
+                divTaskReadonly.style.display = 'none'; // Hide readonly Task
                 divExec.style.display = 'none';    // Hide Executor
+                divPrioridad.style.display = 'block'; // Show Prioridad
                 
                 // Clear fields
                 document.getElementById('cf-project-input').value = "";
                 document.getElementById('cf-gestor').value = "";
+                document.getElementById('cf-task').value = "";
                 $area.value = "";
                 $area.disabled = false;
                 
@@ -1006,12 +1052,14 @@
                 divProjInput.style.display = 'none';
                 divProjReadonly.style.display = 'block';
                 divGestor.style.display = 'none';  // Hide Gestor (inherited)
-                divTask.style.display = 'block';   // Show Task name
+                divTask.style.display = 'none';    // Hide editable Task name
+                divTaskReadonly.style.display = 'block'; // Show readonly Task
                 divExec.style.display = 'block';   // Show Executor
+                divPrioridad.style.display = 'block'; // Show Prioridad
                 
                 // Pre-fill fields
                 document.getElementById('cf-project-readonly').value = projectObj.nombre;
-                document.getElementById('cf-task').value = "";
+                document.getElementById('cf-task-readonly').value = 'Nueva Tarea';
                 $area.value = projectObj.area;
                 $area.disabled = true; // Lock Area
             }
@@ -1031,7 +1079,7 @@
         // --- Trigger for New Task (called from render loop) ---
         function openCreateTaskModal(projectId) {
             const p = projectMap.get(projectId);
-            if (p) openModal('task', p);
+            if (p) openModal('task', p); // No await, la tarea se abre rápido
         }
 
         document.getElementById('createFieldClose')?.addEventListener('click', () => document.getElementById('createFieldModal').style.display='none');
@@ -1041,6 +1089,7 @@
         document.getElementById('cf-save')?.addEventListener('click', async () => {
             const area = document.getElementById('cf-area').value || 'GENERAL'; 
             const tipo = document.getElementById('cf-tipo').value || 'Proceso';
+            const prioridad = document.getElementById('cf-prioridad').value || 'BAJA';
             let inicioInput = document.getElementById('cf-inicio').value;
             if (!inicioInput) { const d = new Date(); inicioInput = d.toISOString().split('T')[0]; }
             let inicio = inicioInput;
@@ -1057,11 +1106,11 @@
                 gestor = (document.getElementById('cf-gestor').value || '').trim();
                 ejecutor = ""; 
             } else {
-                // Task Mode
-                const p = projectData.find(x => x.id === targetProjectId);
+                // Task Mode - usar projectMap en lugar de .find() para O(1) lookup
+                const p = projectMap.get(targetProjectId);
                 proyecto = p.nombre;
                 gestor = p.gestor || ""; // Inherit
-                tarea = (document.getElementById('cf-task').value || 'Nueva Tarea').trim();
+                tarea = (document.getElementById('cf-task-readonly').value || 'Nueva Tarea').trim();
                 ejecutor = (document.getElementById('cf-ejecutor').value || 'Equipo').trim();
             }
 
@@ -1076,7 +1125,7 @@
             if (createMode === 'project') {
                 const newId = 'u' + Date.now();
                 const newProject = {
-                    id: newId, area, tipo, prioridad: '', inicio, nombre: proyecto, ejecutor: "", gestor: gestor, expanded: false, 
+                    id: newId, area, tipo, prioridad: prioridad, inicio, nombre: proyecto, ejecutor: "", gestor: gestor, expanded: false, 
                     tasks: [], gantt: ganttArr, kpis: []
                 };
                 projectData.push(newProject);
@@ -1085,19 +1134,21 @@
                 const p = projectMap.get(targetProjectId);
                 if (p) {
                     const newTaskId = p.id + 't' + (p.tasks.length + 1);
-                    p.tasks.push({ id: newTaskId, nombre: tarea, tipo, prioridad: '', ejecutor, status: 1, gantt: ganttArr, inicio: inicio });
+                    p.tasks.push({ id: newTaskId, nombre: tarea, tipo, prioridad: prioridad, ejecutor, status: 1, gantt: ganttArr, inicio: inicio });
                 }
             }
 
-            const taskObj = { AREA: area, PROYECTO: proyecto, TAREA: tarea, PRIORIDAD: '', TIPO: tipo, F_INICIO: inicio, EJECUTOR: ejecutor, GESTOR: gestor, ESTADO: 'Pendiente', F_FIN: fFinCalculada };
+            const taskObj = { AREA: area, PROYECTO: proyecto, TAREA: tarea, PRIORIDAD: prioridad, TIPO: tipo, F_INICIO: inicio, EJECUTOR: ejecutor, GESTOR: gestor, ESTADO: 'Pendiente', F_FIN: fFinCalculada };
             
-            try { 
-                await fetch(APPS_SCRIPT_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'saveTaskData', payload: taskObj }) }); 
-                showToast(createMode === 'project' ? 'Proyecto creado' : 'Tarea agregada', 'success'); 
-            } catch(e) { console.error(e); }
-
-            scheduleRender(); 
+            // Actualizar UI inmediatamente (no esperar al servidor)
+            scheduleRender();
             document.getElementById('createFieldModal').style.display = 'none';
+            showToast(createMode === 'project' ? 'Proyecto creado' : 'Tarea agregada', 'success');
+            
+            // Guardar en background (fire and forget) sin bloquear UI
+            fetch(APPS_SCRIPT_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'saveTaskData', payload: taskObj }) })
+                .then(r => r.json())
+                .catch(e => { console.error('Error guardando:', e); showToast('Error: No se guardó en servidor', 'error'); });
         });
 
         // 2. Edit Task Modal (Existing Logic)
@@ -1466,6 +1517,8 @@
         // Start app
         (async () => {
             await loadDataFromSheet();
+            // Extraer columnas inmediatamente después de cargar datos
+            refreshCachedColumns();
             initAutoRefresh();
         })();
     </script>
