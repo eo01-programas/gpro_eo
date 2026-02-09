@@ -485,6 +485,19 @@
             if (!isNaN(d)) return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
             return str;
         }
+        function sortDateValue(dateStr) {
+            if (!dateStr) return Number.POSITIVE_INFINITY;
+            const normalized = formatDateDMY(dateStr);
+            const parts = normalized.split('/');
+            if (parts.length !== 3) return Number.POSITIVE_INFINITY;
+            const day = parseInt(parts[0], 10);
+            const month = parseInt(parts[1], 10) - 1;
+            const year = parseInt(parts[2], 10);
+            if (!Number.isFinite(day) || !Number.isFinite(month) || !Number.isFinite(year)) return Number.POSITIVE_INFINITY;
+            if (day < 1 || day > 31 || month < 0 || month > 11 || year < 1900) return Number.POSITIVE_INFINITY;
+            const ts = new Date(year, month, day).getTime();
+            return Number.isNaN(ts) ? Number.POSITIVE_INFINITY : ts;
+        }
         function padGantt(arr) {
             // Ensure data array is full year length (52)
             const currentLen = arr.length;
@@ -721,7 +734,10 @@
                 ganttFragment.appendChild(pRowRight);
 
                 if (p.expanded) {
-                    p.tasks.forEach((t, tIndex) => {
+                    const tasksForRender = p.tasks
+                        .map((t, tIndex) => ({ t, tIndex, sortKey: sortDateValue(t.inicio || p.inicio) }))
+                        .sort((a, b) => (a.sortKey - b.sortKey) || (a.tIndex - b.tIndex));
+                    tasksForRender.forEach(({ t, tIndex }) => {
                         // TASK VISIBILITY FILTER (Inside Project)
                         // Hide finished tasks unless SHOW_COMPLETED is enabled
                         if (t.status === 3 && !SHOW_COMPLETED) return;
