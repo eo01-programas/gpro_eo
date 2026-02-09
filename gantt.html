@@ -662,9 +662,9 @@
                     <div class="cell col-area text-blue-700">${p.area}</div>
                     <div class="cell col-tipo text-xs font-bold text-slate-700">${calculatedType}</div>
                     <div class="cell col-estado"><div class="status-badge-select ${statusClass}" style="cursor: default; pointer-events: none;">${statusText}</div></div>
-                    <div class="cell col-inicio">
-                        <input type="date" class="table-input text-center font-bold" value="${dateToISO(p.inicio)}" onchange="updateProjectDate('${p.id}', dateFromISO(this.value))" onclick="event.stopPropagation()">
-                    </div>
+                      <div class="cell col-inicio">
+                          <input type="text" inputmode="numeric" placeholder="dd/mm/aaaa" maxlength="10" class="table-input text-center font-bold" value="${formatDateDMY(p.inicio)}" onchange="updateProjectDate('${p.id}', formatDateDMY(this.value))" onclick="event.stopPropagation()">
+                      </div>
                     <div class="cell col-nombre font-bold text-slate-700 group-hover:text-blue-800 transition"><span onclick="toggleProject('${p.id}')">${p.nombre}</span></div>
                     <div class="cell col-prioridad"><i class="fa-solid fa-star priority-indicator ${isPriorityProject(p) ? 'priority-alta' : 'priority-baja'}" title="${p.prioridad || 'BAJA'}"></i></div>
                     <div class="cell col-gestor">${p.gestor || ''}</div>
@@ -769,7 +769,7 @@
                         tRowLeft.innerHTML = `
                             <div class="cell col-icon"></div><div class="cell col-area"></div>
                             <div class="cell col-tipo">${tipoSelectTask}</div><div class="cell col-estado">${statusSelectTask}</div>
-                            <div class="cell col-inicio"><input type="date" class="table-input text-center font-bold text-xs" value="${dateToISO(t.inicio || p.inicio)}" onchange="updateTaskDate('${p.id}', ${tIndex}, dateFromISO(this.value))" onclick="event.stopPropagation()"></div>
+                            <div class="cell col-inicio"><input type="text" inputmode="numeric" placeholder="dd/mm/aaaa" maxlength="10" class="table-input text-center font-bold text-xs" value="${formatDateDMY(t.inicio || p.inicio)}" onchange="updateTaskDate('${p.id}', ${tIndex}, formatDateDMY(this.value))" onclick="event.stopPropagation()"></div>
                             <div class="cell col-nombre pl-6 text-sm"><span class="tree-line-v"></span><span class="tree-line-h"></span><div class="tree-connector"></div>${t.nombre}</div>
                             <div class="cell col-prioridad"></div>
                             <div class="cell col-gestor"></div>
