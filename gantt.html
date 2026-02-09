@@ -1052,14 +1052,14 @@
                 divProjInput.style.display = 'none';
                 divProjReadonly.style.display = 'block';
                 divGestor.style.display = 'none';  // Hide Gestor (inherited)
-                divTask.style.display = 'none';    // Hide editable Task name
-                divTaskReadonly.style.display = 'block'; // Show readonly Task
+                divTask.style.display = 'block';    // Show editable Task name
+                divTaskReadonly.style.display = 'none'; // Hide readonly Task
                 divExec.style.display = 'block';   // Show Executor
                 divPrioridad.style.display = 'block'; // Show Prioridad
                 
                 // Pre-fill fields
                 document.getElementById('cf-project-readonly').value = projectObj.nombre;
-                document.getElementById('cf-task-readonly').value = 'Nueva Tarea';
+                document.getElementById('cf-task').value = '';
                 $area.value = projectObj.area;
                 $area.disabled = true; // Lock Area
             }
@@ -1110,7 +1110,7 @@
                 const p = projectMap.get(targetProjectId);
                 proyecto = p.nombre;
                 gestor = p.gestor || ""; // Inherit
-                tarea = (document.getElementById('cf-task-readonly').value || 'Nueva Tarea').trim();
+                tarea = (document.getElementById('cf-task').value || 'Nueva Tarea').trim();
                 ejecutor = (document.getElementById('cf-ejecutor').value || 'Equipo').trim();
             }
 
