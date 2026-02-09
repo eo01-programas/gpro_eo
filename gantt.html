@@ -228,7 +228,7 @@
                     <div id="div-cf-task-readonly" class="block col-span-2" style="display:none;">
                         <label class="block"><span class="text-xs font-bold text-slate-500 uppercase mb-1 block">Nombre de la Tarea</span><input id="cf-task-readonly" class="w-full border border-slate-300 rounded p-2 text-sm bg-slate-100 text-slate-500 outline-none" readonly></label>
                     </div>
-                    <label class="block"><span class="text-xs font-bold text-slate-500 uppercase mb-1 block">F. Inicio</span><input id="cf-inicio" type="date" class="w-full border border-slate-300 rounded p-2 text-sm outline-none"></label>
+                    <label class="block"><span class="text-xs font-bold text-slate-500 uppercase mb-1 block">F. Inicio</span><input id="cf-inicio" type="text" inputmode="numeric" placeholder="dd/mm/aaaa" maxlength="10" class="w-full border border-slate-300 rounded p-2 text-sm outline-none"></label>
                     <div id="div-cf-ejecutor">
                         <label class="block"><span class="text-xs font-bold text-slate-500 uppercase mb-1 block">Ejecutor (Tarea)</span><select id="cf-ejecutor" class="w-full border border-slate-300 rounded p-2 text-sm bg-white outline-none"></select></label>
                     </div>
@@ -256,7 +256,7 @@
                     <label class="block col-span-2"><span class="text-xs font-bold text-slate-500 uppercase mb-1 block">Nombre</span><input id="edit-task-name" class="w-full border border-slate-300 rounded p-2 text-sm outline-none"></label>
                     <label class="block"><span class="text-xs font-bold text-slate-500 uppercase mb-1 block">Tipo</span><select id="edit-task-tipo" class="w-full border border-slate-300 rounded p-2 text-sm bg-white outline-none"></select></label>
                     <label class="block"><span class="text-xs font-bold text-slate-500 uppercase mb-1 block">Estado</span><select id="edit-task-estado" class="w-full border border-slate-300 rounded p-2 text-sm bg-white outline-none"><option value="1">Pendiente</option><option value="2">En Proceso</option><option value="3">Terminado</option></select></label>
-                    <label class="block"><span class="text-xs font-bold text-slate-500 uppercase mb-1 block">F. Inicio</span><input id="edit-task-inicio" type="date" class="w-full border border-slate-300 rounded p-2 text-sm outline-none"></label>
+                    <label class="block"><span class="text-xs font-bold text-slate-500 uppercase mb-1 block">F. Inicio</span><input id="edit-task-inicio" type="text" inputmode="numeric" placeholder="dd/mm/aaaa" maxlength="10" class="w-full border border-slate-300 rounded p-2 text-sm outline-none"></label>
                     <label class="block"><span class="text-xs font-bold text-slate-500 uppercase mb-1 block">Ejecutor</span><input id="edit-task-ejecutor" class="w-full border border-slate-300 rounded p-2 text-sm outline-none"></label>
                 </div>
             </div>
@@ -424,9 +424,10 @@
 
         function dateToWeekNumber(dateStr) {
             if (!dateStr) return -1;
-            const parts = dateStr.split('/');
+            const normalized = formatDateDMY(dateStr);
+            const parts = normalized.split('/');
             if (parts.length !== 3) return -1;
-            const d = new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
+            const d = new Date(parseInt(parts[2], 10), parseInt(parts[1], 10) - 1, parseInt(parts[0], 10));
             const startOfYear = new Date(d.getFullYear(), 0, 1);
             const diff = d - startOfYear;
             // Return 1-based week number (weeks starting at day 1..7 => week 1)
@@ -436,9 +437,10 @@
         // Zero-based week index for internal array indexing (0..51)
         function dateToWeekIndex(dateStr) {
             if (!dateStr) return -1;
-            const parts = dateStr.split('/');
+            const normalized = formatDateDMY(dateStr);
+            const parts = normalized.split('/');
             if (parts.length !== 3) return -1;
-            const d = new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
+            const d = new Date(parseInt(parts[2], 10), parseInt(parts[1], 10) - 1, parseInt(parts[0], 10));
             const startOfYear = new Date(d.getFullYear(), 0, 1);
             const diff = d - startOfYear;
             return Math.floor(diff / (1000 * 60 * 60 * 24 * 7));
@@ -446,7 +448,8 @@
 
         function dateToISO(dateStr) {
             if (!dateStr) return '';
-            const parts = dateStr.split('/');
+            const normalized = formatDateDMY(dateStr);
+            const parts = normalized.split('/');
             if(parts.length < 3) return '';
             const day = parts[0].padStart(2, '0');
             const month = parts[1].padStart(2, '0');
@@ -459,30 +462,66 @@
             const [year, month, day] = isoStr.split('-');
             return `${day}/${month}/${year}`;
         }
-        function formatDateDMY(str) {
+        function formatDateDMY(value) {
+            if (value === null || value === undefined) return '';
+            if (value instanceof Date) {
+                const dd = String(value.getDate()).padStart(2, '0');
+                const mm = String(value.getMonth() + 1).padStart(2, '0');
+                const yyyy = value.getFullYear();
+                return `${dd}/${mm}/${yyyy}`;
+            }
+            const str = String(value).trim();
             if (!str) return '';
+
+            // Google Sheets JSON sometimes returns Date(YYYY,MM,DD)
+            const dateMatch = str.match(/Date\((\d+),\s*(\d+),\s*(\d+)\)/);
+            if (dateMatch) {
+                const year = parseInt(dateMatch[1], 10);
+                const month = parseInt(dateMatch[2], 10);
+                const day = parseInt(dateMatch[3], 10);
+                const dd = String(day).padStart(2, '0');
+                const mm = String(month + 1).padStart(2, '0');
+                return `${dd}/${mm}/${year}`;
+            }
+
             // ISO format: yyyy-mm-dd
-            if (str.includes('-')) {
-                const parts = str.split('-');
-                if (parts.length === 3) {
-                    const [y, m, d] = parts;
-                    return `${String(d).padStart(2, '0')}/${String(m).padStart(2, '0')}/${y}`;
-                }
+            const isoMatch = str.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+            if (isoMatch) {
+                const year = parseInt(isoMatch[1], 10);
+                const month = parseInt(isoMatch[2], 10);
+                const day = parseInt(isoMatch[3], 10);
+                return `${String(day).padStart(2, '0')}/${String(month).padStart(2, '0')}/${year}`;
             }
-            // Slash format: try dd/mm/yyyy or yyyy/mm/dd
-            if (str.includes('/')) {
-                const parts = str.split('/');
-                if (parts.length === 3) {
-                    // if first part is 4 chars treat as yyyy/mm/dd
-                    if (parts[0].length === 4) {
-                        return `${String(parts[2]).padStart(2, '0')}/${String(parts[1]).padStart(2, '0')}/${parts[0]}`;
-                    }
-                    return `${String(parts[0]).padStart(2, '0')}/${String(parts[1]).padStart(2, '0')}/${parts[2]}`;
+
+            // Slash format: dd/mm/yyyy, mm/dd/yyyy, or yyyy/mm/dd
+            const slashMatch = str.match(/^(\d{1,4})[\\/](\d{1,2})[\\/](\d{2,4})/);
+            if (slashMatch) {
+                const a = parseInt(slashMatch[1], 10);
+                const b = parseInt(slashMatch[2], 10);
+                let c = parseInt(slashMatch[3], 10);
+
+                // yyyy/mm/dd
+                if (slashMatch[1].length === 4) {
+                    return `${String(b).padStart(2, '0')}/${String(c).padStart(2, '0')}/${a}`;
                 }
+
+                // If year is two digits, assume 2000+
+                if (slashMatch[3].length === 2) c = 2000 + c;
+
+                // Heuristic: if second part > 12, it's mm/dd/yyyy -> swap
+                if (b > 12 && a <= 12) {
+                    return `${String(b).padStart(2, '0')}/${String(a).padStart(2, '0')}/${c}`;
+                }
+
+                // Default to dd/mm/yyyy (Excel expected)
+                return `${String(a).padStart(2, '0')}/${String(b).padStart(2, '0')}/${c}`;
             }
+
             // Fallback: try Date parse
             const d = new Date(str);
-            if (!isNaN(d)) return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
+            if (!isNaN(d)) {
+                return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
+            }
             return str;
         }
         function sortDateValue(dateStr) {
@@ -1081,7 +1120,7 @@
             }
 
             // Default Date
-            const today = new Date().toISOString().split('T')[0]; 
+            const today = getTodayFormatted();
             document.getElementById('cf-inicio').value = today;
 
             modal.style.display = 'flex';
@@ -1107,8 +1146,8 @@
             const tipo = document.getElementById('cf-tipo').value || 'Proceso';
             const prioridad = document.getElementById('cf-prioridad').value || 'BAJA';
             let inicioInput = document.getElementById('cf-inicio').value;
-            if (!inicioInput) { const d = new Date(); inicioInput = d.toISOString().split('T')[0]; }
-            let inicio = inicioInput;
+            if (!inicioInput) { inicioInput = getTodayFormatted(); }
+            let inicio = formatDateDMY(inicioInput);
             
             // Logic split
             let proyecto = "";
@@ -1175,7 +1214,7 @@
             document.getElementById('edit-task-name').value = t.nombre;
             const typesSelect = document.getElementById('edit-task-tipo'); typesSelect.innerHTML = PROJECT_TYPES.map(type => `<option value="${type}">${type}</option>`).join(''); typesSelect.value = t.tipo || PROJECT_TYPES[0];
             document.getElementById('edit-task-estado').value = t.status || 1;
-            document.getElementById('edit-task-inicio').value = dateToISO(t.inicio || p.inicio);
+            document.getElementById('edit-task-inicio').value = formatDateDMY(t.inicio || p.inicio);
             document.getElementById('edit-task-ejecutor').value = t.ejecutor || p.ejecutor;
             document.getElementById('editTaskModal').style.display = 'flex';
         }
@@ -1184,7 +1223,7 @@
             if (!currentEdit) return;
             const { pid, tidx } = currentEdit; const p = projectMap.get(pid); if (!p) return; const t = p.tasks[tidx];
             t.nombre = document.getElementById('edit-task-name').value.trim() || t.nombre; t.tipo = document.getElementById('edit-task-tipo').value || t.tipo;
-            t.status = parseInt(document.getElementById('edit-task-estado').value, 10) || t.status; t.inicio = dateFromISO(document.getElementById('edit-task-inicio').value) || t.inicio;
+            t.status = parseInt(document.getElementById('edit-task-estado').value, 10) || t.status; t.inicio = formatDateDMY(document.getElementById('edit-task-inicio').value) || t.inicio;
             t.ejecutor = document.getElementById('edit-task-ejecutor').value || t.ejecutor;
             saveToSheetAsync(pid, tidx); closeEditTaskModal(); scheduleRender(); showToast('Tarea actualizada', 'success');
         }
@@ -1451,6 +1490,9 @@
             datosData.forEach(row => {
                 const projName = row['PROYECTO'] || ''; 
                 const taskName = row['TAREA'] || '';
+                const inicioRaw = row['F.INICIO'] && String(row['F.INICIO']).trim() !== '' ? row['F.INICIO'] : '';
+                const inicioNorm = inicioRaw ? formatDateDMY(inicioRaw) : '';
+                const inicioFinal = inicioNorm || getTodayFormatted();
                 
                 // Validar que proyecto tenga nombre
                 if (!String(projName).trim()) return;
@@ -1462,7 +1504,7 @@
                         area: row['AREA'] || '', 
                         tipo: row['TIPO'] || 'Proceso', 
                         prioridad: row['PRIORIDAD'] || '', 
-                        inicio: row['F.INICIO'] && String(row['F.INICIO']).trim() !== '' ? row['F.INICIO'] : getTodayFormatted(),
+                        inicio: inicioFinal,
                         nombre: projName, 
                         ejecutor: '', // Los proyectos NO tienen ejecutor directo (es para tareas)
                         gestor: row['GESTOR'] || '', 
@@ -1479,8 +1521,8 @@
                     let taskGantt = padGantt([]);
                     
                     // Calcular rango gantt desde F.INICIO y F. FIN
-                    if(row['F.INICIO'] && row['F. FIN']) {
-                        const startW = dateToWeekIndex(row['F.INICIO']); 
+                    if(inicioNorm && row['F. FIN']) {
+                        const startW = dateToWeekIndex(inicioNorm); 
                         const endW = parseInt(row['F. FIN'], 10) - 1;
                         
                         if(startW >= 0 && endW >= startW && startW < MAX_YEAR_WEEKS) { 
@@ -1498,7 +1540,7 @@
                         tipo: row['TIPO'] || 'Proceso', 
                         prioridad: row['PRIORIDAD'] || '', 
                         ejecutor: row['EJECUTOR'] || '', 
-                        inicio: row['F.INICIO'] && String(row['F.INICIO']).trim() !== '' ? row['F.INICIO'] : getTodayFormatted(), 
+                        inicio: inicioFinal, 
                         status: getStatusFromText(row['ESTADO'] || ''), 
                         gantt: taskGantt
                     });
