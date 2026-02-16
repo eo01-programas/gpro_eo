@@ -214,11 +214,8 @@
                          <label class="block"><span class="text-xs font-bold text-slate-500 uppercase mb-1 block">Nombre del Proyecto</span><input id="cf-project-input" class="w-full border border-slate-300 rounded p-2 text-sm outline-none" placeholder="Nombre del nuevo proyecto"></label>
                     </div>
                     <label class="block"><span class="text-xs font-bold text-slate-500 uppercase mb-1 block">Tipo</span><select id="cf-tipo" class="w-full border border-slate-300 rounded p-2 text-sm bg-white outline-none"></select></label>
-                    <div id="div-cf-task" class="block col-span-2">
+                    <div id="div-cf-task" class="block col-span-2" style="display:none;">
                         <label class="block"><span class="text-xs font-bold text-slate-500 uppercase mb-1 block">Nombre de la Tarea</span><input id="cf-task" class="w-full border border-slate-300 rounded p-2 text-sm outline-none" placeholder="Nombre de la tarea"></label>
-                    </div>
-                    <div id="div-cf-task-readonly" class="block col-span-2" style="display:none;">
-                        <label class="block"><span class="text-xs font-bold text-slate-500 uppercase mb-1 block">Nombre de la Tarea</span><input id="cf-task-readonly" class="w-full border border-slate-300 rounded p-2 text-sm bg-slate-100 text-slate-500 outline-none" readonly></label>
                     </div>
                     <label class="block"><span class="text-xs font-bold text-slate-500 uppercase mb-1 block">F. Inicio</span><input id="cf-inicio" type="date" class="w-full border border-slate-300 rounded p-2 text-sm outline-none"></label>
                     <div id="div-cf-ejecutor">
@@ -286,7 +283,7 @@
 
     <script>
         // ========= CONFIG & GLOBALS =========
-        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwjKZtOjuOZFOsfrnw9anT1WG7gsH0v1f1h7AWRpvAJJoTOfE36fzS6e7DL76ZOS_3Z/exec';
+        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxoiHhw0yucl31_0kqrvhFUkwvAc_PdwkOsFd7fAbrFnmY6dXrMvimtkiNHX93Lrtm6/exec';
         const PROJECT_TYPES = ['Digital', 'Digital + IA', 'Maquina', 'Proceso'];
         const STATUS_BADGE_CLASSES = { 1: 'sb-pendiente', 2: 'sb-proceso', 3: 'sb-terminado' };
         const STATE_ICONS = { 0: '', 1: '!', 2: '►', 3: '✓' };
@@ -1093,7 +1090,6 @@
             const divProjInput = document.getElementById('div-cf-project-input');
             const divProjReadonly = document.getElementById('div-cf-project-select');
             const divTask = document.getElementById('div-cf-task');
-            const divTaskReadonly = document.getElementById('div-cf-task-readonly');
             const divExec = document.getElementById('div-cf-ejecutor');
             
             if (mode === 'project') {
@@ -1102,13 +1098,11 @@
                 
                 divProjInput.style.display = 'block';
                 divProjReadonly.style.display = 'none';
-                divTask.style.display = 'block';    // Show editable Task name
-                divTaskReadonly.style.display = 'none'; // Hide readonly Task
+                divTask.style.display = 'none';    // Hide Task name
                 divExec.style.display = 'none';    // Hide Executor
                 
                 // Clear fields
                 document.getElementById('cf-project-input').value = "";
-                document.getElementById('cf-task').value = "";
                 $area.value = "";
                 $area.disabled = false;
                 
@@ -1118,8 +1112,7 @@
                 
                 divProjInput.style.display = 'none';
                 divProjReadonly.style.display = 'block';
-                divTask.style.display = 'block';    // Show editable Task name
-                divTaskReadonly.style.display = 'none'; // Hide readonly Task
+                divTask.style.display = 'block';   // Show Task name
                 divExec.style.display = 'block';   // Show Executor
                 
                 // Pre-fill fields
@@ -1210,9 +1203,38 @@
             document.getElementById('createFieldModal').style.display = 'none';
             showToast(createMode === 'project' ? 'Proyecto creado' : 'Tarea agregada', 'success');
             
-            // Solo guardar en servidor si es una tarea (createMode === 'task')
-            // Los proyectos se guardan cuando se crea la primera tarea
-            if (createMode === 'task') {
+            // Guardar en servidor
+            if (createMode === 'project') {
+                const projectObj = {
+                    area: area,
+                    proyecto: proyecto,
+                    tipo: tipo,
+                    f_inicio: inicio
+                };
+                
+                console.log('Guardando proyecto:', projectObj);
+                
+                // Guardar proyecto en background con mejor manejo de errores
+                fetch(APPS_SCRIPT_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify({ action: 'saveProjectData', payload: projectObj })
+                })
+                    .then(r => {
+                        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+                        return r.json();
+                    })
+                    .then(result => {
+                        console.log('Respuesta servidor (proyecto):', result);
+                        if (!result.success) {
+                            console.error('Error del servidor:', result);
+                        }
+                    })
+                    .catch(e => {
+                        console.error('Error guardando proyecto:', e);
+                        showToast('Advertencia: Posible error al guardar proyecto', 'error');
+                    });
+            } else if (createMode === 'task') {
                 const taskObj = {
                     area: area,
                     proyecto: proyecto,
