@@ -206,7 +206,7 @@
             </div>
             <div class="p-6 bg-slate-50 flex-1 overflow-auto">
                 <div class="grid grid-cols-2 gap-6">
-                    <label class="block"><span class="text-xs font-bold text-slate-500 uppercase mb-1 block">Área</span><select id="cf-area" class="w-full border border-slate-300 rounded p-2 text-sm bg-white outline-none"></select></label>
+                    <label class="block"><span class="text-xs font-bold text-slate-500 uppercase mb-1 block">Área</span><input id="cf-area" list="cf-areas-list" class="w-full border border-slate-300 rounded p-2 text-sm outline-none" placeholder="Selecciona o escribe una nueva área"><datalist id="cf-areas-list"></datalist></label>
                     <div id="div-cf-project-select" style="display:none;">
                          <label class="block"><span class="text-xs font-bold text-slate-500 uppercase mb-1 block">Proyecto</span><input id="cf-project-readonly" class="w-full border border-slate-300 rounded p-2 text-sm bg-slate-100 text-slate-500 outline-none" readonly></label>
                     </div>
@@ -259,6 +259,31 @@
         </div>
     </div>
 
+    <!-- Modal Edit Project -->
+    <div id="editProjectModal" class="modal-overlay" style="display:none;">
+        <div class="modal-card modal-card-lg">
+            <div class="flex items-center justify-between px-6 py-4 bg-blue-900 text-white">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded bg-white/10 flex items-center justify-center"><i class="fa-solid fa-pen-to-square"></i></div>
+                    <div><h3 class="text-sm font-bold uppercase tracking-wider">Editar Proyecto</h3></div>
+                </div>
+                <button onclick="closeEditProjectModal()" class="text-white/70 hover:text-white text-xl transition"><i class="fa-solid fa-times"></i></button>
+            </div>
+            <div class="p-6 bg-slate-50 flex-1 overflow-auto">
+                <div class="grid grid-cols-2 gap-6">
+                    <label class="block col-span-2"><span class="text-xs font-bold text-slate-500 uppercase mb-1 block">Nombre</span><input id="edit-project-name" class="w-full border border-slate-300 rounded p-2 text-sm outline-none"></label>
+                    <label class="block"><span class="text-xs font-bold text-slate-500 uppercase mb-1 block">Área</span><input id="edit-project-area" list="edit-areas-list" class="w-full border border-slate-300 rounded p-2 text-sm outline-none" placeholder="Selecciona o escribe una nueva área"><datalist id="edit-areas-list"></datalist></label>
+                    <label class="block"><span class="text-xs font-bold text-slate-500 uppercase mb-1 block">Tipo</span><select id="edit-project-tipo" class="w-full border border-slate-300 rounded p-2 text-sm bg-white outline-none"></select></label>
+                    <label class="block"><span class="text-xs font-bold text-slate-500 uppercase mb-1 block">F. Inicio</span><input id="edit-project-inicio" type="date" class="w-full border border-slate-300 rounded p-2 text-sm outline-none"></label>
+                </div>
+            </div>
+            <div class="px-6 py-3 border-t border-slate-200 bg-white flex justify-end">
+                <button onclick="closeEditProjectModal()" class="px-4 py-2 mr-2 bg-slate-100 text-slate-600 font-medium rounded hover:bg-slate-200 transition">Cancelar</button>
+                <button onclick="saveEditedProject()" class="px-4 py-2 bg-emerald-600 text-white font-medium rounded hover:bg-emerald-700 transition shadow-lg shadow-emerald-200">Guardar Cambios</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         // ========= CONFIG & GLOBALS =========
         const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwjKZtOjuOZFOsfrnw9anT1WG7gsH0v1f1h7AWRpvAJJoTOfE36fzS6e7DL76ZOS_3Z/exec';
@@ -276,6 +301,7 @@
         let SHOW_ALL_TASKS = true; // when true, list every task in the left panel regardless of GANTT view range
         const FILTERS = { month: 'all', area: '', project: '' };
         let currentEdit = null;
+        let currentEditProject = null;
         let confirmCallback = null;
         let createMode = 'project'; 
         let targetProjectId = null;
@@ -701,6 +727,7 @@
                     <div class="cell col-prioridad"><i class="fa-solid fa-star priority-indicator ${isPriorityProject(p) ? 'priority-alta' : 'priority-baja'}" title="${p.prioridad || 'BAJA'}"></i></div>
                     <div class="cell col-ejecutor font-bold text-slate-600"></div>
                     <div class="cell col-acciones">
+                        <button onclick="event.stopPropagation(); openEditProjectModal('${p.id}')" class="action-btn text-xs text-slate-500 hover:text-blue-600" title="Editar Proyecto"><i class="fa-solid fa-pen-to-square"></i></button>
                         <button onclick="event.stopPropagation(); openKpiModal('${p.id}')" class="action-btn text-xs text-emerald-600 hover:text-emerald-700" title="Ver KPIs"><i class="fa-solid fa-chart-pie"></i></button>
                         <button onclick="event.stopPropagation(); openCreateTaskModal('${p.id}')" class="action-btn text-xs text-blue-600 hover:text-blue-700" title="Agregar Tarea"><i class="fa-solid fa-plus"></i></button>
                     </div>
@@ -1047,10 +1074,11 @@
             // Refrescar columnas desde datos ya cargados (instantáneo, sin fetch)
             refreshCachedColumns();
             
-            // Poblar dropdown de AREA desde datos del Excel (columna AREA de hoja Datos)
+            // Poblar datalist de AREA desde datos del Excel (columna AREA de hoja Datos)
             const $area = document.getElementById('cf-area');
-            $area.innerHTML = '<option value="">-- Seleccione área --</option>' + 
-                cachedColumns.areas.map(a => `<option value="${a}">${a}</option>`).join('');
+            const $areaList = document.getElementById('cf-areas-list');
+            $areaList.innerHTML = cachedColumns.areas.map(a => `<option value="${a}">`).join('');
+            $area.value = '';
             
             // Poblar dropdown de EJECUTOR desde datos del Excel (columna EJECUTOR de hoja Datos)
             const $exec = document.getElementById('cf-ejecutor');
@@ -1177,44 +1205,48 @@
                 }
             }
 
-            const taskObj = {
-                area: area,
-                proyecto: proyecto,
-                tarea: tarea,
-                tipo: tipo,
-                f_inicio: inicio,
-                ejecutor: ejecutor,
-                estado: 'PENDIENTE',
-                f_fin: fFinCalculada
-            };
-            
-            console.log('Guardando:', taskObj);
-            
             // Actualizar UI inmediatamente (no esperar al servidor)
             scheduleRender();
             document.getElementById('createFieldModal').style.display = 'none';
             showToast(createMode === 'project' ? 'Proyecto creado' : 'Tarea agregada', 'success');
             
-            // Guardar en background con mejor manejo de errores
-            fetch(APPS_SCRIPT_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                body: JSON.stringify({ action: 'saveTaskData', payload: taskObj })
-            })
-                .then(r => {
-                    if (!r.ok) throw new Error(`HTTP ${r.status}`);
-                    return r.json();
+            // Solo guardar en servidor si es una tarea (createMode === 'task')
+            // Los proyectos se guardan cuando se crea la primera tarea
+            if (createMode === 'task') {
+                const taskObj = {
+                    area: area,
+                    proyecto: proyecto,
+                    tarea: tarea,
+                    tipo: tipo,
+                    f_inicio: inicio,
+                    ejecutor: ejecutor,
+                    estado: 'PENDIENTE',
+                    f_fin: fFinCalculada
+                };
+                
+                console.log('Guardando tarea:', taskObj);
+                
+                // Guardar en background con mejor manejo de errores
+                fetch(APPS_SCRIPT_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify({ action: 'saveTaskData', payload: taskObj })
                 })
-                .then(result => {
-                    console.log('Respuesta servidor:', result);
-                    if (!result.success) {
-                        console.error('Error del servidor:', result);
-                    }
-                })
-                .catch(e => {
-                    console.error('Error guardando:', e);
-                    showToast('Advertencia: Posible error al guardar', 'error');
-                });
+                    .then(r => {
+                        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+                        return r.json();
+                    })
+                    .then(result => {
+                        console.log('Respuesta servidor:', result);
+                        if (!result.success) {
+                            console.error('Error del servidor:', result);
+                        }
+                    })
+                    .catch(e => {
+                        console.error('Error guardando:', e);
+                        showToast('Advertencia: Posible error al guardar', 'error');
+                    });
+            }
         });
 
         // 2. Edit Task Modal (Existing Logic)
@@ -1252,6 +1284,59 @@
             showConfirm(`¿Eliminar la tarea "${t.nombre}"?`, () => {
                 p.tasks.splice(tidx, 1); deleteTaskAsync(p.area, p.nombre, t.nombre); scheduleRender(); showToast('Tarea eliminada', 'success');
             });
+        }
+
+        // 3. Edit Project Modal
+        function openEditProjectModal(pid) {
+            const p = projectMap.get(pid); if (!p) return;
+            currentEditProject = pid;
+            document.getElementById('edit-project-name').value = p.nombre;
+            
+            // Llenar el datalist de áreas con opciones disponibles
+            const $areaInput = document.getElementById('edit-project-area');
+            const $areaList = document.getElementById('edit-areas-list');
+            const areas = Array.from(new Set(projectData.map(proj => proj.area).filter(a => a)));
+            $areaList.innerHTML = areas.map(area => `<option value="${area}">`).join('');
+            $areaInput.value = p.area || '';
+            
+            // Llenar el selector de tipo
+            const $tipoSelect = document.getElementById('edit-project-tipo');
+            $tipoSelect.innerHTML = PROJECT_TYPES.map(type => `<option value="${type}">${type}</option>`).join('');
+            $tipoSelect.value = calculateProjectType(p.tasks) || PROJECT_TYPES[0];
+            
+            // Convertir de formato DD/MM/YYYY a YYYY-MM-DD
+            const fechaStr = p.inicio;
+            const [d, m, y] = fechaStr.split('/');
+            document.getElementById('edit-project-inicio').value = `${y}-${m}-${d}`;
+            
+            document.getElementById('editProjectModal').style.display = 'flex';
+        }
+        
+        function closeEditProjectModal() { 
+            document.getElementById('editProjectModal').style.display = 'none'; 
+            currentEditProject = null; 
+        }
+        
+        function saveEditedProject() {
+            if (!currentEditProject) return;
+            const p = projectMap.get(currentEditProject); if (!p) return;
+            
+            p.nombre = document.getElementById('edit-project-name').value.trim() || p.nombre;
+            p.area = document.getElementById('edit-project-area').value || p.area;
+            
+            // Convertir de formato YYYY-MM-DD a DD/MM/YYYY
+            const inicioValue = document.getElementById('edit-project-inicio').value;
+            if (inicioValue) {
+                const [year, month, day] = inicioValue.split('-');
+                p.inicio = `${day}/${month}/${year}`;
+            }
+            
+            closeEditProjectModal(); 
+            scheduleRender(); 
+            showToast('Proyecto actualizado', 'success');
+            
+            // Opcional: guardar cambios en servidor (si deseas sincronizar)
+            // saveProjectToSheetAsync(p);
         }
 
         // 3. KPI Modal (Multi-KPI Reactivo)
