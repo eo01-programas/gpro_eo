@@ -1216,7 +1216,6 @@
                 <div class="summary-actions">
                     <button id="gantt-button">Gantt</button>
                     <button id="kanban-button">Kanban</button>
-                    <button id="informe-button">Informe</button>
                     <button id="acambio-button">A.cambio</button>
                 </div>
             </div>
@@ -2485,8 +2484,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const totalAhorroHoras = totalAhorroMin / 60;
         const totalAhorroDias = totalAhorroHoras / 9;
 
-        const areasUnicas = new Set(rows.map(r => String(r.area || '').trim()).filter(Boolean)).size;
-        const tiposUnicos = new Set(rows.map(r => String(r.tipo || '').trim()).filter(Boolean)).size;
         const agentesUnicos = new Set(rows.map(r => String(r.agenteCambio || '').trim()).filter(Boolean)).size;
         const proyectosUnicos = new Set(rows.map(r => String(r.proyecto || '').trim()).filter(Boolean)).size;
         const ahorroPromedioProyectoHoras = proyectosUnicos > 0 ? (totalAhorroHoras / proyectosUnicos) : 0;
@@ -2495,7 +2492,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const topAreas = aggregateACambio(rows, 'area').slice(0, 7);
         const topTipos = aggregateACambio(rows, 'tipo').slice(0, 7);
         const topAgentes = aggregateACambio(rows, 'agenteCambio').slice(0, 7);
-        const topProyectos = aggregateACambio(rows, 'proyecto').slice(0, 7);
         const topMeses = aggregateACambio(rows, 'mes').slice(0, 7);
 
         const rowsSorted = rows.slice().sort((a, b) => (b.ahorroMin - a.ahorroMin));
@@ -2506,16 +2502,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="acambio-kpi-title">Registros A.cambio</div>
                     <div class="acambio-kpi-value">${formatNumber(totalRegistros)}</div>
                     <div class="acambio-kpi-sub">Filas procesadas</div>
-                </div>
-                <div class="acambio-kpi-card">
-                    <div class="acambio-kpi-title">Areas Impactadas</div>
-                    <div class="acambio-kpi-value">${formatNumber(areasUnicas)}</div>
-                    <div class="acambio-kpi-sub">Cobertura por area</div>
-                </div>
-                <div class="acambio-kpi-card">
-                    <div class="acambio-kpi-title">Tipos</div>
-                    <div class="acambio-kpi-value">${formatNumber(tiposUnicos)}</div>
-                    <div class="acambio-kpi-sub">Clasificaciones de cambio</div>
                 </div>
                 <div class="acambio-kpi-card">
                     <div class="acambio-kpi-title">Agentes de Cambio</div>
@@ -2551,10 +2537,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="acambio-top-card">
                     <div class="acambio-top-title">Top Agentes de Cambio</div>
                     ${renderTopList(topAgentes)}
-                </div>
-                <div class="acambio-top-card">
-                    <div class="acambio-top-title">Top Proyectos</div>
-                    ${renderTopList(topProyectos)}
                 </div>
                 <div class="acambio-top-card">
                     <div class="acambio-top-title">Top Meses</div>
@@ -2677,7 +2659,6 @@ document.addEventListener('DOMContentLoaded', () => {
             allRowsData = rowsBd;
             updateMapWithData(allRowsData);
             setupDetailsModalListeners();
-            setupInformeModalListeners();
             return Promise.all([
                 loadSheetJSONP(SHEET_ID, SHEET_NAME_KANBAN).catch(() => []),
                 loadSheetJSONP(SHEET_ID, SHEET_NAME_ACAMBIO).catch(() => [])
