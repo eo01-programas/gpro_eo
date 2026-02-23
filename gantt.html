@@ -283,7 +283,7 @@
 
     <script>
         // ========= CONFIG & GLOBALS =========
-        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxoiHhw0yucl31_0kqrvhFUkwvAc_PdwkOsFd7fAbrFnmY6dXrMvimtkiNHX93Lrtm6/exec';
+        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwK3ueQDj7min6iNj0UyZXaJxkNs5hcZVWMyhJGZEI8mb0FJlda7nnL-yItmjhHHcgi/exec';
         const PROJECT_TYPES = ['Digital', 'Digital + IA', 'Maquina', 'Proceso'];
         const STATUS_BADGE_CLASSES = { 1: 'sb-pendiente', 2: 'sb-proceso', 3: 'sb-terminado' };
         const STATE_ICONS = { 0: '', 1: '!', 2: '►', 3: '✓' };
@@ -613,7 +613,29 @@
             if (!p.kpis || p.kpis.length === 0) return false;
             return p.kpis.some(kpi => (kpi.prioridad || '').toUpperCase().trim() === 'ALTA');
         }
+        
+        function normalizeAreaName(areaValue) {
+            return String(areaValue || '').trim();
+        }
+        
+        function compareProjectsByAreaThenName(a, b) {
+            const areaA = normalizeAreaName(a.area);
+            const areaB = normalizeAreaName(b.area);
 
+            if (areaA !== areaB) {
+                if (!areaA) return 1;
+                if (!areaB) return -1;
+                return areaA.localeCompare(areaB, 'es', { sensitivity: 'base' });
+            }
+
+            const nameA = String(a.nombre || '').trim();
+            const nameB = String(b.nombre || '').trim();
+            const nameCmp = nameA.localeCompare(nameB, 'es', { sensitivity: 'base' });
+            if (nameCmp !== 0) return nameCmp;
+
+            return String(a.id || '').localeCompare(String(b.id || ''), 'es', { sensitivity: 'base' });
+        }
+        
         function matchesFilters(p) {
             const status = calculateProjectStatus(p.tasks);
             if (!SHOW_COMPLETED && status === 3) return false; 
@@ -647,7 +669,11 @@
                 if (!(pStartW <= mEnd && pEndW >= mStart)) return false;
             }
 
-            if (FILTERS.area && p.area !== FILTERS.area) return false;
+            if (FILTERS.area) {
+                const projectMatches = p.area === FILTERS.area;
+                const taskMatches = (p.tasks || []).some(t => normalizeAreaName(t.area) === FILTERS.area);
+                if (!projectMatches && !taskMatches) return false;
+            }
             if (FILTERS.project && p.nombre !== FILTERS.project) return false;
             return true;
         }
@@ -681,9 +707,19 @@
             // Month filter removed
             const areaSel = document.getElementById('filter-area');
             const projectSel = document.getElementById('filter-project');
-            const areas = Array.from(new Set(projectData.map(p => p.area).filter(a => a)));
+            const areaSet = new Set();
+            projectData.forEach(p => {
+                const pArea = normalizeAreaName(p.area);
+                if (pArea) areaSet.add(pArea);
+                (p.tasks || []).forEach(t => {
+                    const tArea = normalizeAreaName(t.area);
+                    if (tArea) areaSet.add(tArea);
+                });
+            });
+            const areas = Array.from(areaSet).sort((a, b) => a.localeCompare(b, 'es', { sensitivity: 'base' }));
             areaSel.innerHTML = '<option value="">Todas las áreas</option>' + areas.map(a => `<option value="${a}">${a}</option>`).join('');
-            const projects = Array.from(new Set(projectData.map(p => p.nombre).filter(n => n)));
+            const projects = Array.from(new Set(projectData.map(p => p.nombre).filter(n => n)))
+                .sort((a, b) => String(a).localeCompare(String(b), 'es', { sensitivity: 'base' }));
             projectSel.innerHTML = '<option value="">Buscar proyecto (todos)</option>' + projects.map(n => `<option value="${n}">${n}</option>`).join('');
             areaSel.addEventListener('change', (e) => { FILTERS.area = e.target.value; render(); });
             projectSel.addEventListener('change', (e) => { FILTERS.project = e.target.value; render(); });
@@ -704,7 +740,11 @@
             const taskFragment = document.createDocumentFragment();
             const ganttFragment = document.createDocumentFragment();
 
-            projectData.filter(p => matchesFilters(p)).forEach(p => {
+            const projectsForRender = projectData
+                .filter(p => matchesFilters(p))
+                .sort(compareProjectsByAreaThenName);
+
+            projectsForRender.forEach(p => {
                 const calculatedStatus = calculateProjectStatus(p.tasks);
                 const calculatedType = calculateProjectType(p.tasks);
                 const statusClass = STATUS_BADGE_CLASSES[calculatedStatus];
@@ -797,6 +837,7 @@
                         // Hide finished tasks unless SHOW_COMPLETED is enabled
                         if (t.status === 3 && !SHOW_COMPLETED) return;
                         let showTask = true;
+                        const taskAreaDisplay = normalizeAreaName(t.area) || normalizeAreaName(p.area);
                         
                         const viewStartIdx = OFFSET_WEEKS_INDEX;
                         const viewEndIdx = OFFSET_WEEKS_INDEX + VISIBLE_TOTAL_WEEKS - 1;
@@ -822,7 +863,7 @@
                         const tipoSelectTask = `<select class="table-input" style="font-size:0.7rem;" onchange="updateTaskType('${p.id}', ${tIndex}, this.value)" onclick="event.stopPropagation()">${taskTipoOptions}</select>`;
 
                         tRowLeft.innerHTML = `
-                            <div class="cell col-icon"></div><div class="cell col-area"></div>
+                            <div class="cell col-icon"></div><div class="cell col-area text-slate-500 text-xs">${taskAreaDisplay}</div>
                             <div class="cell col-tipo">${tipoSelectTask}</div><div class="cell col-estado">${statusSelectTask}</div>
                             <div class="cell col-inicio"><input type="text" inputmode="numeric" placeholder="dd/mm/aaaa" maxlength="10" class="table-input text-center font-bold text-xs" value="${formatDateDMY(t.inicio || p.inicio)}" onchange="updateTaskDate('${p.id}', ${tIndex}, formatDateDMY(this.value))" onclick="event.stopPropagation()"></div>
                             <div class="cell col-nombre pl-6 text-sm"><span class="tree-line-v"></span><span class="tree-line-h"></span><div class="tree-connector"></div>${t.nombre}</div>
@@ -1021,6 +1062,7 @@
                 if (p.area && String(p.area).trim()) areasSet.add(String(p.area).trim());
                 if (p.tasks) {
                     p.tasks.forEach(t => {
+                        if (t.area && String(t.area).trim()) areasSet.add(String(t.area).trim());
                         if (t.ejecutor && String(t.ejecutor).trim()) ejecutoresSet.add(String(t.ejecutor).trim());
                     });
                 }
@@ -1032,7 +1074,7 @@
             console.log('Columnas extraídas de datos:', cachedColumns);
         }
 
-        async function saveToSheetAsync(pid, tidx) {
+        async function saveToSheetAsync(pid, tidx, oldIdentity = null) {
             const p = projectMap.get(pid); if (!p) return;
             const task = tidx >= 0 ? p.tasks[tidx] : null;
             const statusText = task ? {1: 'PENDIENTE', 2: 'EN PROCESO', 3: 'TERMINADO'}[task.status] : {1: 'PENDIENTE', 2: 'EN PROCESO', 3: 'TERMINADO'}[p.status];
@@ -1041,7 +1083,7 @@
             const calculatedEndWeek = calculateEndWeekFromGantt(currentGantt);
             const calculatedStartSheet = dateFromISO(currentStart); 
             const taskObj = { 
-              area: p.area, 
+              area: task ? (normalizeAreaName(task.area) || p.area) : p.area, 
               proyecto: p.nombre, 
               tarea: task ? task.nombre : '', 
               tipo: task ? task.tipo : p.tipo, 
@@ -1050,6 +1092,11 @@
               f_inicio: calculatedStartSheet, 
               f_fin: calculatedEndWeek 
             };
+            if (oldIdentity) {
+                if (oldIdentity.area !== undefined) taskObj.old_area = oldIdentity.area;
+                if (oldIdentity.proyecto !== undefined) taskObj.old_proyecto = oldIdentity.proyecto;
+                if (oldIdentity.tarea !== undefined) taskObj.old_tarea = oldIdentity.tarea;
+            }
             try { await fetch(APPS_SCRIPT_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'saveTaskData', payload: taskObj }) }); } catch(e) { console.error('Error guardando en Sheet:', e); }
         }
 
@@ -1104,6 +1151,7 @@
                 // Clear fields
                 document.getElementById('cf-project-input').value = "";
                 $area.value = "";
+                $area.placeholder = "Selecciona o escribe una nueva área";
                 $area.disabled = false;
                 
             } else { // mode === 'task'
@@ -1118,8 +1166,11 @@
                 // Pre-fill fields
                 document.getElementById('cf-project-readonly').value = projectObj.nombre;
                 document.getElementById('cf-task').value = '';
-                $area.value = projectObj.area;
-                $area.disabled = true; // Lock Area
+                const projectArea = normalizeAreaName(projectObj.area);
+                const lockArea = !!projectArea;
+                $area.value = lockArea ? projectArea : '';
+                $area.placeholder = lockArea ? "Área bloqueada por proyecto" : "Selecciona o escribe una nueva área";
+                $area.disabled = lockArea;
             }
 
             // Default Date
@@ -1146,7 +1197,8 @@
         
         // --- SAVE LOGIC ---
         document.getElementById('cf-save')?.addEventListener('click', async () => {
-            const area = document.getElementById('cf-area').value || 'GENERAL'; 
+            const areaInput = normalizeAreaName(document.getElementById('cf-area').value);
+            const area = areaInput || 'GENERAL'; 
             const tipo = document.getElementById('cf-tipo').value || 'Proceso';
             let inicioInput = document.getElementById('cf-inicio').value;
             if (!inicioInput) { 
@@ -1171,6 +1223,10 @@
                 tarea = ""; 
                 ejecutor = ""; 
             } else {
+                if (!areaInput) {
+                    showToast('Selecciona un Ã¡rea para la tarea', 'error');
+                    return;
+                }
                 // Task Mode - usar projectMap en lugar de .find() para O(1) lookup
                 const p = projectMap.get(targetProjectId);
                 proyecto = p.nombre;
@@ -1194,7 +1250,7 @@
                 const p = projectMap.get(targetProjectId);
                 if (p) {
                     const newTaskId = p.id + 't' + (p.tasks.length + 1);
-                    p.tasks.push({ id: newTaskId, nombre: tarea, tipo, ejecutor, status: 1, gantt: ganttArr, inicio: inicio });
+                    p.tasks.push({ id: newTaskId, nombre: tarea, tipo, ejecutor, status: 1, gantt: ganttArr, inicio: inicio, area: area });
                 }
             }
 
@@ -1290,6 +1346,11 @@
         function saveEditedTask() {
             if (!currentEdit) return;
             const { pid, tidx } = currentEdit; const p = projectMap.get(pid); if (!p) return; const t = p.tasks[tidx];
+            const oldIdentity = {
+                area: normalizeAreaName(t.area) || p.area,
+                proyecto: p.nombre,
+                tarea: t.nombre
+            };
             t.nombre = document.getElementById('edit-task-name').value.trim() || t.nombre; t.tipo = document.getElementById('edit-task-tipo').value || t.tipo;
             t.status = parseInt(document.getElementById('edit-task-estado').value, 10) || t.status;
             // Convertir de formato YYYY-MM-DD a DD/MM/YYYY
@@ -1299,12 +1360,12 @@
                 t.inicio = `${day}/${month}/${year}`;
             }
             t.ejecutor = document.getElementById('edit-task-ejecutor').value || t.ejecutor;
-            saveToSheetAsync(pid, tidx); closeEditTaskModal(); scheduleRender(); showToast('Tarea actualizada', 'success');
+            saveToSheetAsync(pid, tidx, oldIdentity); closeEditTaskModal(); scheduleRender(); showToast('Tarea actualizada', 'success');
         }
         function deleteTaskConfirm(pid, tidx) {
             const p = projectMap.get(pid); if (!p) return; const t = p.tasks[tidx]; if (!t) return;
             showConfirm(`¿Eliminar la tarea "${t.nombre}"?`, () => {
-                p.tasks.splice(tidx, 1); deleteTaskAsync(p.area, p.nombre, t.nombre); scheduleRender(); showToast('Tarea eliminada', 'success');
+                p.tasks.splice(tidx, 1); deleteTaskAsync((normalizeAreaName(t.area) || p.area), p.nombre, t.nombre); scheduleRender(); showToast('Tarea eliminada', 'success');
             });
         }
 
@@ -1342,9 +1403,18 @@
         function saveEditedProject() {
             if (!currentEditProject) return;
             const p = projectMap.get(currentEditProject); if (!p) return;
+            const oldArea = normalizeAreaName(p.area) || '';
+            const oldProjectName = String(p.nombre || '').trim();
+            const newProjectName = document.getElementById('edit-project-name').value.trim() || p.nombre;
+            const newArea = normalizeAreaName(document.getElementById('edit-project-area').value) || p.area;
+            const newType = document.getElementById('edit-project-tipo').value || calculateProjectType(p.tasks) || p.tipo;
             
-            p.nombre = document.getElementById('edit-project-name').value.trim() || p.nombre;
-            p.area = document.getElementById('edit-project-area').value || p.area;
+            p.nombre = newProjectName;
+            p.area = newArea;
+            p.tipo = newType;
+            if (p.tasks && p.tasks.length > 0) {
+                p.tasks.forEach(t => { t.area = newArea; });
+            }
             
             // Convertir de formato YYYY-MM-DD a DD/MM/YYYY
             const inicioValue = document.getElementById('edit-project-inicio').value;
@@ -1356,9 +1426,35 @@
             closeEditProjectModal(); 
             scheduleRender(); 
             showToast('Proyecto actualizado', 'success');
-            
-            // Opcional: guardar cambios en servidor (si deseas sincronizar)
-            // saveProjectToSheetAsync(p);
+
+            const projectObj = {
+                area: p.area,
+                proyecto: p.nombre,
+                tipo: p.tipo,
+                f_inicio: p.inicio,
+                old_area: oldArea,
+                old_proyecto: oldProjectName
+            };
+
+            fetch(APPS_SCRIPT_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({ action: 'saveProjectData', payload: projectObj })
+            })
+                .then(r => {
+                    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+                    return r.json();
+                })
+                .then(result => {
+                    if (!result.success) {
+                        console.error('Error del servidor al guardar proyecto:', result);
+                        showToast('Error al guardar el proyecto', 'error');
+                    }
+                })
+                .catch(e => {
+                    console.error('Error guardando proyecto:', e);
+                    showToast('Advertencia: Posible error al guardar proyecto', 'error');
+                });
         }
 
         // 3. KPI Modal (Multi-KPI Reactivo)
@@ -1644,104 +1740,135 @@
 
         function transformSheetDataToGantt(datosData, kpiData) {
             const proyectosMap = new Map();
-            const kpiMap = new Map(); 
-            
-            // Mapeo de KPIs por proyecto
+            const kpiMap = new Map();
+
+            const slugify = (value) => String(value || '')
+                .toLowerCase()
+                .replace(/[^a-z0-9]+/g, '_')
+                .replace(/^_+|_+$/g, '');
+
+            const buildProjectKey = (projectName, areaName) => `${projectName}||${areaName}`;
+
+            const knownAreasByProject = new Map();
+            const registerKnownArea = (projectName, areaName) => {
+                const project = String(projectName || '').trim();
+                const area = normalizeAreaName(areaName);
+                if (!project || !area) return;
+                if (!knownAreasByProject.has(project)) knownAreasByProject.set(project, new Set());
+                knownAreasByProject.get(project).add(area);
+            };
+
+            const resolveAreaForRow = (projectName, rowArea) => {
+                const area = normalizeAreaName(rowArea);
+                if (area) return area;
+                const knownAreas = knownAreasByProject.get(projectName);
+                if (knownAreas && knownAreas.size === 1) return Array.from(knownAreas)[0];
+                return 'GENERAL';
+            };
+
+            datosData.forEach(row => {
+                const projectName = String(row['PROYECTO'] || '').trim();
+                if (!projectName) return;
+                registerKnownArea(projectName, row['AREA']);
+            });
+
             if (kpiData) {
                 kpiData.forEach(k => {
-                    const pname = k['PROYECTO'];
-                    if(pname && String(pname).trim()) {
-                        if(!kpiMap.has(pname)) kpiMap.set(pname, []);
-                        kpiMap.get(pname).push({
-                            id: k['ID'] || ('k_' + Math.random().toString(36).substr(2, 5)),
-                            f_inicio: k['F INICIO'], a_cambio: k['A. CAMBIO'], prioridad: k['PRIORIDAD'] || 'BAJA', que_soluciono: k['¿QUE SOLUCIONO?'], objetivo: k['OBJETIVO'], l_base: k['L_BASE'], meta: k['META'], indicador: k['INDICADOR'], denominador: k['DENOMINADOR'], numerador: k['NUMERADOR'],
-                            monthly: { ene: k['ENE'], feb: k['FEB'], mar: k['MAR'], abr: k['ABR'], may: k['MAY'], jun: k['JUN'], jul: k['JUL'], ago: k['AGO'], sep: k['SEP'], oct: k['OCT'], nov: k['NOV'], dic: k['DIC'] }
-                        });
-                    }
+                    const projectName = String(k['PROYECTO'] || '').trim();
+                    if (!projectName) return;
+                    const areaName = resolveAreaForRow(projectName, k['AREA']);
+                    const kpiKey = buildProjectKey(projectName, areaName);
+                    if (!kpiMap.has(kpiKey)) kpiMap.set(kpiKey, []);
+                    kpiMap.get(kpiKey).push({
+                        id: k['ID'] || ('k_' + Math.random().toString(36).substr(2, 5)),
+                        f_inicio: k['F INICIO'], a_cambio: k['A. CAMBIO'], prioridad: k['PRIORIDAD'] || 'BAJA', que_soluciono: k['¿QUE SOLUCIONO?'], objetivo: k['OBJETIVO'], l_base: k['L_BASE'], meta: k['META'], indicador: k['INDICADOR'], denominador: k['DENOMINADOR'], numerador: k['NUMERADOR'],
+                        monthly: { ene: k['ENE'], feb: k['FEB'], mar: k['MAR'], abr: k['ABR'], may: k['MAY'], jun: k['JUN'], jul: k['JUL'], ago: k['AGO'], sep: k['SEP'], oct: k['OCT'], nov: k['NOV'], dic: k['DIC'] }
+                    });
                 });
             }
-            
-            // Procesar datos de Datos sheet
+
             datosData.forEach(row => {
-                const projName = row['PROYECTO'] || ''; 
-                const taskName = row['TAREA'] || '';
+                const projectName = String(row['PROYECTO'] || '').trim();
+                if (!projectName) return;
+
+                const taskName = String(row['TAREA'] || '').trim();
+                const isTaskRow = taskName.length > 0;
+                const areaName = resolveAreaForRow(projectName, row['AREA']);
+
                 const inicioRaw = row['F.INICIO'] && String(row['F.INICIO']).trim() !== '' ? row['F.INICIO'] : '';
                 const inicioNorm = inicioRaw ? formatDateDMY(inicioRaw) : '';
                 const inicioFinal = inicioNorm || getTodayFormatted();
-                
-                // Validar que proyecto tenga nombre
-                if (!String(projName).trim()) return;
-                
-                // Crear proyecto solo si no existe (usar primer registro como referencia)
-                if (!proyectosMap.has(projName)) {
-                    proyectosMap.set(projName, {
-                        id: 'p_' + projName.replace(/\s+/g, '_').toLowerCase(), 
-                        area: row['AREA'] || '', 
-                        tipo: row['TIPO'] || 'Proceso', 
-                        prioridad: row['PRIORIDAD'] || '', 
+
+                const projectKey = buildProjectKey(projectName, areaName);
+                if (!proyectosMap.has(projectKey)) {
+                    const kpiKey = buildProjectKey(projectName, areaName);
+                    const kpiFallbackKey = buildProjectKey(projectName, 'GENERAL');
+                    proyectosMap.set(projectKey, {
+                        id: 'p_' + slugify(projectName) + '_' + slugify(areaName) + '_' + String(proyectosMap.size),
+                        area: areaName,
+                        tipo: row['TIPO'] || 'Proceso',
+                        prioridad: row['PRIORIDAD'] || '',
                         inicio: inicioFinal,
-                        nombre: projName, 
-                        ejecutor: '', // Los proyectos NO tienen ejecutor directo (es para tareas)
-                        expanded: false, 
-                        status: getStatusFromText(row['ESTADO'] || ''), 
-                        gantt: padGantt([]), 
-                        kpis: kpiMap.get(projName) || [], 
+                        nombre: projectName,
+                        ejecutor: '',
+                        expanded: false,
+                        status: getStatusFromText(row['ESTADO'] || ''),
+                        gantt: padGantt([]),
+                        kpis: kpiMap.get(kpiKey) || kpiMap.get(kpiFallbackKey) || [],
                         tasks: []
                     });
                 }
-                
-                // Agregar tarea si existe nombre de tarea
-                if (String(taskName).trim()) {
-                    let taskGantt = padGantt([]);
-                    
-                    // Calcular rango gantt desde F.INICIO y F. FIN
-                    if(inicioNorm && row['F. FIN']) {
-                        const startW = dateToWeekIndex(inicioNorm); 
-                        const endW = parseInt(row['F. FIN'], 10) - 1;
-                        
-                        if(startW >= 0 && endW >= startW && startW < MAX_YEAR_WEEKS) { 
-                            for(let i = startW; i <= Math.min(MAX_YEAR_WEEKS - 1, endW); i++) { 
-                                taskGantt[i] = 1; 
-                            } 
+
+                const proyecto = proyectosMap.get(projectKey);
+
+                if (!isTaskRow) {
+                    if (row['TIPO']) proyecto.tipo = row['TIPO'];
+                    if (row['PRIORIDAD']) proyecto.prioridad = row['PRIORIDAD'];
+                    if (inicioNorm) proyecto.inicio = inicioNorm;
+                    if (row['ESTADO']) proyecto.status = getStatusFromText(row['ESTADO']);
+                    return;
+                }
+
+                let taskGantt = padGantt([]);
+                if (inicioNorm && row['F. FIN']) {
+                    const startW = dateToWeekIndex(inicioNorm);
+                    const endW = parseInt(row['F. FIN'], 10) - 1;
+                    if (startW >= 0 && endW >= startW && startW < MAX_YEAR_WEEKS) {
+                        for (let i = startW; i <= Math.min(MAX_YEAR_WEEKS - 1, endW); i++) {
+                            taskGantt[i] = 1;
                         }
                     }
-                    
-                    // Crear objeto tarea
-                    const proyecto = proyectosMap.get(projName);
-                    proyecto.tasks.push({
-                        id: 't_' + projName.replace(/\s+/g, '_') + '_' + taskName.replace(/\s+/g, '_') + '_' + Math.random().toString(36).substr(2, 5),
-                        nombre: taskName, 
-                        tipo: row['TIPO'] || 'Proceso', 
-                        prioridad: row['PRIORIDAD'] || '', 
-                        ejecutor: row['EJECUTOR'] || '', 
-                        inicio: inicioFinal, 
-                        status: getStatusFromText(row['ESTADO'] || ''), 
-                        gantt: taskGantt
+                }
+
+                proyecto.tasks.push({
+                    id: 't_' + slugify(projectName) + '_' + slugify(taskName) + '_' + Math.random().toString(36).substr(2, 5),
+                    nombre: taskName,
+                    area: areaName,
+                    tipo: row['TIPO'] || 'Proceso',
+                    prioridad: row['PRIORIDAD'] || '',
+                    ejecutor: row['EJECUTOR'] || '',
+                    inicio: inicioFinal,
+                    status: getStatusFromText(row['ESTADO'] || ''),
+                    gantt: taskGantt
+                });
+            });
+
+            const projs = Array.from(proyectosMap.values());
+            projs.forEach(p => {
+                const pGantt = new Array(MAX_YEAR_WEEKS).fill(0);
+                p.tasks.forEach(t => {
+                    t.gantt.forEach((v, i) => {
+                        if (v > 0) pGantt[i] = 1;
                     });
+                });
+                p.gantt = pGantt;
+
+                if (p.tasks.length > 0) {
+                    p.status = calculateProjectStatus(p.tasks);
+                    p.tipo = calculateProjectType(p.tasks);
                 }
             });
-            
-            // Recalcular gantt del proyecto basado en tareas
-            const projs = Array.from(proyectosMap.values());
-            projs.forEach(p => { 
-                const pGantt = new Array(MAX_YEAR_WEEKS).fill(0); 
-                
-                // El gantt del proyecto es la unión de todos los gantts de las tareas
-                p.tasks.forEach(t => { 
-                    t.gantt.forEach((v, i) => {
-                        if(v > 0) pGantt[i] = 1;
-                    });
-                }); 
-                
-                p.gantt = pGantt;
-                
-                // Recalcular estado del proyecto basado en tareas
-                p.status = calculateProjectStatus(p.tasks);
-                
-                // Recalcular tipo del proyecto basado en tareas
-                p.tipo = calculateProjectType(p.tasks);
-            });
-            
+
             return projs;
         }
 
