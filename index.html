@@ -390,7 +390,8 @@
 
         #kanban-button,
         #informe-button,
-        #gantt-button {
+        #gantt-button,
+        #acambio-button {
             padding: 5px 10px;
             font-size: 12px;
             font-weight: bold;
@@ -428,6 +429,16 @@
 
         #gantt-button:hover {
             background-color: #0b5ed7;
+            transform: translateY(-1px);
+        }
+
+        #acambio-button {
+            background-color: #14b8a6;
+            color: #f0fdfa;
+        }
+
+        #acambio-button:hover {
+            background-color: #0f9f90;
             transform: translateY(-1px);
         }
 
@@ -473,7 +484,8 @@
 
         /* --- ESTILOS MODALES GENERALES --- */
         #details-modal,
-        #informe-modal {
+        #informe-modal,
+        #acambio-modal {
             display: none;
             position: fixed;
             z-index: 4000;
@@ -503,6 +515,11 @@
             max-width: 1000px;
         }
 
+        #acambio-modal .modal-content {
+            width: 92%;
+            max-width: 1280px;
+        }
+
         .modal-close {
             color: #aaa;
             position: absolute;
@@ -520,7 +537,8 @@
         }
 
         #modal-title,
-        #informe-modal-title {
+        #informe-modal-title,
+        #acambio-modal-title {
             margin-top: 0;
             color: #003366;
             font-family: 'Inter', sans-serif;
@@ -804,6 +822,129 @@
             color: #064b8a;
         }
 
+        .acambio-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding-right: 8px;
+        }
+
+        .acambio-kpis {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+            gap: 10px;
+        }
+
+        .acambio-kpi-card {
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            background: #f8fafc;
+            padding: 10px 12px;
+        }
+
+        .acambio-kpi-title {
+            color: #0f766e;
+            font-size: 11px;
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            margin-bottom: 6px;
+        }
+
+        .acambio-kpi-value {
+            color: #0f172a;
+            font-size: 20px;
+            font-weight: 700;
+            line-height: 1.15;
+        }
+
+        .acambio-kpi-sub {
+            color: #475569;
+            font-size: 12px;
+            margin-top: 4px;
+        }
+
+        .acambio-top-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 10px;
+        }
+
+        .acambio-top-card {
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            background: #ffffff;
+            padding: 10px 12px;
+        }
+
+        .acambio-top-title {
+            color: #0f172a;
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+
+        .acambio-top-list {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .acambio-top-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            border-bottom: 1px dashed #e2e8f0;
+            padding-bottom: 5px;
+            font-size: 12px;
+        }
+
+        .acambio-top-item:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .acambio-top-label {
+            color: #0f172a;
+            font-weight: 600;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: 70%;
+        }
+
+        .acambio-top-value {
+            color: #0f766e;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .acambio-link-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            padding: 4px 8px;
+            border-radius: 6px;
+            border: 1px solid #99f6e4;
+            background: #ecfeff;
+            color: #0f766e;
+            font-size: 11px;
+            font-weight: 700;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .acambio-link-btn:hover {
+            background: #ccfbf1;
+            border-color: #5eead4;
+        }
+
         /* --- MODAL KANBAN --- */
         #kanban-modal {
             display: none;
@@ -1076,6 +1217,7 @@
                     <button id="gantt-button">Gantt</button>
                     <button id="kanban-button">Kanban</button>
                     <button id="informe-button">Informe</button>
+                    <button id="acambio-button">A.cambio</button>
                 </div>
             </div>
 
@@ -1369,6 +1511,15 @@
     </div>
 </div>
 
+<!-- MODAL A.CAMBIO -->
+<div id="acambio-modal">
+    <div class="modal-content">
+        <span class="modal-close" id="acambio-modal-close">&times;</span>
+        <h2 id="acambio-modal-title">Dashboard A.cambio</h2>
+        <div class="modal-table-wrapper acambio-wrapper" id="acambio-modal-body"></div>
+    </div>
+</div>
+
 <!-- MODAL KANBAN -->
 <div id="kanban-modal">
     <div class="kanban-content">
@@ -1392,6 +1543,7 @@
 const SHEET_ID    = '1lRBoAr2JN2elTtB9QgmvIYNIq1zsxvBENpuwzjIuZt4';
 const SHEET_NAME_BD = 'Bd';
 const SHEET_NAME_KANBAN = 'Kanban';
+const SHEET_NAME_ACAMBIO = 'A_cambio';
 
 const HORAS_COLUMN_NAME = 'HRS PROY.(AÑO)';
 const HORAS_ACTUAL_COLUMN_NAME = 'HRS AHORRADO (ACTUAL)';
@@ -1405,6 +1557,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let allRowsData = [];
     let kanbanData = [];
+    let aCambioData = [];
     let processedStats = {};
 
     const $detailsModal = document.getElementById('details-modal');
@@ -1419,6 +1572,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const $kanbanButton = document.getElementById('kanban-button');
     const $ganttButton = document.getElementById('gantt-button');
+    const $acambioButton = document.getElementById('acambio-button');
+    const $acambioModal = document.getElementById('acambio-modal');
+    const $acambioModalClose = document.getElementById('acambio-modal-close');
+    const $acambioModalBody = document.getElementById('acambio-modal-body');
     // Open standalone Gantt page (external file)
     if ($ganttButton) {
         $ganttButton.addEventListener('click', () => {
@@ -1799,7 +1956,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function gvizToObjects(resp) {
         if (!resp || !resp.table) return [];
-        const cols = (resp.table.cols || []).map(c => String(c.label || c.id || '').trim().toUpperCase());
+        const seenHeaders = new Map();
+        const cols = (resp.table.cols || []).map(c => {
+            const base = String(c.label || c.id || '').trim().toUpperCase();
+            const count = (seenHeaders.get(base) || 0) + 1;
+            seenHeaders.set(base, count);
+            return count > 1 ? `${base}_${count}` : base;
+        });
         return (resp.table.rows || []).map(r => {
             const o = {};
             cols.forEach((h, i) => {
@@ -2180,6 +2343,286 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    function escapeHtml(value) {
+        return String(value || '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }
+
+    function parseNumericCell(value) {
+        if (value === null || value === undefined || value === '') return 0;
+        if (typeof value === 'number') return isNaN(value) ? 0 : value;
+
+        const raw = String(value).trim();
+        if (!raw) return 0;
+
+        const hhmmMatch = raw.match(/^(-?\d+):(\d{1,2})$/);
+        if (hhmmMatch) {
+            const hh = parseInt(hhmmMatch[1], 10) || 0;
+            const mm = parseInt(hhmmMatch[2], 10) || 0;
+            return (hh * 60) + mm;
+        }
+
+        let normalized = raw.replace(/[^\d.,-]/g, '');
+        if (!normalized) return 0;
+
+        const hasDot = normalized.includes('.');
+        const hasComma = normalized.includes(',');
+        if (hasDot && hasComma) {
+            normalized = normalized.replace(/,/g, '');
+        } else if (!hasDot && hasComma) {
+            normalized = normalized.replace(',', '.');
+        }
+
+        const num = parseFloat(normalized);
+        return isNaN(num) ? 0 : num;
+    }
+
+    function getSafeHttpUrl(value) {
+        const raw = String(value || '').trim();
+        if (!raw) return '';
+
+        let normalized = raw;
+        if (/^www\./i.test(normalized) || /^drive\.google\.com\//i.test(normalized)) {
+            normalized = `https://${normalized}`;
+        }
+
+        if (!/^https?:\/\//i.test(normalized)) return '';
+
+        try {
+            const parsed = new URL(normalized);
+            if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') return '';
+            return parsed.href;
+        } catch (e) {
+            return '';
+        }
+    }
+
+    function normalizeACambioRows(rows) {
+        return (rows || []).map(row => {
+            const mes = row.MES || '';
+            const area = row.AREA || '';
+            const tipo = row.TIPO || row.TIPO_1 || row['TIPO PROYECTO'] || '';
+            const agenteCambio = row['A.CAMBIO'] || row['A CAMBIO'] || row['A_CAMBIO'] || '';
+            const proyecto = row.PROYECTO || '';
+            const antes = row.ANTES || '';
+            const frecuenciaAntes = row.FRECUENCIA || row.FRECUENCIA_1 || '';
+            const ahora = row.AHORA || '';
+            const frecuenciaAhora = row.FRECUENCIA_2 || row['FRECUENCIA AHORA'] || row['FRECUENCIA_ACTUAL'] || row.FRECUENCIA2 || '';
+            const ahorroMin = parseNumericCell(row.AHORRO);
+            const linkRaw = row.LINK || row.LINK_1 || row['LINK PROYECTO'] || '';
+            const linkUrl = getSafeHttpUrl(linkRaw);
+            return {
+                mes,
+                area,
+                tipo,
+                agenteCambio,
+                proyecto,
+                antes,
+                frecuenciaAntes,
+                ahora,
+                frecuenciaAhora,
+                ahorroMin,
+                linkUrl
+            };
+        }).filter(r =>
+            String(r.area).trim() ||
+            String(r.tipo).trim() ||
+            String(r.agenteCambio).trim() ||
+            String(r.proyecto).trim() ||
+            r.ahorroMin !== 0 ||
+            String(r.linkUrl).trim()
+        );
+    }
+
+    function aggregateACambio(rows, fieldName) {
+        const map = new Map();
+        rows.forEach(r => {
+            const rawLabel = String(r[fieldName] || '').trim();
+            const label = rawLabel || 'SIN DATO';
+            if (!map.has(label)) map.set(label, { label, ahorroMin: 0, count: 0 });
+            const curr = map.get(label);
+            curr.ahorroMin += parseNumericCell(r.ahorroMin);
+            curr.count += 1;
+        });
+        return Array.from(map.values())
+            .sort((a, b) => (b.ahorroMin - a.ahorroMin) || (b.count - a.count) || a.label.localeCompare(b.label, 'es', { sensitivity: 'base' }));
+    }
+
+    function renderTopList(items) {
+        if (!items || items.length === 0) {
+            return '<div class="acambio-kpi-sub">Sin datos para mostrar.</div>';
+        }
+        return `
+            <ul class="acambio-top-list">
+                ${items.map(item => `
+                    <li class="acambio-top-item">
+                        <span class="acambio-top-label" title="${escapeHtml(item.label)}">${escapeHtml(item.label)}</span>
+                        <span class="acambio-top-value">${formatNumber(item.ahorroMin)} min</span>
+                    </li>
+                `).join('')}
+            </ul>
+        `;
+    }
+
+    function openACambioModal() {
+        if (!aCambioData || aCambioData.length === 0) {
+            showError("No hay datos en la hoja 'A_cambio'.");
+            return;
+        }
+
+        const rows = normalizeACambioRows(aCambioData);
+        if (rows.length === 0) {
+            showError("La hoja 'A_cambio' no tiene registros válidos.");
+            return;
+        }
+
+        const totalRegistros = rows.length;
+        const totalAhorroMin = rows.reduce((acc, r) => acc + parseNumericCell(r.ahorroMin), 0);
+        const totalAhorroHoras = totalAhorroMin / 60;
+        const totalAhorroDias = totalAhorroHoras / 9;
+
+        const areasUnicas = new Set(rows.map(r => String(r.area || '').trim()).filter(Boolean)).size;
+        const tiposUnicos = new Set(rows.map(r => String(r.tipo || '').trim()).filter(Boolean)).size;
+        const agentesUnicos = new Set(rows.map(r => String(r.agenteCambio || '').trim()).filter(Boolean)).size;
+        const proyectosUnicos = new Set(rows.map(r => String(r.proyecto || '').trim()).filter(Boolean)).size;
+        const ahorroPromedioProyectoHoras = proyectosUnicos > 0 ? (totalAhorroHoras / proyectosUnicos) : 0;
+        const ahorroPromedioRegistroMin = totalRegistros > 0 ? (totalAhorroMin / totalRegistros) : 0;
+
+        const topAreas = aggregateACambio(rows, 'area').slice(0, 7);
+        const topTipos = aggregateACambio(rows, 'tipo').slice(0, 7);
+        const topAgentes = aggregateACambio(rows, 'agenteCambio').slice(0, 7);
+        const topProyectos = aggregateACambio(rows, 'proyecto').slice(0, 7);
+        const topMeses = aggregateACambio(rows, 'mes').slice(0, 7);
+
+        const rowsSorted = rows.slice().sort((a, b) => (b.ahorroMin - a.ahorroMin));
+
+        const html = `
+            <div class="acambio-kpis">
+                <div class="acambio-kpi-card">
+                    <div class="acambio-kpi-title">Registros A.cambio</div>
+                    <div class="acambio-kpi-value">${formatNumber(totalRegistros)}</div>
+                    <div class="acambio-kpi-sub">Filas procesadas</div>
+                </div>
+                <div class="acambio-kpi-card">
+                    <div class="acambio-kpi-title">Areas Impactadas</div>
+                    <div class="acambio-kpi-value">${formatNumber(areasUnicas)}</div>
+                    <div class="acambio-kpi-sub">Cobertura por area</div>
+                </div>
+                <div class="acambio-kpi-card">
+                    <div class="acambio-kpi-title">Tipos</div>
+                    <div class="acambio-kpi-value">${formatNumber(tiposUnicos)}</div>
+                    <div class="acambio-kpi-sub">Clasificaciones de cambio</div>
+                </div>
+                <div class="acambio-kpi-card">
+                    <div class="acambio-kpi-title">Agentes de Cambio</div>
+                    <div class="acambio-kpi-value">${formatNumber(agentesUnicos)}</div>
+                    <div class="acambio-kpi-sub">Responsables activos</div>
+                </div>
+                <div class="acambio-kpi-card">
+                    <div class="acambio-kpi-title">Proyectos</div>
+                    <div class="acambio-kpi-value">${formatNumber(proyectosUnicos)}</div>
+                    <div class="acambio-kpi-sub">Proyectos con ahorro</div>
+                </div>
+                <div class="acambio-kpi-card">
+                    <div class="acambio-kpi-title">Ahorro Total</div>
+                    <div class="acambio-kpi-value">${formatNumber(totalAhorroMin)} min</div>
+                    <div class="acambio-kpi-sub">${formatNumberOneDecimal(totalAhorroHoras)} h | ${formatNumberOneDecimal(totalAhorroDias)} dias (9 h/dia)</div>
+                </div>
+                <div class="acambio-kpi-card">
+                    <div class="acambio-kpi-title">Promedio por Proyecto</div>
+                    <div class="acambio-kpi-value">${formatNumberOneDecimal(ahorroPromedioProyectoHoras)} h</div>
+                    <div class="acambio-kpi-sub">${formatNumberOneDecimal(ahorroPromedioRegistroMin)} min por registro</div>
+                </div>
+            </div>
+
+            <div class="acambio-top-grid">
+                <div class="acambio-top-card">
+                    <div class="acambio-top-title">Top Areas por Ahorro</div>
+                    ${renderTopList(topAreas)}
+                </div>
+                <div class="acambio-top-card">
+                    <div class="acambio-top-title">Top Tipos por Ahorro</div>
+                    ${renderTopList(topTipos)}
+                </div>
+                <div class="acambio-top-card">
+                    <div class="acambio-top-title">Top Agentes de Cambio</div>
+                    ${renderTopList(topAgentes)}
+                </div>
+                <div class="acambio-top-card">
+                    <div class="acambio-top-title">Top Proyectos</div>
+                    ${renderTopList(topProyectos)}
+                </div>
+                <div class="acambio-top-card">
+                    <div class="acambio-top-title">Top Meses</div>
+                    ${renderTopList(topMeses)}
+                </div>
+            </div>
+
+            <table class="modal-table">
+                <thead>
+                    <tr>
+                        <th style="width: 7%;">MES</th>
+                        <th style="width: 8%;">AREA</th>
+                        <th style="width: 8%;">TIPO</th>
+                        <th style="width: 10%;">A.CAMBIO</th>
+                        <th style="width: 14%;">PROYECTO</th>
+                        <th style="width: 10%;">ANTES</th>
+                        <th style="width: 8%;">FRECUENCIA</th>
+                        <th style="width: 10%;">AHORA</th>
+                        <th style="width: 8%;">FRECUENCIA</th>
+                        <th style="width: 9%;">AHORRO</th>
+                        <th style="width: 8%;">DETALLE</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${rowsSorted.map(r => {
+                        const h = r.ahorroMin / 60;
+                        const d = h / 9;
+                        const detailHtml = r.linkUrl
+                            ? `<a class="acambio-link-btn" href="${escapeHtml(r.linkUrl)}" target="_blank" rel="noopener noreferrer" title="Abrir carpeta de Drive">&#128269; Ver detalle</a>`
+                            : '<span style="color:#94a3b8;">-</span>';
+                        return `
+                            <tr>
+                                <td>${escapeHtml(r.mes)}</td>
+                                <td>${escapeHtml(r.area)}</td>
+                                <td>${escapeHtml(r.tipo)}</td>
+                                <td>${escapeHtml(r.agenteCambio)}</td>
+                                <td>${escapeHtml(r.proyecto)}</td>
+                                <td>${escapeHtml(r.antes)}</td>
+                                <td>${escapeHtml(r.frecuenciaAntes)}</td>
+                                <td>${escapeHtml(r.ahora)}</td>
+                                <td>${escapeHtml(r.frecuenciaAhora)}</td>
+                                <td>${formatNumber(r.ahorroMin)} min<br><span style="color:#475569;font-size:11px;">${formatNumberOneDecimal(h)} h | ${formatNumberOneDecimal(d)} d</span></td>
+                                <td style="text-align:center;">${detailHtml}</td>
+                            </tr>
+                        `;
+                    }).join('')}
+                </tbody>
+            </table>
+        `;
+
+        $acambioModalBody.innerHTML = html;
+        $acambioModal.style.display = 'block';
+    }
+
+    function setupACambioModalListeners() {
+        if ($acambioButton) {
+            $acambioButton.addEventListener('click', openACambioModal);
+        }
+        if ($acambioModalClose) {
+            $acambioModalClose.addEventListener('click', () => $acambioModal.style.display = 'none');
+        }
+        if ($acambioModal) {
+            $acambioModal.addEventListener('click', (e) => {
+                if (e.target === $acambioModal) $acambioModal.style.display = 'none';
+            });
+        }
+    }
+
     // === KANBAN ===
     function displayKanbanModal() {
         if (!kanbanData || kanbanData.length === 0) {
@@ -2235,15 +2678,24 @@ document.addEventListener('DOMContentLoaded', () => {
             updateMapWithData(allRowsData);
             setupDetailsModalListeners();
             setupInformeModalListeners();
-            return loadSheetJSONP(SHEET_ID, SHEET_NAME_KANBAN);
+            return Promise.all([
+                loadSheetJSONP(SHEET_ID, SHEET_NAME_KANBAN).catch(() => []),
+                loadSheetJSONP(SHEET_ID, SHEET_NAME_ACAMBIO).catch(() => [])
+            ]);
         })
-        .then(rowsKanban => {
+        .then(([rowsKanban, rowsACambio]) => {
             if (!Array.isArray(rowsKanban)) {
                 kanbanData = [];
             } else {
                 kanbanData = rowsKanban;
             }
+            if (!Array.isArray(rowsACambio)) {
+                aCambioData = [];
+            } else {
+                aCambioData = rowsACambio;
+            }
             setupKanbanModalListeners();
+            setupACambioModalListeners();
             hideLoading();
             alignColumnHeights();
         })
