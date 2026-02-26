@@ -485,7 +485,8 @@
         /* --- ESTILOS MODALES GENERALES --- */
         #details-modal,
         #informe-modal,
-        #acambio-modal {
+        #acambio-chart-modal,
+        #asistencia-modal {
             display: none;
             position: fixed;
             z-index: 4000;
@@ -515,11 +516,6 @@
             max-width: 1000px;
         }
 
-        #acambio-modal .modal-content {
-            width: 92%;
-            max-width: 1280px;
-        }
-
         .modal-close {
             color: #aaa;
             position: absolute;
@@ -538,7 +534,8 @@
 
         #modal-title,
         #informe-modal-title,
-        #acambio-modal-title {
+        #acambio-chart-modal-title,
+        #asistencia-modal-title {
             margin-top: 0;
             color: #003366;
             font-family: 'Inter', sans-serif;
@@ -827,6 +824,8 @@
             flex-direction: column;
             gap: 12px;
             padding-right: 8px;
+            max-height: calc(100vh - 190px);
+            overflow: auto;
         }
 
         .acambio-kpis {
@@ -943,6 +942,284 @@
         .acambio-link-btn:hover {
             background: #ccfbf1;
             border-color: #5eead4;
+        }
+
+        .acambio-sheet {
+            display: none;
+            min-height: 100vh;
+            background: #f8fafc;
+            padding: 22px;
+        }
+
+        .acambio-sheet-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .acambio-sheet-title {
+            margin: 0;
+            color: #0f172a;
+            font-size: 26px;
+            font-weight: 700;
+        }
+
+        .acambio-sheet-sub {
+            margin: 3px 0 0;
+            color: #475569;
+            font-size: 13px;
+        }
+
+        .acambio-sheet-back {
+            border: 1px solid #cbd5e1;
+            background: #ffffff;
+            color: #0f172a;
+            border-radius: 8px;
+            font-weight: 600;
+            padding: 8px 12px;
+            cursor: pointer;
+        }
+
+        .acambio-sheet-back:hover {
+            background: #f1f5f9;
+        }
+
+        .acambio-chart-bars {
+            list-style: none;
+            margin: 10px 0 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .acambio-chart-item {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .acambio-chart-label {
+            font-size: 12px;
+            color: #334155;
+            font-weight: 600;
+        }
+
+        .acambio-chart-track {
+            width: 100%;
+            height: 9px;
+            border-radius: 999px;
+            background: #e2e8f0;
+            overflow: hidden;
+            margin-top: 2px;
+        }
+
+        .acambio-chart-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #0ea5e9, #14b8a6);
+            border-radius: 999px;
+        }
+
+        .acambio-chart-value {
+            font-size: 12px;
+            color: #0f172a;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .acambio-top-actions {
+            margin-top: 10px;
+            text-align: right;
+        }
+
+        .acambio-open-detail {
+            border: 1px solid #d1d5db;
+            background: #fff;
+            color: #0f172a;
+            border-radius: 8px;
+            padding: 6px 10px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .acambio-open-detail:hover {
+            background: #f8fafc;
+        }
+
+        .acambio-header-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .acambio-assist-btn {
+            border: 1px solid #0f766e;
+            background: #14b8a6;
+            color: #f0fdfa;
+            border-radius: 8px;
+            font-weight: 700;
+            padding: 8px 12px;
+            cursor: pointer;
+        }
+
+        .acambio-assist-btn:hover {
+            background: #0f9f90;
+        }
+
+        .assist-form {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+        }
+
+        .assist-form label {
+            font-size: 12px;
+            color: #334155;
+            font-weight: 700;
+        }
+
+        .assist-form select,
+        .assist-form input {
+            width: 100%;
+            padding: 8px 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 13px;
+            box-sizing: border-box;
+        }
+
+        .assist-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+            margin-top: 6px;
+        }
+
+        .assist-save-btn {
+            border: 1px solid #0f766e;
+            background: #14b8a6;
+            color: #f0fdfa;
+            border-radius: 8px;
+            font-weight: 700;
+            padding: 8px 12px;
+            cursor: pointer;
+        }
+
+        .assist-cancel-btn {
+            border: 1px solid #cbd5e1;
+            background: #ffffff;
+            color: #0f172a;
+            border-radius: 8px;
+            font-weight: 700;
+            padding: 8px 12px;
+            cursor: pointer;
+        }
+
+        .ucofaco-section {
+            border: 1px solid #cbd5e1;
+            border-radius: 10px;
+            background: #ffffff;
+            padding: 12px;
+        }
+
+        .ucofaco-title {
+            margin: 0 0 10px;
+            color: #0f172a;
+            font-size: 15px;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+        .ucofaco-kpis {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .ucofaco-kpi-card {
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            background: #f8fafc;
+            padding: 10px;
+        }
+
+        .ucofaco-kpi-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            color: #0f766e;
+            font-weight: 700;
+        }
+
+        .ucofaco-kpi-value {
+            color: #0f172a;
+            font-size: 20px;
+            font-weight: 800;
+            margin-top: 4px;
+        }
+
+        .ucofaco-kpi-sub {
+            color: #475569;
+            font-size: 12px;
+            margin-top: 3px;
+        }
+
+        .ucofaco-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 10px;
+        }
+
+        .ucofaco-card {
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            background: #ffffff;
+            padding: 10px;
+        }
+
+        .ucofaco-card-title {
+            margin: 0 0 8px;
+            color: #1e293b;
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .ucofaco-filter {
+            margin-bottom: 8px;
+        }
+
+        .ucofaco-filter select {
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            padding: 6px 8px;
+            font-size: 12px;
+            background: #fff;
+        }
+
+        .ucofaco-list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            max-height: 220px;
+            overflow: auto;
+        }
+
+        .ucofaco-list-item {
+            border-bottom: 1px dashed #e2e8f0;
+            padding-bottom: 4px;
+            font-size: 12px;
+            color: #0f172a;
+            display: flex;
+            justify-content: space-between;
+            gap: 8px;
         }
 
         /* --- MODAL KANBAN --- */
@@ -1216,7 +1493,7 @@
                 <div class="summary-actions">
                     <button id="gantt-button">Gantt</button>
                     <button id="kanban-button">Kanban</button>
-                    <button id="acambio-button">A.cambio</button>
+                    <button id="acambio-button">Agentes de cambio</button>
                 </div>
             </div>
 
@@ -1510,12 +1787,52 @@
     </div>
 </div>
 
-<!-- MODAL A.CAMBIO -->
-<div id="acambio-modal">
+<!-- MODAL DETALLE GRAFICOS A.CAMBIO -->
+<div id="acambio-chart-modal">
     <div class="modal-content">
-        <span class="modal-close" id="acambio-modal-close">&times;</span>
-        <h2 id="acambio-modal-title">Dashboard A.cambio</h2>
-        <div class="modal-table-wrapper acambio-wrapper" id="acambio-modal-body"></div>
+        <span class="modal-close" id="acambio-chart-modal-close">&times;</span>
+        <h2 id="acambio-chart-modal-title">Detalle de Agentes de cambio</h2>
+        <div class="modal-table-wrapper">
+            <table class="modal-table">
+                <thead>
+                    <tr>
+                        <th>Concepto</th>
+                        <th>Registros</th>
+                        <th>Ahorro (min)</th>
+                    </tr>
+                </thead>
+                <tbody id="acambio-chart-modal-body"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div id="asistencia-modal">
+    <div class="modal-content" style="max-width: 520px;">
+        <span class="modal-close" id="asistencia-modal-close">&times;</span>
+        <h2 id="asistencia-modal-title">Registrar asistencia</h2>
+        <form id="asistencia-form" class="assist-form">
+            <div>
+                <label for="asistencia-area">Area</label>
+                <select id="asistencia-area" required></select>
+            </div>
+            <div>
+                <label for="asistencia-colaborador">Colaborador</label>
+                <select id="asistencia-colaborador" required></select>
+            </div>
+            <div>
+                <label for="asistencia-fecha-columna">Fecha</label>
+                <select id="asistencia-fecha-columna" required></select>
+            </div>
+            <div>
+                <label for="asistencia-valor">Asistencia</label>
+                <input id="asistencia-valor" type="text" placeholder="Ejemplo: SI, X, 1" required />
+            </div>
+            <div class="assist-actions">
+                <button type="button" id="asistencia-cancel" class="assist-cancel-btn">Cancelar</button>
+                <button type="submit" id="asistencia-save" class="assist-save-btn">Guardar</button>
+            </div>
+        </form>
     </div>
 </div>
 
@@ -1538,11 +1855,26 @@
     </div>
 </div>
 
+<div id="acambio-sheet" class="acambio-sheet">
+    <div class="acambio-sheet-header">
+        <div>
+            <h2 class="acambio-sheet-title">Dashboard Agentes de cambio</h2>
+            <p class="acambio-sheet-sub">Vista de ahorro y detalle por area, tipo, agente y mes.</p>
+        </div>
+        <div class="acambio-header-actions">
+            <button id="acambio-asistencia-button" class="acambio-assist-btn">Asistencia</button>
+            <button id="acambio-sheet-back" class="acambio-sheet-back">Volver al mapa</button>
+        </div>
+    </div>
+    <div id="acambio-sheet-body" class="acambio-wrapper"></div>
+</div>
+
 <script>
 const SHEET_ID    = '1lRBoAr2JN2elTtB9QgmvIYNIq1zsxvBENpuwzjIuZt4';
 const SHEET_NAME_BD = 'Bd';
 const SHEET_NAME_KANBAN = 'Kanban';
 const SHEET_NAME_ACAMBIO = 'A_cambio';
+const SHEET_NAME_UCOFACO = 'U_cofaco';
 
 const HORAS_COLUMN_NAME = 'HRS PROY.(AÑO)';
 const HORAS_ACTUAL_COLUMN_NAME = 'HRS AHORRADO (ACTUAL)';
@@ -1557,6 +1889,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let allRowsData = [];
     let kanbanData = [];
     let aCambioData = [];
+    let ucofacoData = [];
     let processedStats = {};
 
     const $detailsModal = document.getElementById('details-modal');
@@ -1572,9 +1905,25 @@ document.addEventListener('DOMContentLoaded', () => {
     const $kanbanButton = document.getElementById('kanban-button');
     const $ganttButton = document.getElementById('gantt-button');
     const $acambioButton = document.getElementById('acambio-button');
-    const $acambioModal = document.getElementById('acambio-modal');
-    const $acambioModalClose = document.getElementById('acambio-modal-close');
-    const $acambioModalBody = document.getElementById('acambio-modal-body');
+    const $mainLayout = document.querySelector('.main-layout-container');
+    const $acambioSheet = document.getElementById('acambio-sheet');
+    const $acambioSheetBack = document.getElementById('acambio-sheet-back');
+    const $acambioSheetBody = document.getElementById('acambio-sheet-body');
+    const $acambioChartModal = document.getElementById('acambio-chart-modal');
+    const $acambioChartModalClose = document.getElementById('acambio-chart-modal-close');
+    const $acambioChartModalBody = document.getElementById('acambio-chart-modal-body');
+    const $acambioChartModalTitle = document.getElementById('acambio-chart-modal-title');
+    let aCambioChartData = {};
+    const $acambioAsistenciaButton = document.getElementById('acambio-asistencia-button');
+    const $asistenciaModal = document.getElementById('asistencia-modal');
+    const $asistenciaModalClose = document.getElementById('asistencia-modal-close');
+    const $asistenciaForm = document.getElementById('asistencia-form');
+    const $asistenciaCancel = document.getElementById('asistencia-cancel');
+    const $asistenciaArea = document.getElementById('asistencia-area');
+    const $asistenciaColaborador = document.getElementById('asistencia-colaborador');
+    const $asistenciaFecha = document.getElementById('asistencia-fecha-columna');
+    const $asistenciaValor = document.getElementById('asistencia-valor');
+    let ucofacoSummary = null;
     // Open standalone Gantt page (external file)
     if ($ganttButton) {
         $ganttButton.addEventListener('click', () => {
@@ -2451,23 +2800,285 @@ document.addEventListener('DOMContentLoaded', () => {
             .sort((a, b) => (b.ahorroMin - a.ahorroMin) || (b.count - a.count) || a.label.localeCompare(b.label, 'es', { sensitivity: 'base' }));
     }
 
-    function renderTopList(items) {
+    function renderTopBarChart(items, key) {
         if (!items || items.length === 0) {
             return '<div class="acambio-kpi-sub">Sin datos para mostrar.</div>';
         }
+        const maxValue = Math.max(...items.map(i => parseNumericCell(i.ahorroMin)), 0);
         return `
-            <ul class="acambio-top-list">
+            <ul class="acambio-chart-bars">
                 ${items.map(item => `
-                    <li class="acambio-top-item">
-                        <span class="acambio-top-label" title="${escapeHtml(item.label)}">${escapeHtml(item.label)}</span>
-                        <span class="acambio-top-value">${formatNumber(item.ahorroMin)} min</span>
+                    <li class="acambio-chart-item">
+                        <div>
+                            <div class="acambio-chart-label" title="${escapeHtml(item.label)}">${escapeHtml(item.label)}</div>
+                            <div class="acambio-chart-track">
+                                <div class="acambio-chart-fill" style="width:${maxValue > 0 ? ((parseNumericCell(item.ahorroMin) / maxValue) * 100).toFixed(1) : 0}%"></div>
+                            </div>
+                        </div>
+                        <span class="acambio-chart-value">${formatNumber(item.ahorroMin)} min</span>
+                    </li>
+                `).join('')}
+            </ul>
+            <div class="acambio-top-actions">
+                <button class="acambio-open-detail" data-chart="${escapeHtml(key)}">Ver detalle</button>
+            </div>
+        `;
+    }
+
+    async function postAction(action, payload) {
+        const response = await fetch(window.location.href, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action, payload })
+        });
+        if (!response.ok) {
+            throw new Error(`Error HTTP ${response.status}`);
+        }
+        const result = await response.json();
+        if (!result || result.success === false || result.error) {
+            throw new Error((result && (result.message || result.error)) || 'No se pudo completar la operacion.');
+        }
+        return result;
+    }
+
+    function uniqueValues(items) {
+        return Array.from(new Set((items || []).map(v => String(v || '').trim()).filter(Boolean)))
+            .sort((a, b) => a.localeCompare(b, 'es', { sensitivity: 'base' }));
+    }
+
+    function getUcofacoDateColumns(rows) {
+        const keys = rows && rows.length ? Object.keys(rows[0]) : [];
+        return keys.filter(k => k !== 'AREA' && k !== 'COLABORADOR');
+    }
+
+    function fillSelectOptions(selectEl, values, placeholder) {
+        if (!selectEl) return;
+        const optionsHtml = [`<option value="">${escapeHtml(placeholder || 'Seleccionar')}</option>`]
+            .concat((values || []).map(v => `<option value="${escapeHtml(v)}">${escapeHtml(v)}</option>`));
+        selectEl.innerHTML = optionsHtml.join('');
+    }
+
+    function refreshColaboradorOptions() {
+        const selectedArea = String(($asistenciaArea && $asistenciaArea.value) || '').trim();
+        const filtered = (ucofacoData || []).filter(r => String(r.AREA || '').trim() === selectedArea);
+        const colaboradores = uniqueValues(filtered.map(r => r.COLABORADOR));
+        fillSelectOptions($asistenciaColaborador, colaboradores, 'Seleccionar colaborador');
+    }
+
+    function openAsistenciaModal() {
+        if (!Array.isArray(ucofacoData) || ucofacoData.length === 0) {
+            showError("No hay datos en la hoja 'U_cofaco'.");
+            return;
+        }
+        const areas = uniqueValues(ucofacoData.map(r => r.AREA));
+        const fechas = getUcofacoDateColumns(ucofacoData);
+        fillSelectOptions($asistenciaArea, areas, 'Seleccionar area');
+        fillSelectOptions($asistenciaFecha, fechas, 'Seleccionar fecha');
+        fillSelectOptions($asistenciaColaborador, [], 'Seleccionar colaborador');
+        if ($asistenciaValor) $asistenciaValor.value = '';
+        $asistenciaModal.style.display = 'block';
+    }
+
+    function closeAsistenciaModal() {
+        if ($asistenciaModal) $asistenciaModal.style.display = 'none';
+    }
+
+    async function submitAsistenciaForm(e) {
+        e.preventDefault();
+        const payload = {
+            area: String(($asistenciaArea && $asistenciaArea.value) || '').trim(),
+            colaborador: String(($asistenciaColaborador && $asistenciaColaborador.value) || '').trim(),
+            fecha_columna: String(($asistenciaFecha && $asistenciaFecha.value) || '').trim(),
+            asistencia: String(($asistenciaValor && $asistenciaValor.value) || '').trim()
+        };
+
+        if (!payload.area || !payload.colaborador || !payload.fecha_columna || !payload.asistencia) {
+            showError('Completa todos los campos de asistencia.');
+            return;
+        }
+
+        try {
+            showLoading();
+            const saveBtn = document.getElementById('asistencia-save');
+            if (saveBtn) saveBtn.disabled = true;
+            await postAction('saveUcofacoAsistencia', payload);
+            closeAsistenciaModal();
+            alert('Asistencia registrada correctamente.');
+        } catch (err) {
+            showError(err.message || 'No se pudo guardar la asistencia.');
+        } finally {
+            const saveBtn = document.getElementById('asistencia-save');
+            if (saveBtn) saveBtn.disabled = false;
+            hideLoading();
+        }
+    }
+
+    function isPresentMark(value) {
+        const v = String(value || '').trim();
+        return v !== '';
+    }
+
+    function buildUcofacoSummary(rows) {
+        const safeRows = Array.isArray(rows) ? rows : [];
+        const dateColumns = getUcofacoDateColumns(safeRows);
+        if (safeRows.length === 0 || dateColumns.length === 0) {
+            return {
+                totalPersonas: 0,
+                totalClases: 0,
+                promedioParticipantes: 0,
+                faltasPorPersona: [],
+                areaStats: []
+            };
+        }
+
+        const byPerson = new Map();
+        const byArea = new Map();
+        const totalClases = dateColumns.length;
+
+        safeRows.forEach(r => {
+            const area = String(r.AREA || '').trim() || 'SIN AREA';
+            const col = String(r.COLABORADOR || '').trim() || 'SIN COLABORADOR';
+            const personKey = `${area}__${col}`;
+
+            let asistencias = 0;
+            dateColumns.forEach(dc => {
+                if (isPresentMark(r[dc])) asistencias += 1;
+            });
+            const faltas = Math.max(totalClases - asistencias, 0);
+
+            byPerson.set(personKey, { area, colaborador: col, asistencias, faltas });
+
+            if (!byArea.has(area)) byArea.set(area, { area, personas: 0, asistencias: 0, capacidad: 0 });
+            const curr = byArea.get(area);
+            curr.personas += 1;
+            curr.asistencias += asistencias;
+            curr.capacidad += totalClases;
+        });
+
+        const faltasPorPersona = Array.from(byPerson.values())
+            .sort((a, b) => (b.faltas - a.faltas) || a.colaborador.localeCompare(b.colaborador, 'es', { sensitivity: 'base' }));
+
+        const areaStats = Array.from(byArea.values()).map(a => {
+            const promedioParticipantes = totalClases > 0 ? (a.asistencias / totalClases) : 0;
+            const asistenciaPct = a.capacidad > 0 ? ((a.asistencias / a.capacidad) * 100) : 0;
+            return { ...a, promedioParticipantes, asistenciaPct };
+        }).sort((a, b) => b.promedioParticipantes - a.promedioParticipantes);
+
+        const totalPersonas = safeRows.length;
+        const totalAsistencias = safeRows.reduce((acc, r) => {
+            let c = 0;
+            dateColumns.forEach(dc => { if (isPresentMark(r[dc])) c += 1; });
+            return acc + c;
+        }, 0);
+        const promedioParticipantes = totalClases > 0 ? (totalAsistencias / totalClases) : 0;
+
+        return {
+            totalPersonas,
+            totalClases,
+            promedioParticipantes,
+            faltasPorPersona,
+            areaStats
+        };
+    }
+
+    function renderFaltasList(items, minFaltas) {
+        const filtered = (items || []).filter(p => p.faltas >= minFaltas);
+        if (filtered.length === 0) return '<li class="ucofaco-list-item"><span>Sin personas en este rango.</span></li>';
+        return filtered.map(p => `
+            <li class="ucofaco-list-item">
+                <span>${escapeHtml(p.colaborador)} <span style="color:#64748b;">(${escapeHtml(p.area)})</span></span>
+                <strong>${formatNumber(p.faltas)} faltas</strong>
+            </li>
+        `).join('');
+    }
+
+    function renderUcofacoAreaBars(areaStats) {
+        if (!areaStats || areaStats.length === 0) return '<div class="acambio-kpi-sub">Sin datos de areas.</div>';
+        const maxProm = Math.max(...areaStats.map(a => a.promedioParticipantes), 0);
+        return `
+            <ul class="acambio-chart-bars">
+                ${areaStats.slice(0, 8).map(a => `
+                    <li class="acambio-chart-item">
+                        <div>
+                            <div class="acambio-chart-label">${escapeHtml(a.area)} (${formatNumberOneDecimal(a.asistenciaPct)}%)</div>
+                            <div class="acambio-chart-track">
+                                <div class="acambio-chart-fill" style="width:${maxProm > 0 ? ((a.promedioParticipantes / maxProm) * 100).toFixed(1) : 0}%"></div>
+                            </div>
+                        </div>
+                        <span class="acambio-chart-value">${formatNumberOneDecimal(a.promedioParticipantes)}</span>
                     </li>
                 `).join('')}
             </ul>
         `;
     }
 
-    function openACambioModal() {
+    function renderUcofacoDashboard() {
+        ucofacoSummary = buildUcofacoSummary(ucofacoData);
+        const s = ucofacoSummary;
+        return `
+            <section class="ucofaco-section">
+                <h3 class="ucofaco-title">Dashboard U_cofaco</h3>
+                <div class="ucofaco-kpis">
+                    <div class="ucofaco-kpi-card">
+                        <div class="ucofaco-kpi-label">Promedio de participantes</div>
+                        <div class="ucofaco-kpi-value">${formatNumberOneDecimal(s.promedioParticipantes)}</div>
+                        <div class="ucofaco-kpi-sub">Por clase registrada</div>
+                    </div>
+                    <div class="ucofaco-kpi-card">
+                        <div class="ucofaco-kpi-label">Participantes</div>
+                        <div class="ucofaco-kpi-value">${formatNumber(s.totalPersonas)}</div>
+                        <div class="ucofaco-kpi-sub">Personas en U_cofaco</div>
+                    </div>
+                    <div class="ucofaco-kpi-card">
+                        <div class="ucofaco-kpi-label">Clases</div>
+                        <div class="ucofaco-kpi-value">${formatNumber(s.totalClases)}</div>
+                        <div class="ucofaco-kpi-sub">Fechas de control</div>
+                    </div>
+                </div>
+                <div class="ucofaco-grid">
+                    <div class="ucofaco-card">
+                        <h4 class="ucofaco-card-title">Personas con faltas</h4>
+                        <div class="ucofaco-filter">
+                            <select id="ucofaco-faltas-filter">
+                                <option value="1">Faltan 1 o mas veces</option>
+                                <option value="2">Faltan 2 o mas veces</option>
+                                <option value="3">Faltan 3 o mas veces</option>
+                                <option value="4">Faltan 4 o mas veces</option>
+                            </select>
+                        </div>
+                        <ul id="ucofaco-faltas-list" class="ucofaco-list">
+                            ${renderFaltasList(s.faltasPorPersona, 1)}
+                        </ul>
+                    </div>
+                    <div class="ucofaco-card">
+                        <h4 class="ucofaco-card-title">Area con mas participacion/asistencia</h4>
+                        ${renderUcofacoAreaBars(s.areaStats)}
+                    </div>
+                </div>
+            </section>
+        `;
+    }
+
+    function openACambioChartModal(chartKey) {
+        const items = aCambioChartData[chartKey] || [];
+        const titles = {
+            areas: 'Top Areas por ahorro',
+            tipos: 'Top Tipos por ahorro',
+            agentes: 'Top Agentes de cambio',
+            meses: 'Top Meses por ahorro'
+        };
+        $acambioChartModalTitle.textContent = `Detalle: ${titles[chartKey] || 'Agentes de cambio'}`;
+        $acambioChartModalBody.innerHTML = items.map(item => `
+            <tr>
+                <td>${escapeHtml(item.label)}</td>
+                <td>${formatNumber(item.count)}</td>
+                <td>${formatNumber(item.ahorroMin)}</td>
+            </tr>
+        `).join('');
+        $acambioChartModal.style.display = 'block';
+    }
+
+    function openACambioSheet() {
         if (!aCambioData || aCambioData.length === 0) {
             showError("No hay datos en la hoja 'A_cambio'.");
             return;
@@ -2496,10 +3107,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const rowsSorted = rows.slice().sort((a, b) => (b.ahorroMin - a.ahorroMin));
 
+        aCambioChartData = {
+            areas: topAreas,
+            tipos: topTipos,
+            agentes: topAgentes,
+            meses: topMeses
+        };
+
         const html = `
+            ${renderUcofacoDashboard()}
+
             <div class="acambio-kpis">
                 <div class="acambio-kpi-card">
-                    <div class="acambio-kpi-title">Registros A.cambio</div>
+                    <div class="acambio-kpi-title">Registros Agentes de cambio</div>
                     <div class="acambio-kpi-value">${formatNumber(totalRegistros)}</div>
                     <div class="acambio-kpi-sub">Filas procesadas</div>
                 </div>
@@ -2528,19 +3148,19 @@ document.addEventListener('DOMContentLoaded', () => {
             <div class="acambio-top-grid">
                 <div class="acambio-top-card">
                     <div class="acambio-top-title">Top Areas por Ahorro</div>
-                    ${renderTopList(topAreas)}
+                    ${renderTopBarChart(topAreas, 'areas')}
                 </div>
                 <div class="acambio-top-card">
                     <div class="acambio-top-title">Top Tipos por Ahorro</div>
-                    ${renderTopList(topTipos)}
+                    ${renderTopBarChart(topTipos, 'tipos')}
                 </div>
                 <div class="acambio-top-card">
                     <div class="acambio-top-title">Top Agentes de Cambio</div>
-                    ${renderTopList(topAgentes)}
+                    ${renderTopBarChart(topAgentes, 'agentes')}
                 </div>
                 <div class="acambio-top-card">
                     <div class="acambio-top-title">Top Meses</div>
-                    ${renderTopList(topMeses)}
+                    ${renderTopBarChart(topMeses, 'meses')}
                 </div>
             </div>
 
@@ -2550,7 +3170,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <th style="width: 7%;">MES</th>
                         <th style="width: 8%;">AREA</th>
                         <th style="width: 8%;">TIPO</th>
-                        <th style="width: 10%;">A.CAMBIO</th>
+                        <th style="width: 10%;">AGENTE DE CAMBIO</th>
                         <th style="width: 14%;">PROYECTO</th>
                         <th style="width: 10%;">ANTES</th>
                         <th style="width: 8%;">FRECUENCIA</th>
@@ -2587,20 +3207,66 @@ document.addEventListener('DOMContentLoaded', () => {
             </table>
         `;
 
-        $acambioModalBody.innerHTML = html;
-        $acambioModal.style.display = 'block';
+        $acambioSheetBody.innerHTML = html;
+        if ($mainLayout) $mainLayout.style.display = 'none';
+        $acambioSheet.style.display = 'block';
     }
 
-    function setupACambioModalListeners() {
+    function setupACambioSheetListeners() {
         if ($acambioButton) {
-            $acambioButton.addEventListener('click', openACambioModal);
+            $acambioButton.addEventListener('click', () => {
+                const isWebApp = /\/(exec|dev)(?:\?|$)/.test(window.location.href);
+                const url = isWebApp ? `${window.location.href.split('?')[0]}?page=a_cambio` : 'a_cambio.html';
+                window.location.href = url;
+            });
         }
-        if ($acambioModalClose) {
-            $acambioModalClose.addEventListener('click', () => $acambioModal.style.display = 'none');
+        if ($acambioAsistenciaButton) {
+            $acambioAsistenciaButton.addEventListener('click', openAsistenciaModal);
         }
-        if ($acambioModal) {
-            $acambioModal.addEventListener('click', (e) => {
-                if (e.target === $acambioModal) $acambioModal.style.display = 'none';
+        if ($acambioSheetBack) {
+            $acambioSheetBack.addEventListener('click', () => {
+                $acambioSheet.style.display = 'none';
+                if ($mainLayout) $mainLayout.style.display = '';
+            });
+        }
+        if ($acambioSheetBody) {
+            $acambioSheetBody.addEventListener('click', (e) => {
+                const btn = e.target.closest('.acambio-open-detail');
+                if (!btn) return;
+                openACambioChartModal(btn.dataset.chart);
+            });
+            $acambioSheetBody.addEventListener('change', (e) => {
+                const target = e.target;
+                if (!target || target.id !== 'ucofaco-faltas-filter') return;
+                const minFaltas = parseInt(target.value, 10) || 1;
+                const list = document.getElementById('ucofaco-faltas-list');
+                if (!list || !ucofacoSummary) return;
+                list.innerHTML = renderFaltasList(ucofacoSummary.faltasPorPersona, minFaltas);
+            });
+        }
+        if ($acambioChartModalClose) {
+            $acambioChartModalClose.addEventListener('click', () => $acambioChartModal.style.display = 'none');
+        }
+        if ($acambioChartModal) {
+            $acambioChartModal.addEventListener('click', (e) => {
+                if (e.target === $acambioChartModal) $acambioChartModal.style.display = 'none';
+            });
+        }
+        if ($asistenciaArea) {
+            $asistenciaArea.addEventListener('change', refreshColaboradorOptions);
+        }
+        if ($asistenciaForm) {
+            $asistenciaForm.addEventListener('submit', submitAsistenciaForm);
+        }
+        if ($asistenciaModalClose) {
+            $asistenciaModalClose.addEventListener('click', closeAsistenciaModal);
+        }
+        if ($asistenciaCancel) {
+            $asistenciaCancel.addEventListener('click', closeAsistenciaModal);
+        }
+        if ($asistenciaModal) {
+            $asistenciaModal.addEventListener('click', (e) => {
+                if (e.target === $asistenciaModal) closeAsistenciaModal();
             });
         }
     }
@@ -2661,10 +3327,11 @@ document.addEventListener('DOMContentLoaded', () => {
             setupDetailsModalListeners();
             return Promise.all([
                 loadSheetJSONP(SHEET_ID, SHEET_NAME_KANBAN).catch(() => []),
-                loadSheetJSONP(SHEET_ID, SHEET_NAME_ACAMBIO).catch(() => [])
+                loadSheetJSONP(SHEET_ID, SHEET_NAME_ACAMBIO).catch(() => []),
+                loadSheetJSONP(SHEET_ID, SHEET_NAME_UCOFACO).catch(() => [])
             ]);
         })
-        .then(([rowsKanban, rowsACambio]) => {
+        .then(([rowsKanban, rowsACambio, rowsUcofaco]) => {
             if (!Array.isArray(rowsKanban)) {
                 kanbanData = [];
             } else {
@@ -2675,8 +3342,13 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 aCambioData = rowsACambio;
             }
+            if (!Array.isArray(rowsUcofaco)) {
+                ucofacoData = [];
+            } else {
+                ucofacoData = rowsUcofaco;
+            }
             setupKanbanModalListeners();
-            setupACambioModalListeners();
+            setupACambioSheetListeners();
             hideLoading();
             alignColumnHeights();
         })
