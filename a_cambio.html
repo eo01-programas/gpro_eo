@@ -290,6 +290,8 @@
     .mini-center strong { font-size:15px; color:#0f172a; line-height:1; }
     .mini-legend { display:flex; flex-direction:column; gap:6px; }
     .mini-legend-row { display:flex; align-items:center; justify-content:space-between; gap:8px; font-size:12px; border-bottom:1px dashed #e2e8f0; padding-bottom:4px; }
+    .area-coverage-line { font-size:12px; color:#334155; border:1px dashed #cbd5e1; background:#f8fafc; border-radius:8px; padding:7px 9px; }
+    .area-coverage-line strong { color:#0f172a; }
     .mix-legend { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:10px; }
     .mix-chip { display:inline-flex; align-items:center; gap:6px; font-size:11px; color:#334155; background:#f8fafc; border:1px solid #e2e8f0; border-radius:999px; padding:4px 8px; }
     .mix-grid { display:flex; flex-direction:column; border:1px solid #e2e8f0; border-radius:8px; overflow:hidden; }
@@ -376,6 +378,22 @@ const personaCount=n=>`${fmt(Math.round(num(n)))} ${personaWord(n)}`;
 const withMin=v=>{ const s=String(v==null?'':v).trim(); if(!s) return '-'; return /min/i.test(s)?s:`${s} min`; };
 function loadJSONP(sheet){ return new Promise((res,rej)=>{ const cb='CB_'+Math.random().toString(36).slice(2); const sc=document.createElement('script'); const tm=setTimeout(()=>{cleanup();rej(new Error('Timeout '+sheet));},15000); function cleanup(){clearTimeout(tm); delete window[cb]; sc.remove();} window[cb]=(r)=>{cleanup(); try{ const seen=new Map(); const cols=(r.table.cols||[]).map(c=>{ const b=String(c.label||c.id||'').trim().toUpperCase(); const n=(seen.get(b)||0)+1; seen.set(b,n); return n>1?`${b}_${n}`:b;}); const out=(r.table.rows||[]).map(row=>{ const o={}; cols.forEach((h,i)=>{ const ce=row.c&&row.c[i]?row.c[i]:null; o[h]=ce&&ce.v!=null?ce.v:'';}); return o;}); res(out);}catch(e){rej(e);} }; sc.onerror=()=>{cleanup();rej(new Error('No cargo '+sheet));}; sc.src=`https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?sheet=${encodeURIComponent(sheet)}&headers=1&tq=${encodeURIComponent('select *')}&tqx=out:json;responseHandler:${cb}&nocache=${Date.now()}`; document.head.appendChild(sc); }); }
 function agg(rows,f){ const m=new Map(); rows.forEach(r=>{ const k=String(r[f]||'').trim()||'SIN DATO'; if(!m.has(k)) m.set(k,{label:k,ahorroMin:0,count:0}); const c=m.get(k); c.ahorroMin+=num(r.ahorroMin); c.count++;}); return [...m.values()].sort((a,b)=>(b.ahorroMin-a.ahorroMin)||(b.count-a.count)); }
+function aggAgentsWithArea(rows,limit){
+  const areaByAgent=new Map();
+  (rows||[]).forEach(r=>{
+    const agent=String(r.agenteCambio||'').trim()||'SIN DATO';
+    const area=String(r.area||'').trim()||'SIN AREA';
+    if(!areaByAgent.has(agent)) areaByAgent.set(agent,new Map());
+    const byArea=areaByAgent.get(agent);
+    byArea.set(area,(byArea.get(area)||0)+1);
+  });
+  return agg(rows,'agenteCambio').map(item=>{
+    const agent=String(item.label||'').trim()||'SIN DATO';
+    const byArea=areaByAgent.get(agent)||new Map();
+    const area=[...byArea.entries()].sort((a,b)=>(b[1]-a[1])||a[0].localeCompare(b[0],'es',{sensitivity:'base'}))[0]?.[0]||'SIN AREA';
+    return {...item, areaLabel:area, displayLabel:`${agent} - ${area} (${fmt(item.count)})`};
+  }).slice(0,limit);
+}
 function normAC(rows){ return (rows||[]).map(r=>({mes:r.MES||'', area:r.AREA||'', tipo:r.TIPO||r.TIPO_1||'', agenteCambio:r['A.CAMBIO']||r['A CAMBIO']||r['A_CAMBIO']||'', proyecto:r.PROYECTO||'', frecuencia:r.FRECUENCIA||r.FRECUENCIA_1||r.FRECUENCIA_2||r.FRECUENCIA2||'', antes:r.ANTES||'', ahora:r.AHORA||'', ahorroMin:num(r.AHORRO), linkUrl:(()=>{let u=String(r.LINK||r.LINK_1||'').trim(); if(/^www\./i.test(u)||/^drive\.google\.com\//i.test(u))u='https://'+u; return /^https?:\/\//i.test(u)?u:'';})()})).filter(r=>r.area||r.tipo||r.agenteCambio||r.proyecto||r.ahorroMin||r.linkUrl); }
 function countProjectsByArea(rows){ const m=new Map(); (rows||[]).forEach(r=>{ const area=String(r.area||'').trim(); const proyecto=String(r.proyecto||'').trim(); if(!area||!proyecto) return; if(!m.has(area)) m.set(area,new Set()); m.get(area).add(proyecto); }); const out={}; m.forEach((set,area)=>{ out[area]=set.size; }); return out; }
 function bar(items,key,showDetail=true,showCountInLabel=false){ if(!items.length) return '<div class="kpi-sub">Sin datos</div>'; const m=Math.max(...items.map(i=>num(i.ahorroMin)),0); const detail=(showDetail&&key)?`<div style="text-align:right;margin-top:8px;"><button class="btn" data-chart="${key}">Ver detalle</button></div>`:''; return `<ul class="chart-list">${items.map(i=>`<li class="chart-item"><div><div class="label">${esc(i.label)}${showCountInLabel?` (${fmt(i.count)})`:''}</div><div class="track"><div class="fill" style="width:${m>0?((num(i.ahorroMin)/m)*100).toFixed(1):0}%"></div></div></div><span class="val">${fmt(i.ahorroMin)} min</span></li>`).join('')}</ul>${detail}`; }
@@ -483,7 +501,7 @@ function attendanceBars(items){
   return `<div class="vbars">${top.map(a=>{ const h=m>0?((a.pct/m)*100):0; return `<div class="vbar-col"><div class="vbar-val">${fmt(a.asistencias)} / ${fmt(a.cap)}<br/><small>${fmt1(a.prom)} prom.</small></div><div class="vbar-track"><div class="vbar-fill" style="height:${h.toFixed(1)}%;"></div></div><div class="vbar-label">${esc(a.area)}<br/><small>${fmt1(a.pct)}%</small></div></div>`; }).join('')}</div>`;
 }
 
-function areaAhorroDonut(items,total,projectCountByArea){
+function areaAhorroDonut(items,total,projectCountByArea,coverage){
   const parts=(items||[]).map(i=>{ const label=i.label||i.area||''; return {label:label, value: num(i.ahorroMin), projects:num((projectCountByArea&&projectCountByArea[label])||0)}; });
   const tot = total||parts.reduce((s,p)=>s+p.value,0);
   if(!tot) return '<div class="kpi-sub">Sin datos de ahorro.</div>';
@@ -503,12 +521,17 @@ function areaAhorroDonut(items,total,projectCountByArea){
     const y = 85 + (Math.sin(rad) * r);
     return `<span class="donut-slice-label" style="left:${x.toFixed(1)}px;top:${y.toFixed(1)}px;">${fmt1(w.pct)}%</span>`;
   }).join('');
+  const presentadas = Math.max(0, parseInt((coverage&&coverage.presentadas),10) || parts.length || 0);
+  const totalAreasRaw = parseInt((coverage&&coverage.total),10) || presentadas || 0;
+  const totalAreas = Math.max(presentadas, totalAreasRaw);
+  const pctAreas = totalAreas > 0 ? ((presentadas / totalAreas) * 100) : 0;
   return `<div class="donut-wrap">
     <div class="donut" style="background: conic-gradient(${grad});">
       <div class="donut-slice-labels">${labelHtml}</div>
       <div class="donut-center"><strong>${fmt(tot)}</strong><span>min</span></div>
     </div>
     <div class="faltas-legend">
+      <div class="area-coverage-line">Areas que presentaron: <strong>${fmt(presentadas)}/${fmt(totalAreas)}</strong> (${fmt1(pctAreas)}%)</div>
       ${withColor.map(w=>`<div class="mini-legend-row"><span><span class="swatch" style="background:${w.c};width:12px;height:12px;display:inline-block;margin-right:6px;border-radius:3px;"></span>${esc(w.label)}(${fmt(w.projects)})</span><strong>${fmt(w.value)} min</strong></div>`).join('')}
     </div>
   </div>`;
@@ -640,7 +663,7 @@ function agentsVerticalCombined(items,key){
   if(!top.length) return '<div class="kpi-sub">Sin datos</div>';
   const maxA=Math.max(...top.map(i=>num(i.ahorroMin)),0);
   return `<ul class="chart-list">
-    ${top.map(i=>{ const p=maxA>0?((num(i.ahorroMin)/maxA)*100):0; return `<li class="chart-item"><div><div class="label">${esc(i.label)} (${fmt(i.count)})</div><div class="track"><div class="fill" style="width:${p.toFixed(1)}%;"></div></div></div><span class="val">${fmt(i.ahorroMin)} min</span></li>`; }).join('')}
+    ${top.map(i=>{ const p=maxA>0?((num(i.ahorroMin)/maxA)*100):0; const label=i.displayLabel||`${i.label} (${fmt(i.count)})`; return `<li class="chart-item"><div><div class="label">${esc(label)}</div><div class="track"><div class="fill" style="width:${p.toFixed(1)}%;"></div></div></div><span class="val">${fmt(i.ahorroMin)} min</span></li>`; }).join('')}
   </ul>`;
 }
 function agentesPorArea(rows,key){
@@ -664,7 +687,11 @@ function agentesPorArea(rows,key){
     ${items.map(i=>{ const p=(i.count/max)*100; return `<li class="chart-item"><div><div class="label">${esc(i.label)}</div><div class="track"><div class="fill" style="width:${p.toFixed(1)}%;"></div></div><div class="kpi-sub">${fmt(i.proyectos)} proyectos</div></div><span class="val">${fmt(i.count)} ag.</span></li>`; }).join('')}
   </ul><div style="text-align:right;margin-top:8px;"><button class="btn" data-chart="${key}">Ver detalle</button></div>`;
 }
-function render(){ const rows=normAC(acRows); const areaProjectCounts=countProjectsByArea(rows); const tot=rows.length, sum=rows.reduce((x,r)=>x+num(r.ahorroMin),0), h=sum/60,d=h/9; const ag=new Set(rows.map(r=>String(r.agenteCambio||'').trim()).filter(Boolean)).size; const pr=new Set(rows.map(r=>String(r.proyecto||'').trim()).filter(Boolean)).size; const pa=pr? h/pr:0; const rr=tot? sum/tot:0; const tA=agg(rows,'area').slice(0,7), tT=agg(rows,'tipo').slice(0,5), tG=agg(rows,'agenteCambio').slice(0,5); charts={areas:tA,tipos:tT,agentes:tG}; summary=uSummary(uRows);
+function render(){ const rows=normAC(acRows); const areaProjectCounts=countProjectsByArea(rows); const tot=rows.length, sum=rows.reduce((x,r)=>x+num(r.ahorroMin),0), h=sum/60,d=h/9; const ag=new Set(rows.map(r=>String(r.agenteCambio||'').trim()).filter(Boolean)).size; const pr=new Set(rows.map(r=>String(r.proyecto||'').trim()).filter(Boolean)).size; const pa=pr? h/pr:0; const rr=tot? sum/tot:0; const tA=agg(rows,'area').slice(0,7), tT=agg(rows,'tipo').slice(0,5), tG=aggAgentsWithArea(rows,5); charts={areas:tA,tipos:tT,agentes:tG}; summary=uSummary(uRows);
+  const areasConAhorro=unique(rows.map(r=>r.area));
+  const totalAreasRef=((summary&&summary.areas)||[]).map(a=>a.area);
+  const totalAreas = unique(totalAreasRef).length || areasConAhorro.length;
+  const areaCoverage={ presentadas:areasConAhorro.length, total:totalAreas };
   $('content').innerHTML=`
   <section class="section"><h3>Resumen de asistencia</h3>
     <div class="card">
@@ -679,7 +706,7 @@ function render(){ const rows=normAC(acRows); const areaProjectCounts=countProje
       <div>${areaStackedBars(summary.areas)}</div>
     </div>
   </section>
-  <div class="grid2"><div class="card"><div class="kpi-title">Top Areas por Ahorro</div><div class="areas-kpi-inline"><div class="areas-kpi-box"><div class="kpi-mini-title">Ahorro total por mes</div><div class="kpi-mini-value">${fmt(sum)} min</div><div class="kpi-mini-sub">${fmt1(h)} h | ${fmt1(d)} dias</div></div><div class="areas-kpi-box"><div class="kpi-mini-title">Promedio por proyecto por mes</div><div class="kpi-mini-value">${fmt1(pa)} h</div><div class="kpi-mini-sub">${fmt1(rr)} min por registro</div></div></div>${areaAhorroDonut(tA,sum,areaProjectCounts)}<div style="text-align:right;margin-top:8px;"><button class="btn area-table-detail-btn">Ver detalle</button></div></div><div class="card"><div class="kpi-title">Top Tipos por Ahorro</div>${bar(tT,'tipos',false,true)}</div><div class="card"><div class="kpi-title">Top Agentes de Cambio</div>${agentsVerticalCombined(tG,'agentes')}</div></div>`;
+  <div class="grid2"><div class="card"><div class="kpi-title">Top Areas por Ahorro</div><div class="areas-kpi-inline"><div class="areas-kpi-box"><div class="kpi-mini-title">Ahorro total por mes</div><div class="kpi-mini-value">${fmt(sum)} min</div><div class="kpi-mini-sub">${fmt1(h)} h | ${fmt1(d)} dias</div></div><div class="areas-kpi-box"><div class="kpi-mini-title">Promedio por proyecto por mes</div><div class="kpi-mini-value">${fmt1(pa)} h</div><div class="kpi-mini-sub">${fmt1(rr)} min por registro</div></div></div>${areaAhorroDonut(tA,sum,areaProjectCounts,areaCoverage)}<div style="text-align:right;margin-top:8px;"><button class="btn area-table-detail-btn">Ver detalle</button></div></div><div class="card"><div class="kpi-title">Top Tipos por Ahorro</div>${bar(tT,'tipos',false,true)}</div><div class="card"><div class="kpi-title">Top Agentes de Cambio</div>${agentsVerticalCombined(tG,'agentes')}</div></div>`;
   // attach click handlers to area attendance list
   setTimeout(()=>{ document.querySelectorAll('.vbar-col[data-area], .area-att-row[data-area], .area-bar-row[data-area], .area-vbar-col[data-area]').forEach(el=>{ el.addEventListener('click',()=>{ const area=el.dataset.area||''; if(area) showAreaAbsentees(area); }); }); },50);
   // attach inasistencias button
