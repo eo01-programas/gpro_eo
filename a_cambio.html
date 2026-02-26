@@ -22,6 +22,112 @@
     .kpi-compact .kpi-title { margin-bottom:4px; }
     .kpi-compact .kpi-val { font-size:18px; }
     .kpi-subtle { font-size:11px; color:#64748b; margin-top:2px; }
+    .areas-kpi-inline { display:grid; grid-template-columns:repeat(2,minmax(150px,1fr)); gap:8px; margin-bottom:10px; }
+    .summary-kpi-inline { display:grid; grid-template-columns:repeat(3,minmax(130px,1fr)); gap:8px; margin-bottom:10px; }
+    .areas-kpi-box { border:1px solid #e2e8f0; border-radius:8px; background:#f8fafc; padding:8px 10px; }
+    .areas-kpi-box .kpi-mini-title { font-size:10px; color:#475569; text-transform:uppercase; font-weight:700; letter-spacing:.02em; }
+    .areas-kpi-box .kpi-mini-value { font-size:16px; font-weight:800; color:#0f172a; line-height:1.15; margin-top:2px; }
+    .areas-kpi-box .kpi-mini-sub { font-size:11px; color:#64748b; margin-top:2px; }
+    .summary-att-layout { display:grid; grid-template-columns:minmax(220px,260px) 1fr; gap:10px; align-items:start; }
+    .summary-kpis-vertical { display:grid; gap:10px; }
+    .area-bars-legend { display:flex; flex-wrap:wrap; gap:8px; margin:2px 0 10px; }
+    .area-bars-chip {
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      border:1px solid #e2e8f0;
+      background:#f8fafc;
+      border-radius:999px;
+      padding:3px 8px;
+      font-size:11px;
+      color:#475569;
+    }
+    .area-bars-dot { width:10px; height:10px; border-radius:50%; display:inline-block; }
+    .area-bars-dot.attended { background:#2563eb; }
+    .area-bars-dot.absent { background:#cbd5e1; }
+    .area-vchart-wrap { overflow-x:auto; padding-bottom:8px; }
+    .area-vchart {
+      display:flex;
+      align-items:flex-end;
+      gap:8px;
+      min-height:330px;
+      border-bottom:1px solid #e2e8f0;
+      padding:8px 6px 0;
+    }
+    .area-vbar-col {
+      min-width:110px;
+      flex:1 0 110px;
+      border:none;
+      background:none;
+      padding:0;
+      cursor:pointer;
+      text-align:center;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:3px;
+      color:#0f172a;
+    }
+    .area-vbar-track {
+      width:44px;
+      height:240px;
+      border-radius:12px;
+      overflow:hidden;
+      background:#e2e8f0;
+      display:flex;
+      flex-direction:column-reverse;
+      box-shadow:inset 0 0 0 1px #cbd5e1;
+      position:relative;
+    }
+    .area-vbar-seg { width:100%; display:block; }
+    .area-vbar-seg.att.good { background:linear-gradient(180deg,#22c55e,#16a34a); }
+    .area-vbar-seg.att.warn { background:linear-gradient(180deg,#fbbf24,#f59e0b); }
+    .area-vbar-seg.att.bad { background:linear-gradient(180deg,#f87171,#ef4444); }
+    .area-vbar-seg.abs { background:#cbd5e1; }
+    .area-vbar-label {
+      font-size:11px;
+      line-height:1.2;
+      max-width:108px;
+      min-height:28px;
+      white-space:normal;
+      word-break:normal;
+      overflow-wrap:normal;
+      font-weight:700;
+      color:#334155;
+    }
+    .area-vbar-meta { font-size:10px; color:#64748b; line-height:1.1; }
+    .area-vbar-pct { font-size:12px; font-weight:800; line-height:1; }
+    .area-vbar-pct.good { color:#166534; }
+    .area-vbar-pct.warn { color:#b45309; }
+    .area-vbar-pct.bad { color:#b91c1c; }
+    .area-bars-list { display:flex; flex-direction:column; gap:8px; max-height:340px; overflow:auto; padding-right:2px; }
+    .area-bar-row {
+      width:100%;
+      border:1px solid #e2e8f0;
+      background:#fff;
+      border-radius:10px;
+      padding:8px 10px;
+      cursor:pointer;
+      text-align:left;
+      box-shadow:0 2px 8px rgba(15,23,42,0.04);
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+    }
+    .area-bar-row:hover { background:#f8fafc; border-color:#cbd5e1; }
+    .area-bar-head { display:flex; align-items:center; justify-content:space-between; gap:8px; }
+    .area-bar-name { font-size:12px; font-weight:700; color:#0f172a; }
+    .area-bar-meta { font-size:11px; color:#64748b; }
+    .area-bar-track { height:14px; border-radius:999px; overflow:hidden; background:#e2e8f0; display:flex; }
+    .area-bar-seg { display:block; height:100%; }
+    .area-bar-seg.att.good { background:linear-gradient(90deg,#22c55e,#16a34a); }
+    .area-bar-seg.att.warn { background:linear-gradient(90deg,#fbbf24,#f59e0b); }
+    .area-bar-seg.att.bad { background:linear-gradient(90deg,#f87171,#ef4444); }
+    .area-bar-seg.abs { background:#cbd5e1; }
+    .area-bar-pct { font-size:12px; font-weight:800; }
+    .area-bar-pct.good { color:#166534; }
+    .area-bar-pct.warn { color:#b45309; }
+    .area-bar-pct.bad { color:#b91c1c; }
     .grid2 { display:grid; grid-template-columns:repeat(auto-fit,minmax(360px,1fr)); gap:10px; margin-bottom:10px; }
     .chart-list { list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:8px; }
     .chart-item { display:grid; grid-template-columns:1fr auto; gap:8px; align-items:center; }
@@ -38,9 +144,25 @@
     .section h3 { margin:0 0 10px; font-size:15px; text-transform:uppercase; }
     .filter { margin-bottom:8px; }
     .filter select, .form input, .form select { border:1px solid #cbd5e1; border-radius:8px; padding:7px 9px; font-size:12px; width:100%; box-sizing:border-box; }
+    .asist-tools { display:grid; grid-template-columns:1fr auto; gap:8px; align-items:end; }
+    .asist-tools .btn { white-space:nowrap; }
+    .asist-count { font-size:11px; color:#64748b; margin-top:-2px; }
     .check-row { display:flex; align-items:center; gap:8px; font-size:13px; color:#0f172a; font-weight:700; }
     .check-row input[type="checkbox"] { width:16px; height:16px; }
     .asist-list { border:1px solid #e2e8f0; border-radius:8px; max-height:320px; overflow:auto; background:#fff; }
+    .asist-empty { padding:10px; font-size:12px; color:#64748b; }
+    .asist-group-title {
+      padding:6px 10px;
+      font-size:11px;
+      font-weight:700;
+      color:#475569;
+      text-transform:uppercase;
+      letter-spacing:0.02em;
+      background:#f8fafc;
+      border-top:1px solid #e2e8f0;
+      border-bottom:1px solid #e2e8f0;
+    }
+    .asist-group-title small { font-size:10px; color:#64748b; text-transform:none; }
     .asist-head {
       display:grid;
       grid-template-columns: 1fr auto;
@@ -68,6 +190,18 @@
     .asist-row:last-child { border-bottom:none; }
     .asist-name-wrap { display:flex; align-items:center; gap:8px; min-width:0; }
     .asist-name { line-height:1.2; }
+    .asist-area-chip {
+      display:inline-flex;
+      align-items:center;
+      border:1px solid #dbeafe;
+      background:#eff6ff;
+      color:#1d4ed8;
+      border-radius:999px;
+      padding:1px 7px;
+      font-size:10px;
+      font-weight:700;
+      line-height:1.2;
+    }
     .asist-check { width:18px; height:18px; }
     .asist-status-dot { width:10px; height:10px; border-radius:50%; border:1px solid #cbd5e1; background:#fff; flex:0 0 auto; }
     .asist-status-dot.registrado { background:#2563eb; border-color:#2563eb; }
@@ -175,12 +309,23 @@
     .mix-seg.seg4 { background:#ef4444; }
     .mix-counts { margin-top:4px; font-size:11px; color:#475569; display:flex; gap:8px; }
     @media (max-width: 980px) {
+      .summary-att-layout { grid-template-columns:1fr; }
+      .area-bar-head { flex-direction:column; align-items:flex-start; gap:2px; }
+      .area-vbar-col { min-width:92px; flex-basis:92px; }
+      .area-vbar-track { width:36px; height:200px; }
+      .asist-tools { grid-template-columns:1fr; }
+      .areas-kpi-inline { grid-template-columns:1fr; }
+      .summary-kpi-inline { grid-template-columns:1fr; }
       .mix-head, .mix-row { grid-template-columns: 1fr; }
       .mix-head { display:none; }
       .mix-row { gap:6px; }
     }
     .overlay { display:none; position:fixed; inset:0; background:rgba(2,6,23,.45); z-index:30; }
     .modal { background:#fff; width:92%; max-width:740px; margin:4% auto; border-radius:12px; padding:18px 18px 14px; position:relative; box-shadow:0 10px 30px rgba(2,6,23,0.12); }
+    #detail-modal .modal.modal-wide { width:min(98vw,1500px); max-width:1500px; }
+    #detail-custom { display:none; }
+    #detail-custom .table-wrap { max-height:70vh; }
+    #detail-custom table { min-width:1180px; }
     .close { position:absolute; right:12px; top:10px; font-size:22px; cursor:pointer; color:#475569; }
     .modal h3 { margin:0 0 10px; color:#0f172a; font-size:16px; }
     .modal .btn { padding:6px 10px; border-radius:8px; font-size:13px; }
@@ -199,6 +344,7 @@
       </div>
       <div class="actions">
         <button class="btn btn-primary" id="asistencia-btn">Asistencia</button>
+        <button class="btn" id="inasistencias-btn">Inasistencias</button>
         <button class="btn" id="back-btn">Volver</button>
       </div>
     </div>
@@ -209,23 +355,30 @@
     <div id="detail-filter" style="margin-bottom:8px;display:none;">
       <label>Filtro: <select id="faltas-filter"><option value="">Todos</option><option value="1">1 falta</option><option value="2">2 faltas</option><option value="3">3 faltas</option><option value="4">4+ faltas</option></select></label>
     </div>
-    <div class="table-wrap"><table><thead><tr><th id="detail-h1">Concepto</th><th id="detail-h2">Registros</th><th id="detail-h3">Ahorro</th><th id="detail-h4" style="display:none"></th></tr></thead><tbody id="detail-body"></tbody></table></div></div></div>
-  <div id="asistencia-modal" class="overlay"><div class="modal"><span class="close" data-close="asistencia-modal">&times;</span><h3>Registrar asistencia</h3><form id="asistencia-form" class="form"><label>Area<select id="area" required></select></label><label>Fecha<select id="fecha" required></select></label><label class="check-row"><input id="todos" type="checkbox" /> Participaron todos</label><div class="asist-legend"><span class="asist-legend-item"><span class="asist-status-dot registrado"></span>dato ya registrado</span><span class="asist-legend-item"><span class="asist-status-dot pendiente"></span>por registrar</span><span class="asist-legend-item"><span class="asist-status-dot"></span>sin registro</span></div><div id="colab-list" class="asist-list"></div><div class="form-actions"><button type="button" class="btn" data-close="asistencia-modal">Cancelar</button><button type="submit" class="btn btn-primary">Guardar</button></div></form></div></div>
+    <div id="detail-table-wrap" class="table-wrap"><table><thead><tr><th id="detail-h1">Concepto</th><th id="detail-h2">Registros</th><th id="detail-h3">Ahorro</th><th id="detail-h4" style="display:none"></th></tr></thead><tbody id="detail-body"></tbody></table></div>
+    <div id="detail-custom"></div></div></div>
+  <div id="asistencia-modal" class="overlay"><div class="modal"><span class="close" data-close="asistencia-modal">&times;</span><h3>Registrar asistencia</h3><form id="asistencia-form" class="form"><label>Area<select id="area" required></select></label><label>Fecha<select id="fecha" required></select></label><div class="asist-tools"><label>Buscar colaborador<input id="colab-search" type="text" placeholder="Escribe un nombre..." autocomplete="off" /></label><button type="button" class="btn" id="toggle-grouping">Desagrupar</button></div><div id="asist-count" class="asist-count"></div><label class="check-row"><input id="todos" type="checkbox" /> Participaron todos</label><div class="asist-legend"><span class="asist-legend-item"><span class="asist-status-dot registrado"></span>dato ya registrado</span><span class="asist-legend-item"><span class="asist-status-dot pendiente"></span>por registrar</span><span class="asist-legend-item"><span class="asist-status-dot"></span>sin registro</span></div><div id="colab-list" class="asist-list"></div><div class="form-actions"><button type="button" class="btn" data-close="asistencia-modal">Cancelar</button><button type="submit" class="btn btn-primary">Guardar</button></div></form></div></div>
 
 <script>
 const SHEET_ID='1lRBoAr2JN2elTtB9QgmvIYNIq1zsxvBENpuwzjIuZt4';
 const APPS_SCRIPT_URL='https://script.google.com/macros/s/AKfycbxBmb9mGdOs_GPbhqm_asyxqux4ySEAfJXXKPq46-cu6yaAm5NLp81ROBnZNRTOCiVS/exec';
 const S_AC='A_cambio', S_U='U_cofaco';
 let acRows=[], uRows=[], summary=null, charts={};
+const AREA_ALL='__ALL_AREAS__';
+const asistenciaState={ rows:[], draft:new Map(), search:'', groupByArea:true };
 const $=id=>document.getElementById(id);
 const fmt=n=>Math.round(n||0).toString().replace(/(\d)(?=(\d{3})+(?!\d))/g,'$1,');
 const fmt1=n=>(n||0).toFixed(1).replace(/(\d)(?=(\d{3})+\.)/g,'$1,');
 const esc=s=>String(s||'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 const num=v=>{ if(v==null||v==='') return 0; if(typeof v==='number') return v; let t=String(v).replace(/[^\d.,-]/g,''); if(!t) return 0; if(t.includes('.')&&t.includes(',')) t=t.replace(/,/g,''); else if(!t.includes('.')&&t.includes(',')) t=t.replace(',','.'); return parseFloat(t)||0; };
+const personaWord=n=>Math.round(num(n))===1?'persona':'personas';
+const personaCount=n=>`${fmt(Math.round(num(n)))} ${personaWord(n)}`;
+const withMin=v=>{ const s=String(v==null?'':v).trim(); if(!s) return '-'; return /min/i.test(s)?s:`${s} min`; };
 function loadJSONP(sheet){ return new Promise((res,rej)=>{ const cb='CB_'+Math.random().toString(36).slice(2); const sc=document.createElement('script'); const tm=setTimeout(()=>{cleanup();rej(new Error('Timeout '+sheet));},15000); function cleanup(){clearTimeout(tm); delete window[cb]; sc.remove();} window[cb]=(r)=>{cleanup(); try{ const seen=new Map(); const cols=(r.table.cols||[]).map(c=>{ const b=String(c.label||c.id||'').trim().toUpperCase(); const n=(seen.get(b)||0)+1; seen.set(b,n); return n>1?`${b}_${n}`:b;}); const out=(r.table.rows||[]).map(row=>{ const o={}; cols.forEach((h,i)=>{ const ce=row.c&&row.c[i]?row.c[i]:null; o[h]=ce&&ce.v!=null?ce.v:'';}); return o;}); res(out);}catch(e){rej(e);} }; sc.onerror=()=>{cleanup();rej(new Error('No cargo '+sheet));}; sc.src=`https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?sheet=${encodeURIComponent(sheet)}&headers=1&tq=${encodeURIComponent('select *')}&tqx=out:json;responseHandler:${cb}&nocache=${Date.now()}`; document.head.appendChild(sc); }); }
 function agg(rows,f){ const m=new Map(); rows.forEach(r=>{ const k=String(r[f]||'').trim()||'SIN DATO'; if(!m.has(k)) m.set(k,{label:k,ahorroMin:0,count:0}); const c=m.get(k); c.ahorroMin+=num(r.ahorroMin); c.count++;}); return [...m.values()].sort((a,b)=>(b.ahorroMin-a.ahorroMin)||(b.count-a.count)); }
-function normAC(rows){ return (rows||[]).map(r=>({mes:r.MES||'', area:r.AREA||'', tipo:r.TIPO||r.TIPO_1||'', agenteCambio:r['A.CAMBIO']||r['A CAMBIO']||r['A_CAMBIO']||'', proyecto:r.PROYECTO||'', antes:r.ANTES||'', frecuenciaAntes:r.FRECUENCIA||r.FRECUENCIA_1||'', ahora:r.AHORA||'', frecuenciaAhora:r.FRECUENCIA_2||r.FRECUENCIA2||'', ahorroMin:num(r.AHORRO), linkUrl:(()=>{let u=String(r.LINK||r.LINK_1||'').trim(); if(/^www\./i.test(u)||/^drive\.google\.com\//i.test(u))u='https://'+u; return /^https?:\/\//i.test(u)?u:'';})()})).filter(r=>r.area||r.tipo||r.agenteCambio||r.proyecto||r.ahorroMin||r.linkUrl); }
-function bar(items,key){ if(!items.length) return '<div class="kpi-sub">Sin datos</div>'; const m=Math.max(...items.map(i=>num(i.ahorroMin)),0); return `<ul class="chart-list">${items.map(i=>`<li class="chart-item"><div><div class="label">${esc(i.label)}</div><div class="track"><div class="fill" style="width:${m>0?((num(i.ahorroMin)/m)*100).toFixed(1):0}%"></div></div></div><span class="val">${fmt(i.ahorroMin)} min</span></li>`).join('')}</ul><div style="text-align:right;margin-top:8px;"><button class="btn" data-chart="${key}">Ver detalle</button></div>`; }
+function normAC(rows){ return (rows||[]).map(r=>({mes:r.MES||'', area:r.AREA||'', tipo:r.TIPO||r.TIPO_1||'', agenteCambio:r['A.CAMBIO']||r['A CAMBIO']||r['A_CAMBIO']||'', proyecto:r.PROYECTO||'', frecuencia:r.FRECUENCIA||r.FRECUENCIA_1||r.FRECUENCIA_2||r.FRECUENCIA2||'', antes:r.ANTES||'', ahora:r.AHORA||'', ahorroMin:num(r.AHORRO), linkUrl:(()=>{let u=String(r.LINK||r.LINK_1||'').trim(); if(/^www\./i.test(u)||/^drive\.google\.com\//i.test(u))u='https://'+u; return /^https?:\/\//i.test(u)?u:'';})()})).filter(r=>r.area||r.tipo||r.agenteCambio||r.proyecto||r.ahorroMin||r.linkUrl); }
+function countProjectsByArea(rows){ const m=new Map(); (rows||[]).forEach(r=>{ const area=String(r.area||'').trim(); const proyecto=String(r.proyecto||'').trim(); if(!area||!proyecto) return; if(!m.has(area)) m.set(area,new Set()); m.get(area).add(proyecto); }); const out={}; m.forEach((set,area)=>{ out[area]=set.size; }); return out; }
+function bar(items,key,showDetail=true,showCountInLabel=false){ if(!items.length) return '<div class="kpi-sub">Sin datos</div>'; const m=Math.max(...items.map(i=>num(i.ahorroMin)),0); const detail=(showDetail&&key)?`<div style="text-align:right;margin-top:8px;"><button class="btn" data-chart="${key}">Ver detalle</button></div>`:''; return `<ul class="chart-list">${items.map(i=>`<li class="chart-item"><div><div class="label">${esc(i.label)}${showCountInLabel?` (${fmt(i.count)})`:''}</div><div class="track"><div class="fill" style="width:${m>0?((num(i.ahorroMin)/m)*100).toFixed(1):0}%"></div></div></div><span class="val">${fmt(i.ahorroMin)} min</span></li>`).join('')}</ul>${detail}`; }
 function combinedBar(items,key){ if(!items.length) return '<div class="kpi-sub">Sin datos</div>'; const maxA=Math.max(...items.map(i=>num(i.ahorroMin)),0); const maxC=Math.max(...items.map(i=>num(i.count)),0); return `<ul class="chart-list">${items.map(i=>{ const aPct = maxA?((num(i.ahorroMin)/maxA)*100).toFixed(1):0; const cPct = maxC?((num(i.count)/maxC)*100).toFixed(1):0; return `<li class="chart-item"><div style="flex:1 1 0"><div class="label">${esc(i.label)}</div><div class="track" style="margin-top:6px;height:10px"><div class="fill" style="width:${aPct}%;background:linear-gradient(90deg,#0ea5e9,#14b8a6);"></div></div><div class="kpi-sub" style="margin-top:6px">${fmt(i.ahorroMin)} min · ${fmt(i.count)} proyectos</div></div><span class="val">${fmt1((num(i.ahorroMin)||0))} min</span></li>` }).join('')}</ul><div style="text-align:right;margin-top:8px;"><button class="btn" data-chart="${key}">Ver detalle</button></div>`; }
 function present(v){
   if(v===null||v===undefined) return false;
@@ -316,7 +469,7 @@ function faltasChart(items){
   }).join(', ');
   return `<div class="donut-wrap">
     <div class="donut" style="background: conic-gradient(${gradient});">
-      <div class="donut-center"><strong>${fmt(total)}</strong><span>personas</span></div>
+      <div class="donut-center"><strong>${fmt(total)}</strong><span>${personaWord(total)}</span></div>
     </div>
     <div class="faltas-legend">
       ${parts.map(p=>`<button class="faltas-legend-btn" data-faltas-group="${p.k}" title="Ver detalle"><span><span class="swatch" style="background:${p.c};"></span>${p.label}</span><strong>${fmt(p.v)}</strong></button>`).join('')}
@@ -330,8 +483,8 @@ function attendanceBars(items){
   return `<div class="vbars">${top.map(a=>{ const h=m>0?((a.pct/m)*100):0; return `<div class="vbar-col"><div class="vbar-val">${fmt(a.asistencias)} / ${fmt(a.cap)}<br/><small>${fmt1(a.prom)} prom.</small></div><div class="vbar-track"><div class="vbar-fill" style="height:${h.toFixed(1)}%;"></div></div><div class="vbar-label">${esc(a.area)}<br/><small>${fmt1(a.pct)}%</small></div></div>`; }).join('')}</div>`;
 }
 
-function areaAhorroDonut(items,total){
-  const parts=(items||[]).map(i=>({label:i.label||i.area||'', value: num(i.ahorroMin)}));
+function areaAhorroDonut(items,total,projectCountByArea){
+  const parts=(items||[]).map(i=>{ const label=i.label||i.area||''; return {label:label, value: num(i.ahorroMin), projects:num((projectCountByArea&&projectCountByArea[label])||0)}; });
   const tot = total||parts.reduce((s,p)=>s+p.value,0);
   if(!tot) return '<div class="kpi-sub">Sin datos de ahorro.</div>';
   let acc=0;
@@ -356,8 +509,7 @@ function areaAhorroDonut(items,total){
       <div class="donut-center"><strong>${fmt(tot)}</strong><span>min</span></div>
     </div>
     <div class="faltas-legend">
-      ${withColor.map(w=>`<div class="mini-legend-row"><span><span class="swatch" style="background:${w.c};width:12px;height:12px;display:inline-block;margin-right:6px;border-radius:3px;"></span>${esc(w.label)}</span><strong>${fmt(w.value)} min</strong></div>`).join('')}
-      <div style="text-align:right;margin-top:10px;"><button class="btn area-donut-detail-btn">Ver detalle</button></div>
+      ${withColor.map(w=>`<div class="mini-legend-row"><span><span class="swatch" style="background:${w.c};width:12px;height:12px;display:inline-block;margin-right:6px;border-radius:3px;"></span>${esc(w.label)}(${fmt(w.projects)})</span><strong>${fmt(w.value)} min</strong></div>`).join('')}
     </div>
   </div>`;
 }
@@ -371,15 +523,31 @@ function areaAssistanceRanking(items){
 }
 
 function areaStackedBars(items){
-  const top=(items||[]).slice().sort((a,b)=>(b.pct-a.pct)||(b.asistencias-a.asistencias)).slice(0,8);
-  if(!top.length) return '<div class="kpi-sub">Sin datos de asistencia por area.</div>';
-  const bars = top.map(a=>{
-    const attended = num(a.asistencias), cap = num(a.cap), absent = Math.max(0, cap - attended);
-    const attPct = cap? (attended/cap)*100:0;
-    const absPct = cap? (absent/cap)*100:0;
-    return `<div class="vbar-col" data-area="${esc(a.area)}" style="cursor:pointer;"><div class="vbar-val">${fmt1(attPct)}%</div><div class="vbar-track"><div class="vbar-fill attended" style="height:${attPct.toFixed(1)}%;bottom:0;"></div><div class="vbar-fill absent" style="height:${absPct.toFixed(1)}%;bottom:${attPct.toFixed(1)}%;"></div></div><div class="vbar-label">${esc(a.area)}</div></div>`;
+  const all=(items||[]).slice().map(a=>{
+    const attended = num(a.asistencias);
+    const cap = num(a.cap);
+    const absent = Math.max(0, cap - attended);
+    const attPctRaw = cap ? (attended / cap) * 100 : 0;
+    const attPct = Math.max(0, Math.min(100, attPctRaw));
+    const absPct = Math.max(0, 100 - attPct);
+    return { ...a, attended, cap, absent, attPct, absPct };
+  }).sort((a,b)=>(b.attPct-a.attPct) || String(a.area||'').localeCompare(String(b.area||''),'es',{sensitivity:'base'}));
+  if(!all.length) return '<div class="kpi-sub">Sin datos de asistencia por area.</div>';
+
+  const tone=(pct)=>{
+    const p=num(pct);
+    if(p>=99.95) return 'good'; // 100%
+    if(p>80) return 'warn';     // >80% a <100%
+    return 'bad';               // <=80%
+  };
+
+  const bars = all.map(a=>{
+    const level = tone(a.attPct);
+    return `<button type="button" class="area-vbar-col" data-area="${esc(a.area)}" title="Ver ausentes de ${esc(a.area)}"><div class="area-vbar-pct ${level}">${fmt1(a.attPct)}%</div><div class="area-vbar-track"><span class="area-vbar-seg att ${level}" style="height:${a.attPct.toFixed(1)}%;"></span><span class="area-vbar-seg abs" style="height:${a.absPct.toFixed(1)}%;"></span></div><div class="area-vbar-label">${esc(a.area)}</div><div class="area-vbar-meta">${personaCount(a.personas)}</div></button>`;
   }).join('');
-  return `<div class="vbars">${bars}</div><div style="text-align:right;margin-top:8px;"><small class="kpi-sub">Haz clic en una barra para ver detalle</small></div>`;
+
+  const minWidth=Math.max(all.length*116, 980);
+  return `<div class="area-vchart-wrap"><div class="area-vchart" style="min-width:${minWidth}px">${bars}</div></div>`;
 }
 
 function showAreaAbsentees(area){
@@ -444,7 +612,7 @@ function combinedAttendanceAbsenceChart(summaryObj){
         const w4=(r.buckets[4]/totalPeople)*100;
         return `
           <div class="mix-row">
-            <div class="mix-area"><strong>${esc(r.area)}</strong><span>${fmt(r.personas)} personas</span></div>
+            <div class="mix-area"><strong>${esc(r.area)}</strong><span>${personaCount(r.personas)}</span></div>
             <div class="mix-att"><small style="margin:0;">${fmt1(r.pct)}% asistencia</small></div>
             <div>
               <button class="mix-stack" data-area="${esc(r.area)}" data-faltas-group="all" title="Ver ausentes de ${esc(r.area)}" style="width:100%;border:none;padding:0;cursor:pointer;">
@@ -468,11 +636,11 @@ function monthsVerticalBars(items, key){
   return `<div class="vbars">${top.map(i=>{ const h=m>0?((num(i.ahorroMin)/m)*100):0; return `<div class="vbar-col"><div class="vbar-val">${fmt(i.ahorroMin)}</div><div class="vbar-track"><div class="vbar-fill" style="height:${h.toFixed(1)}%;"></div></div><div class="vbar-label">${esc(i.label)}</div></div>`; }).join('')}</div><div style="text-align:right;margin-top:8px;"><button class="btn" data-chart="${key}">Ver detalle</button></div>`;
 }
 function agentsVerticalCombined(items,key){
-  const top=(items||[]).slice().sort((a,b)=>num(b.ahorroMin)-num(a.ahorroMin)).slice(0,10);
+  const top=(items||[]).slice().sort((a,b)=>num(b.ahorroMin)-num(a.ahorroMin)).slice(0,5);
   if(!top.length) return '<div class="kpi-sub">Sin datos</div>';
   const maxA=Math.max(...top.map(i=>num(i.ahorroMin)),0);
   return `<ul class="chart-list">
-    ${top.map(i=>{ const p=maxA>0?((num(i.ahorroMin)/maxA)*100):0; return `<li class="chart-item"><div><div class="label">${esc(i.label)}</div><div class="track"><div class="fill" style="width:${p.toFixed(1)}%;"></div></div><div class="kpi-sub">${fmt(i.count)} proyectos</div></div><span class="val">${fmt(i.ahorroMin)} min</span></li>`; }).join('')}
+    ${top.map(i=>{ const p=maxA>0?((num(i.ahorroMin)/maxA)*100):0; return `<li class="chart-item"><div><div class="label">${esc(i.label)} (${fmt(i.count)})</div><div class="track"><div class="fill" style="width:${p.toFixed(1)}%;"></div></div></div><span class="val">${fmt(i.ahorroMin)} min</span></li>`; }).join('')}
   </ul>`;
 }
 function agentesPorArea(rows,key){
@@ -496,17 +664,24 @@ function agentesPorArea(rows,key){
     ${items.map(i=>{ const p=(i.count/max)*100; return `<li class="chart-item"><div><div class="label">${esc(i.label)}</div><div class="track"><div class="fill" style="width:${p.toFixed(1)}%;"></div></div><div class="kpi-sub">${fmt(i.proyectos)} proyectos</div></div><span class="val">${fmt(i.count)} ag.</span></li>`; }).join('')}
   </ul><div style="text-align:right;margin-top:8px;"><button class="btn" data-chart="${key}">Ver detalle</button></div>`;
 }
-function render(){ const rows=normAC(acRows); const tot=rows.length, sum=rows.reduce((x,r)=>x+num(r.ahorroMin),0), h=sum/60,d=h/9; const ag=new Set(rows.map(r=>String(r.agenteCambio||'').trim()).filter(Boolean)).size; const pr=new Set(rows.map(r=>String(r.proyecto||'').trim()).filter(Boolean)).size; const pa=pr? h/pr:0; const rr=tot? sum/tot:0; const tA=agg(rows,'area').slice(0,7), tT=agg(rows,'tipo').slice(0,7), tG=agg(rows,'agenteCambio').slice(0,10); charts={areas:tA,tipos:tT,agentes:tG}; summary=uSummary(uRows);
+function render(){ const rows=normAC(acRows); const areaProjectCounts=countProjectsByArea(rows); const tot=rows.length, sum=rows.reduce((x,r)=>x+num(r.ahorroMin),0), h=sum/60,d=h/9; const ag=new Set(rows.map(r=>String(r.agenteCambio||'').trim()).filter(Boolean)).size; const pr=new Set(rows.map(r=>String(r.proyecto||'').trim()).filter(Boolean)).size; const pa=pr? h/pr:0; const rr=tot? sum/tot:0; const tA=agg(rows,'area').slice(0,7), tT=agg(rows,'tipo').slice(0,5), tG=agg(rows,'agenteCambio').slice(0,5); charts={areas:tA,tipos:tT,agentes:tG}; summary=uSummary(uRows);
   $('content').innerHTML=`
   <section class="section"><h3>Resumen de asistencia</h3>
-    <div class="grid-kpi"><div class="card"><div class="kpi-title">Participantes</div><div class="kpi-val">${fmt(summary.totalPersonas)}</div><div class="kpi-sub">Participantes</div></div><div class="card"><div class="kpi-title">Promedio de participantes</div><div class="kpi-val">${fmt(Math.ceil(summary.promedio||0))}</div><div class="kpi-sub">Por clase registrada</div></div><div class="card"><div class="kpi-title">Clases</div><div class="kpi-val">${fmt(summary.totalClases)}</div><div class="kpi-sub">Fechas de control</div></div></div>
-    <div class="card"><div class="kpi-title">Asistencia y faltas por area</div><div style="display:flex;align-items:flex-start;gap:12px;"><div style="flex:1">${areaStackedBars(summary.areas)}</div><div style="flex:0"><button class="btn" id="inasistencias-btn">Inasistencias</button></div></div></div>
+    <div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px;">
+        <div class="kpi-title" style="margin-bottom:0;">Asistencia y faltas por area</div>
+      </div>
+      <div class="summary-kpi-inline">
+        <div class="areas-kpi-box"><div class="kpi-mini-title">Participantes</div><div class="kpi-mini-value">${fmt(summary.totalPersonas)}</div><div class="kpi-mini-sub">Participantes</div></div>
+        <div class="areas-kpi-box"><div class="kpi-mini-title">Promedio de participantes</div><div class="kpi-mini-value">${fmt(Math.ceil(summary.promedio||0))}</div><div class="kpi-mini-sub">Por clase registrada</div></div>
+        <div class="areas-kpi-box"><div class="kpi-mini-title">Clases</div><div class="kpi-mini-value">${fmt(summary.totalClases)}</div><div class="kpi-mini-sub">Fechas de control</div></div>
+      </div>
+      <div>${areaStackedBars(summary.areas)}</div>
+    </div>
   </section>
-  <div class="grid-kpi kpi-compact"><div class="card"><div class="kpi-title">Ahorro total por mes</div><div class="kpi-val">${fmt(sum)} min</div><div class="kpi-subtle">${fmt1(h)} h | ${fmt1(d)} dias</div></div><div class="card"><div class="kpi-title">Promedio por proyecto por mes</div><div class="kpi-val">${fmt1(pa)} h</div><div class="kpi-subtle">${fmt1(rr)} min por registro</div></div></div>
-  <div class="grid2"><div class="card"><div class="kpi-title">Top Areas por Ahorro</div>${areaAhorroDonut(tA,sum)}</div><div class="card"><div class="kpi-title">Top Tipos por Ahorro</div>${bar(tT,'tipos')}</div><div class="card"><div class="kpi-title">Top Agentes de Cambio</div>${agentsVerticalCombined(tG,'agentes')}</div></div>
-  <div class="table-wrap"><table><thead><tr><th>Mes</th><th>Area</th><th>Tipo</th><th>Agente de cambio</th><th>Proyecto</th><th>Antes</th><th>Frecuencia</th><th>Ahora</th><th>Frecuencia</th><th>Ahorro</th><th>Detalle</th></tr></thead><tbody>${rows.sort((a,b)=>b.ahorroMin-a.ahorroMin).map(r=>`<tr><td>${esc(r.mes)}</td><td>${esc(r.area)}</td><td>${esc(r.tipo)}</td><td>${esc(r.agenteCambio)}</td><td>${esc(r.proyecto)}</td><td>${esc(r.antes)}</td><td>${esc(r.frecuenciaAntes)}</td><td>${esc(r.ahora)}</td><td>${esc(r.frecuenciaAhora)}</td><td>${fmt(r.ahorroMin)} min</td><td style="text-align:center;">${r.linkUrl?`<a class="link-btn" href="${esc(r.linkUrl)}" target="_blank" rel="noopener">Ver detalle</a>`:'-'}</td></tr>`).join('')}</tbody></table></div>`;
-  // attach click handlers to area stacked bars
-  setTimeout(()=>{ document.querySelectorAll('.vbar-col[data-area]').forEach(el=>{ el.addEventListener('click',()=>{ const area=el.dataset.area||''; if(area) showAreaAbsentees(area); }); }); },50);
+  <div class="grid2"><div class="card"><div class="kpi-title">Top Areas por Ahorro</div><div class="areas-kpi-inline"><div class="areas-kpi-box"><div class="kpi-mini-title">Ahorro total por mes</div><div class="kpi-mini-value">${fmt(sum)} min</div><div class="kpi-mini-sub">${fmt1(h)} h | ${fmt1(d)} dias</div></div><div class="areas-kpi-box"><div class="kpi-mini-title">Promedio por proyecto por mes</div><div class="kpi-mini-value">${fmt1(pa)} h</div><div class="kpi-mini-sub">${fmt1(rr)} min por registro</div></div></div>${areaAhorroDonut(tA,sum,areaProjectCounts)}<div style="text-align:right;margin-top:8px;"><button class="btn area-table-detail-btn">Ver detalle</button></div></div><div class="card"><div class="kpi-title">Top Tipos por Ahorro</div>${bar(tT,'tipos',false,true)}</div><div class="card"><div class="kpi-title">Top Agentes de Cambio</div>${agentsVerticalCombined(tG,'agentes')}</div></div>`;
+  // attach click handlers to area attendance list
+  setTimeout(()=>{ document.querySelectorAll('.vbar-col[data-area], .area-att-row[data-area], .area-bar-row[data-area], .area-vbar-col[data-area]').forEach(el=>{ el.addEventListener('click',()=>{ const area=el.dataset.area||''; if(area) showAreaAbsentees(area); }); }); },50);
   // attach inasistencias button
   const ina = $('inasistencias-btn'); if(ina) ina.addEventListener('click',()=>{ const sel=$('faltas-filter'); if(sel) sel.value=''; $('detail-filter').style.display='block'; $('detail-title').textContent='Inasistencias'; $('detail-h1').textContent='Colaborador'; $('detail-h1').style.display='table-cell'; $('detail-h2').textContent='Area'; $('detail-h2').style.display='table-cell'; $('detail-h3').textContent='Faltas'; $('detail-h3').style.display='table-cell'; renderFaltasInModal(''); openModal('detail-modal'); });
 }
@@ -585,8 +760,28 @@ async function verifyUcofacoBatchUpdate(payload){
   }
 }
 
+function resetDetailModalMode(){
+  const modal=document.querySelector('#detail-modal .modal');
+  if(modal) modal.classList.remove('modal-wide');
+  const wrap=$('detail-table-wrap'); if(wrap) wrap.style.display='block';
+  const custom=$('detail-custom'); if(custom){ custom.style.display='none'; custom.innerHTML=''; }
+}
 function openModal(id){ $(id).style.display='block'; }
-function closeModal(id){ $(id).style.display='none'; }
+function closeModal(id){
+  $(id).style.display='none';
+  if(id==='detail-modal') resetDetailModalMode();
+}
+function openAhorroGeneralDetail(){
+  const rows = normAC(acRows).slice().sort((a,b)=>num(b.ahorroMin)-num(a.ahorroMin));
+  const tableHtml = `<div class="table-wrap"><table><thead><tr><th>Mes</th><th>Area</th><th>A.Cambio</th><th>Proyecto</th><th>Tipo</th><th>Frecuencia</th><th>Antes</th><th>Ahora</th><th>Ahorro</th><th>Link</th></tr></thead><tbody>${rows.map(r=>`<tr><td>${esc(r.mes)}</td><td>${esc(r.area)}</td><td>${esc(r.agenteCambio)}</td><td>${esc(r.proyecto)}</td><td>${esc(r.tipo)}</td><td>${esc(r.frecuencia)}</td><td>${esc(withMin(r.antes))}</td><td>${esc(withMin(r.ahora))}</td><td>${fmt(r.ahorroMin)} min</td><td style="text-align:center;">${r.linkUrl?`<a class="link-btn" href="${esc(r.linkUrl)}" target="_blank" rel="noopener">Ver detalle</a>`:'-'}</td></tr>`).join('')}</tbody></table></div>`;
+  $('detail-filter').style.display='none';
+  $('detail-title').textContent='Detalle: Top Areas por Ahorro';
+  const modal=document.querySelector('#detail-modal .modal');
+  if(modal) modal.classList.add('modal-wide');
+  const wrap=$('detail-table-wrap'); if(wrap) wrap.style.display='none';
+  const custom=$('detail-custom'); if(custom){ custom.style.display='block'; custom.innerHTML=tableHtml; }
+  openModal('detail-modal');
+}
 function renderFaltasInModal(g){
   const all=(summary&&summary.faltas?summary.faltas:[]);
   const filtered = (g==null||g==='') ? all : all.filter(p=>{ const f=parseInt(p.faltas,10)||0; if(g==='4') return f>=4; return f===parseInt(g,10); });
@@ -597,6 +792,8 @@ function renderFaltasInModal(g){
 }
 function fillSel(sel,vals,ph){ sel.innerHTML=['<option value="">'+ph+'</option>',...vals.map(v=>`<option value="${esc(v)}">${esc(v)}</option>`)].join(''); }
 function unique(v){ return [...new Set(v.map(x=>String(x||'').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'es',{sensitivity:'base'})); }
+function normText(v){ return String(v||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim(); }
+function asistenciaKey(area,colaborador){ return `${String(area||'').trim().toUpperCase()}||${String(colaborador||'').trim().toUpperCase()}`; }
 function getUcofacoRow(area,colaborador){
   const areaNeed=String(area||'').trim().toUpperCase();
   const colNeed=String(colaborador||'').trim().toUpperCase();
@@ -656,21 +853,102 @@ function updateLocalUcofaco(items,fecha){
     keys.forEach(k=>{ if(k) row[k]=v; });
   });
 }
-function renderColabList(area){
-  const areaNeed=String(area||'').trim().toUpperCase();
-  const fecha=String(($('fecha')&&$('fecha').value)||'').trim();
-  const areaRows=(uRows||[]).filter(r=>String(r.AREA||'').trim().toUpperCase()===areaNeed);
-  const cols=unique(areaRows.map(r=>r.COLABORADOR));
-  $('colab-list').innerHTML=cols.length
-    ? `<div class="asist-head"><span>Colaborador</span><span>Asistio</span></div>${cols.map(c=>{ const row=getUcofacoRow(area,c); const checked=present(getUcofacoDateValue(row,fecha)); return `<label class="asist-row ${checked?'is-registered':'is-empty'}"><span class="asist-name-wrap"><span class="asist-status-dot ${checked?'registrado':''}"></span><span class="asist-name">${esc(c)}</span></span><input type="checkbox" class="colab-check asist-check" data-colaborador="${esc(c)}" data-initial-checked="${checked?'1':'0'}" ${checked?'checked':''} /></label>`; }).join('')}`
-    : '<div class="kpi-sub" style="padding:10px;">No hay colaboradores para el area seleccionada.</div>';
-  document.querySelectorAll('.colab-check').forEach(paintAsistenciaRow);
+function getAsistenciaCurrentChecked(item){
+  const k=asistenciaKey(item.area,item.colaborador);
+  if(asistenciaState.draft.has(k)) return !!asistenciaState.draft.get(k);
+  return !!item.initialChecked;
+}
+function setAsistenciaDraft(area,colaborador,initial,current){
+  const k=asistenciaKey(area,colaborador);
+  if(!!current===!!initial) asistenciaState.draft.delete(k);
+  else asistenciaState.draft.set(k,!!current);
+}
+function updateDraftFromCheckbox(ch){
+  if(!ch) return;
+  const area=String(ch.dataset.area||'').trim();
+  const colaborador=String(ch.dataset.colaborador||'').trim();
+  const initial=ch.dataset.initialChecked==='1';
+  const current=!!ch.checked;
+  setAsistenciaDraft(area,colaborador,initial,current);
+}
+function buildAsistenciaRows(area,fecha){
+  const areaSel=String(area||'').trim();
+  const areaNeed=areaSel.toUpperCase();
+  const seen=new Set();
+  const out=[];
+  (uRows||[]).forEach(r=>{
+    const areaName=String(r.AREA||'').trim();
+    const colab=String(r.COLABORADOR||'').trim();
+    if(!areaName||!colab) return;
+    if(areaSel!==AREA_ALL && areaName.toUpperCase()!==areaNeed) return;
+    const k=asistenciaKey(areaName,colab);
+    if(seen.has(k)) return;
+    seen.add(k);
+    out.push({ area:areaName, colaborador:colab, initialChecked:present(getUcofacoDateValue(r,fecha)) });
+  });
+  return out.sort((a,b)=>String(a.area||'').localeCompare(String(b.area||''),'es',{sensitivity:'base'}) || String(a.colaborador||'').localeCompare(String(b.colaborador||''),'es',{sensitivity:'base'}));
+}
+function asistenciaRowHtml(item,showAreaTag){
+  const checked=getAsistenciaCurrentChecked(item);
+  const areaTag=showAreaTag?`<span class="asist-area-chip">${esc(item.area)}</span>`:'';
+  return `<label class="asist-row ${checked?'is-registered':'is-empty'}"><span class="asist-name-wrap"><span class="asist-status-dot ${checked?'registrado':''}"></span><span class="asist-name">${esc(item.colaborador)}</span>${areaTag}</span><input type="checkbox" class="colab-check asist-check" data-area="${esc(item.area)}" data-colaborador="${esc(item.colaborador)}" data-initial-checked="${item.initialChecked?'1':'0'}" ${checked?'checked':''} /></label>`;
+}
+function renderAsistenciaListPanel(){
+  const areaSel=String(($('area')&&$('area').value)||'').trim();
+  const isAll=areaSel===AREA_ALL;
+  const query=normText(asistenciaState.search);
+  const rows=(asistenciaState.rows||[]).filter(item=>!query || normText(item.colaborador).includes(query));
+
+  const groupBtn=$('toggle-grouping');
+  if(groupBtn){
+    groupBtn.disabled=!isAll;
+    groupBtn.textContent=(isAll && asistenciaState.groupByArea)?'Desagrupar':'Agrupar';
+  }
+  const c=$('asist-count');
+  if(c){ c.textContent=`${fmt(rows.length)} de ${fmt((asistenciaState.rows||[]).length)} colaboradores`; }
+
+  if(!rows.length){
+    $('colab-list').innerHTML=`<div class="asist-empty">${query?'No hay colaboradores con ese nombre.':'No hay colaboradores para la selección actual.'}</div>`;
+    syncTodosCheck();
+    return;
+  }
+
+  const head='<div class="asist-head"><span>Colaborador</span><span>Asistio</span></div>';
+  let body='';
+  if(isAll && asistenciaState.groupByArea){
+    const byArea=new Map();
+    rows.forEach(item=>{
+      const areaName=String(item.area||'').trim()||'SIN AREA';
+      if(!byArea.has(areaName)) byArea.set(areaName,[]);
+      byArea.get(areaName).push(item);
+    });
+    body=[...byArea.entries()].map(([areaName,list])=>`<div class="asist-group"><div class="asist-group-title">${esc(areaName)} <small>(${fmt(list.length)})</small></div>${list.map(i=>asistenciaRowHtml(i,false)).join('')}</div>`).join('');
+  }else{
+    body=rows.map(i=>asistenciaRowHtml(i,isAll)).join('');
+  }
+  $('colab-list').innerHTML=head+body;
+  document.querySelectorAll('#colab-list .colab-check').forEach(paintAsistenciaRow);
   syncTodosCheck();
+}
+function renderColabList(area,opts){
+  const cfg=opts||{};
+  const resetDraft=cfg.resetDraft!==false;
+  const fecha=String(($('fecha')&&$('fecha').value)||'').trim();
+  if(resetDraft) asistenciaState.draft.clear();
+  asistenciaState.rows=buildAsistenciaRows(area,fecha);
+  renderAsistenciaListPanel();
 }
 function prepAsistencia(){
   if(!uRows.length){ alert("No hay datos de asistencia."); return; }
   const areas=unique(uRows.map(r=>r.AREA));
   fillSel($('area'),areas,'Seleccionar area');
+  const areaSel=$('area');
+  if(areaSel){
+    const allOpt=document.createElement('option');
+    allOpt.value=AREA_ALL;
+    allOpt.textContent='Todas las areas';
+    areaSel.insertBefore(allOpt, areaSel.options[1]||null);
+  }
   const cols=dateCols(uRows);
   const semanaCols=getWeekDateColumns(cols);
   if(!semanaCols.length){
@@ -679,19 +957,25 @@ function prepAsistencia(){
   }
   fillSel($('fecha'),semanaCols,'Seleccionar fecha');
   $('fecha').value=semanaCols[semanaCols.length-1];
-  if (areas.length) { $('area').value=areas[0]; renderColabList(areas[0]); } else { $('colab-list').innerHTML=''; }
+  asistenciaState.search='';
+  asistenciaState.groupByArea=true;
+  asistenciaState.draft.clear();
+  if($('colab-search')) $('colab-search').value='';
+  if (areas.length) { $('area').value=AREA_ALL; renderColabList(AREA_ALL); } else { $('colab-list').innerHTML=''; }
   openModal('asistencia-modal');
 }
-$('area').addEventListener('change',()=>{ const a=$('area').value.trim(); renderColabList(a); });
-$('fecha').addEventListener('change',()=>{ const a=$('area').value.trim(); renderColabList(a); });
-$('todos').addEventListener('change',()=>{ document.querySelectorAll('.colab-check').forEach(ch=>{ ch.checked=$('todos').checked; paintAsistenciaRow(ch); }); syncTodosCheck(); });
-$('colab-list').addEventListener('change',(ev)=>{ const target=ev.target; if(target&&target.classList&&target.classList.contains('colab-check')) paintAsistenciaRow(target); syncTodosCheck(); });
+$('area').addEventListener('change',()=>{ const a=$('area').value.trim(); renderColabList(a,{resetDraft:true}); });
+$('fecha').addEventListener('change',()=>{ const a=$('area').value.trim(); renderColabList(a,{resetDraft:true}); });
+$('colab-search').addEventListener('input',()=>{ asistenciaState.search=String(($('colab-search')&&$('colab-search').value)||'').trim(); renderAsistenciaListPanel(); });
+$('toggle-grouping').addEventListener('click',()=>{ if(String(($('area')&&$('area').value)||'').trim()!==AREA_ALL) return; asistenciaState.groupByArea=!asistenciaState.groupByArea; renderAsistenciaListPanel(); });
+$('todos').addEventListener('change',()=>{ document.querySelectorAll('#colab-list .colab-check').forEach(ch=>{ ch.checked=$('todos').checked; updateDraftFromCheckbox(ch); paintAsistenciaRow(ch); }); syncTodosCheck(); });
+$('colab-list').addEventListener('change',(ev)=>{ const target=ev.target; if(target&&target.classList&&target.classList.contains('colab-check')){ updateDraftFromCheckbox(target); paintAsistenciaRow(target); } syncTodosCheck(); });
 $('asistencia-form').addEventListener('submit',async(e)=>{
   e.preventDefault();
   const area=$('area').value.trim(), fecha=$('fecha').value.trim();
   if(!area||!fecha){ alert('Completa area y fecha.'); return; }
-  const checks=[...document.querySelectorAll('.colab-check')];
-  if(!checks.length){ alert('No hay colaboradores para registrar.'); return; }
+  const baseRows=asistenciaState.rows||[];
+  if(!baseRows.length){ alert('No hay colaboradores para registrar.'); return; }
 
   const submitBtn=e.target.querySelector('button[type="submit"]');
   const oldLabel=submitBtn?submitBtn.textContent:'';
@@ -699,14 +983,14 @@ $('asistencia-form').addEventListener('submit',async(e)=>{
 
   try{
     const fechaCol=normalizeFechaColumnaForSave(fecha);
-    const items=checks
-      .map(ch=>{
-        const initial=ch.dataset.initialChecked==='1';
-        const current=!!ch.checked;
+    const items=baseRows
+      .map(item=>{
+        const initial=!!item.initialChecked;
+        const current=getAsistenciaCurrentChecked(item);
         if(current===initial) return null;
         return {
-          area,
-          colaborador:ch.dataset.colaborador||'',
+          area:item.area,
+          colaborador:item.colaborador,
           fecha_columna:fechaCol,
           asistencia:current?'x':''
         };
@@ -717,11 +1001,8 @@ $('asistencia-form').addEventListener('submit',async(e)=>{
 
     const saveResult=await postAction('saveUcofacoAsistenciaBatch',{ items });
     updateLocalUcofaco(items,fecha);
-    checks.forEach(ch=>{
-      ch.dataset.initialChecked = ch.checked ? '1' : '0';
-      paintAsistenciaRow(ch);
-    });
-    syncTodosCheck();
+    asistenciaState.draft.clear();
+    renderColabList(area,{resetDraft:true});
     const sentOnly = String((saveResult&&saveResult.message)||'').toLowerCase().includes('enviado');
     if(sentOnly){
       alert(`Asistencia enviada para ${items.length} colaboradores. Puede tardar unos segundos en reflejarse.`);
@@ -780,6 +1061,12 @@ $('content').addEventListener('click',(e)=>{
       }
     }
     openModal('detail-modal');
+    return;
+  }
+
+  const areaTableBtn = e.target.closest && e.target.closest('.area-table-detail-btn');
+  if(areaTableBtn){
+    openAhorroGeneralDetail();
     return;
   }
 
