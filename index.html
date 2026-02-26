@@ -2800,6 +2800,32 @@ document.addEventListener('DOMContentLoaded', () => {
             .sort((a, b) => (b.ahorroMin - a.ahorroMin) || (b.count - a.count) || a.label.localeCompare(b.label, 'es', { sensitivity: 'base' }));
     }
 
+    function aggregateTopAgentesWithArea(rows, limit) {
+        const areaByAgent = new Map();
+        rows.forEach(r => {
+            const agent = String(r.agenteCambio || '').trim() || 'SIN DATO';
+            const area = String(r.area || '').trim() || 'SIN AREA';
+            if (!areaByAgent.has(agent)) areaByAgent.set(agent, new Map());
+            const byArea = areaByAgent.get(agent);
+            byArea.set(area, (byArea.get(area) || 0) + 1);
+        });
+
+        return aggregateACambio(rows, 'agenteCambio')
+            .map(item => {
+                const agent = String(item.label || '').trim() || 'SIN DATO';
+                const byArea = areaByAgent.get(agent) || new Map();
+                const topArea = Array.from(byArea.entries())
+                    .sort((a, b) => (b[1] - a[1]) || a[0].localeCompare(b[0], 'es', { sensitivity: 'base' }))[0];
+                const area = topArea ? topArea[0] : 'SIN AREA';
+                return {
+                    ...item,
+                    areaLabel: area,
+                    displayLabel: `${agent} - ${area} (${formatNumber(item.count)})`
+                };
+            })
+            .slice(0, limit);
+    }
+
     function renderTopBarChart(items, key) {
         if (!items || items.length === 0) {
             return '<div class="acambio-kpi-sub">Sin datos para mostrar.</div>';
@@ -2810,7 +2836,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 ${items.map(item => `
                     <li class="acambio-chart-item">
                         <div>
-                            <div class="acambio-chart-label" title="${escapeHtml(item.label)}">${escapeHtml(item.label)}</div>
+                            <div class="acambio-chart-label" title="${escapeHtml(item.displayLabel || item.label)}">${escapeHtml(item.displayLabel || item.label)}</div>
                             <div class="acambio-chart-track">
                                 <div class="acambio-chart-fill" style="width:${maxValue > 0 ? ((parseNumericCell(item.ahorroMin) / maxValue) * 100).toFixed(1) : 0}%"></div>
                             </div>
@@ -3070,7 +3096,7 @@ document.addEventListener('DOMContentLoaded', () => {
         $acambioChartModalTitle.textContent = `Detalle: ${titles[chartKey] || 'Agentes de cambio'}`;
         $acambioChartModalBody.innerHTML = items.map(item => `
             <tr>
-                <td>${escapeHtml(item.label)}</td>
+                <td>${escapeHtml(item.displayLabel || item.label)}</td>
                 <td>${formatNumber(item.count)}</td>
                 <td>${formatNumber(item.ahorroMin)}</td>
             </tr>
@@ -3102,7 +3128,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const topAreas = aggregateACambio(rows, 'area').slice(0, 7);
         const topTipos = aggregateACambio(rows, 'tipo').slice(0, 7);
-        const topAgentes = aggregateACambio(rows, 'agenteCambio').slice(0, 7);
+        const topAgentes = aggregateTopAgentesWithArea(rows, 7);
         const topMeses = aggregateACambio(rows, 'mes').slice(0, 7);
 
         const rowsSorted = rows.slice().sort((a, b) => (b.ahorroMin - a.ahorroMin));
