@@ -283,11 +283,11 @@
       font-size:12px;
     }
     .swatch { width:10px; height:10px; border-radius:50%; display:inline-block; margin-right:6px; }
-    .mini-donut-wrap { display:grid; grid-template-columns: 150px 1fr; gap:10px; align-items:center; }
-    .mini-donut { width:140px; height:140px; border-radius:50%; position:relative; margin:0 auto; }
-    .mini-donut::after { content:''; position:absolute; inset:24px; border-radius:50%; background:#fff; border:1px solid #e2e8f0; }
-    .mini-center { position:absolute; inset:0; z-index:1; display:flex; align-items:center; justify-content:center; flex-direction:column; font-size:10px; color:#64748b; }
-    .mini-center strong { font-size:15px; color:#0f172a; line-height:1; }
+    .mini-donut-wrap { display:grid; grid-template-columns: 220px 1fr; gap:14px; align-items:center; }
+    .mini-donut { width:210px; height:210px; border-radius:50%; position:relative; margin:0 auto; }
+    .mini-donut::after { content:''; position:absolute; inset:32px; border-radius:50%; background:#fff; border:1px solid #e2e8f0; }
+    .mini-center { position:absolute; inset:0; z-index:1; display:flex; align-items:center; justify-content:center; flex-direction:column; font-size:12px; color:#64748b; }
+    .mini-center strong { font-size:32px; color:#0f172a; line-height:1; }
     .mini-legend { display:flex; flex-direction:column; gap:6px; }
     .mini-legend-row { display:flex; align-items:center; justify-content:space-between; gap:8px; font-size:12px; border-bottom:1px dashed #e2e8f0; padding-bottom:4px; }
     .area-coverage-line { font-size:12px; color:#334155; border:1px dashed #cbd5e1; background:#f8fafc; border-radius:8px; padding:7px 9px; }
@@ -536,6 +536,26 @@ function areaAhorroDonut(items,total,projectCountByArea,coverage){
     </div>
   </div>`;
 }
+function tiposShareDonut(items,total){
+  const base=(items||[]).map(i=>({label:i.label||'SIN DATO',value:Math.max(0,num(i.ahorroMin))})).filter(i=>i.value>0);
+  const totalVal=Math.max(0,num(total));
+  if(!base.length||!totalVal) return '<div class="kpi-sub" style="margin-top:8px;">Sin distribucion para tipos.</div>';
+  const shown=base.reduce((s,i)=>s+i.value,0);
+  const others=Math.max(0,totalVal-shown);
+  const slices=base.slice();
+  if(others>0.0001) slices.push({label:'Otros',value:others});
+  const colors=['#1d9bd1','#22c55e','#f59e0b','#ef4444','#8b5cf6','#14b8a6','#f97316','#0ea5e9'];
+  let acc=0;
+  const grad=slices.map((s,idx)=>{ const pct=(s.value/totalVal)*100; const start=acc; acc+=pct; return `${colors[idx%colors.length]} ${start.toFixed(2)}% ${acc.toFixed(2)}%`; }).join(', ');
+  return `<div class="mini-donut-wrap" style="margin-top:10px;">
+    <div class="mini-donut" style="background:conic-gradient(${grad});">
+      <div class="mini-center"><strong>${fmt(totalVal)}</strong><span>min total</span></div>
+    </div>
+    <div class="mini-legend">
+      ${slices.map((s,idx)=>`<div class="mini-legend-row"><span><span class="swatch" style="background:${colors[idx%colors.length]};"></span>${esc(s.label)}</span><strong>${fmt1((s.value/totalVal)*100)}%</strong></div>`).join('')}
+    </div>
+  </div>`;
+}
 function areaAssistanceRanking(items){
   const top=(items||[]).slice().sort((a,b)=>(b.pct-a.pct)||(b.asistencias-a.asistencias)).slice(0,8);
   if(!top.length) return '<div class="kpi-sub">Sin datos de asistencia por area.</div>';
@@ -659,12 +679,12 @@ function monthsVerticalBars(items, key){
   return `<div class="vbars">${top.map(i=>{ const h=m>0?((num(i.ahorroMin)/m)*100):0; return `<div class="vbar-col"><div class="vbar-val">${fmt(i.ahorroMin)}</div><div class="vbar-track"><div class="vbar-fill" style="height:${h.toFixed(1)}%;"></div></div><div class="vbar-label">${esc(i.label)}</div></div>`; }).join('')}</div><div style="text-align:right;margin-top:8px;"><button class="btn" data-chart="${key}">Ver detalle</button></div>`;
 }
 function agentsVerticalCombined(items,key){
-  const top=(items||[]).slice().sort((a,b)=>num(b.ahorroMin)-num(a.ahorroMin)).slice(0,5);
+  const top=(items||[]).slice().sort((a,b)=>num(b.ahorroMin)-num(a.ahorroMin)).slice(0,10);
   if(!top.length) return '<div class="kpi-sub">Sin datos</div>';
   const maxA=Math.max(...top.map(i=>num(i.ahorroMin)),0);
   return `<ul class="chart-list">
     ${top.map(i=>{ const p=maxA>0?((num(i.ahorroMin)/maxA)*100):0; const label=i.displayLabel||`${i.label} (${fmt(i.count)})`; return `<li class="chart-item"><div><div class="label">${esc(label)}</div><div class="track"><div class="fill" style="width:${p.toFixed(1)}%;"></div></div></div><span class="val">${fmt(i.ahorroMin)} min</span></li>`; }).join('')}
-  </ul>`;
+  </ul><div style="text-align:right;margin-top:8px;"><button class="btn" data-chart="${key==='agentes'?'agentes_all':key}">${key==='agentes'?'Ver todos':'Ver detalle'}</button></div>`;
 }
 function agentesPorArea(rows,key){
   const map = new Map();
@@ -687,7 +707,7 @@ function agentesPorArea(rows,key){
     ${items.map(i=>{ const p=(i.count/max)*100; return `<li class="chart-item"><div><div class="label">${esc(i.label)}</div><div class="track"><div class="fill" style="width:${p.toFixed(1)}%;"></div></div><div class="kpi-sub">${fmt(i.proyectos)} proyectos</div></div><span class="val">${fmt(i.count)} ag.</span></li>`; }).join('')}
   </ul><div style="text-align:right;margin-top:8px;"><button class="btn" data-chart="${key}">Ver detalle</button></div>`;
 }
-function render(){ const rows=normAC(acRows); const areaProjectCounts=countProjectsByArea(rows); const tot=rows.length, sum=rows.reduce((x,r)=>x+num(r.ahorroMin),0), h=sum/60,d=h/9; const ag=new Set(rows.map(r=>String(r.agenteCambio||'').trim()).filter(Boolean)).size; const pr=new Set(rows.map(r=>String(r.proyecto||'').trim()).filter(Boolean)).size; const pa=pr? h/pr:0; const rr=tot? sum/tot:0; const tA=agg(rows,'area').slice(0,7), tT=agg(rows,'tipo').slice(0,5), tG=aggAgentsWithArea(rows,5); charts={areas:tA,tipos:tT,agentes:tG}; summary=uSummary(uRows);
+function render(){ const rows=normAC(acRows); const areaProjectCounts=countProjectsByArea(rows); const tot=rows.length, sum=rows.reduce((x,r)=>x+num(r.ahorroMin),0), h=sum/60,d=h/9; const ag=new Set(rows.map(r=>String(r.agenteCambio||'').trim()).filter(Boolean)).size; const pr=new Set(rows.map(r=>String(r.proyecto||'').trim()).filter(Boolean)).size; const pa=pr? h/pr:0; const rr=tot? sum/tot:0; const tA=agg(rows,'area').slice(0,7), tT=agg(rows,'tipo').slice(0,5), agentesAll=aggAgentsWithArea(rows,9999), tG=agentesAll.slice(0,10); charts={areas:tA,tipos:tT,agentes:tG,agentes_all:agentesAll}; summary=uSummary(uRows);
   const areasConAhorro=unique(rows.map(r=>r.area));
   const totalAreasRef=((summary&&summary.areas)||[]).map(a=>a.area);
   const totalAreas = unique(totalAreasRef).length || areasConAhorro.length;
@@ -707,7 +727,7 @@ function render(){ const rows=normAC(acRows); const areaProjectCounts=countProje
       <div>${areaStackedBars(summary.areas)}</div>
     </div>
   </section>
-  <div class="grid2"><div class="card"><div class="kpi-title">Top Areas por Ahorro</div><div class="areas-kpi-inline"><div class="areas-kpi-box"><div class="kpi-mini-title">Ahorro total por mes</div><div class="kpi-mini-value">${fmt(sum)} min</div><div class="kpi-mini-sub">${fmt1(h)} h | ${fmt1(d)} dias</div></div><div class="areas-kpi-box"><div class="kpi-mini-title">Promedio por proyecto por mes</div><div class="kpi-mini-value">${fmt1(pa)} h</div><div class="kpi-mini-sub">${fmt1(rr)} min por registro</div></div></div>${areaAhorroDonut(tA,sum,areaProjectCounts,areaCoverage)}<div style="text-align:right;margin-top:8px;"><button class="btn area-table-detail-btn">Ver detalle</button></div></div><div class="card"><div class="kpi-title">Top Tipos por Ahorro</div>${bar(tT,'tipos',false,true)}</div><div class="card"><div class="kpi-title">Top Agentes de Cambio</div>${agentsVerticalCombined(tG,'agentes')}</div></div>`;
+  <div class="grid2"><div class="card"><div class="kpi-title">Top Areas por Ahorro</div><div class="areas-kpi-inline"><div class="areas-kpi-box"><div class="kpi-mini-title">Ahorro total por mes</div><div class="kpi-mini-value">${fmt(sum)} min</div><div class="kpi-mini-sub">${fmt1(h)} h | ${fmt1(d)} dias</div></div><div class="areas-kpi-box"><div class="kpi-mini-title">Promedio por proyecto por mes</div><div class="kpi-mini-value">${fmt1(pa)} h</div><div class="kpi-mini-sub">${fmt1(rr)} min por registro</div></div></div>${areaAhorroDonut(tA,sum,areaProjectCounts,areaCoverage)}<div style="text-align:right;margin-top:8px;"><button class="btn area-table-detail-btn">Ver detalle</button></div></div><div class="card"><div class="kpi-title">Top Tipos por Ahorro</div>${bar(tT,'tipos',false,true)}${tiposShareDonut(tT,sum)}<div style="text-align:right;margin-top:8px;"><button class="btn" data-chart="tipos_full">Ver detalle</button></div></div><div class="card"><div class="kpi-title">Top Agentes de Cambio</div>${agentsVerticalCombined(tG,'agentes')}</div></div>`;
   // attach click handlers to area attendance list
   setTimeout(()=>{ document.querySelectorAll('.vbar-col[data-area], .area-att-row[data-area], .area-bar-row[data-area], .area-vbar-col[data-area]').forEach(el=>{ el.addEventListener('click',()=>{ const area=el.dataset.area||''; if(area) showAreaAbsentees(area); }); }); },50);
   // attach inasistencias button
@@ -804,6 +824,21 @@ function openAhorroGeneralDetail(){
   const tableHtml = `<div class="table-wrap"><table><thead><tr><th>Mes</th><th>Area</th><th>A.Cambio</th><th>Proyecto</th><th>Tipo</th><th>Frecuencia</th><th>Antes</th><th>Ahora</th><th>Ahorro</th><th>Link</th></tr></thead><tbody>${rows.map(r=>`<tr><td>${esc(r.mes)}</td><td>${esc(r.area)}</td><td>${esc(r.agenteCambio)}</td><td>${esc(r.proyecto)}</td><td>${esc(r.tipo)}</td><td>${esc(r.frecuencia)}</td><td>${esc(withMin(r.antes))}</td><td>${esc(withMin(r.ahora))}</td><td>${fmt(r.ahorroMin)} min</td><td style="text-align:center;">${r.linkUrl?`<a class="link-btn" href="${esc(r.linkUrl)}" target="_blank" rel="noopener">Ver detalle</a>`:'-'}</td></tr>`).join('')}</tbody></table></div>`;
   $('detail-filter').style.display='none';
   $('detail-title').textContent='Detalle: Top Areas por Ahorro';
+  const modal=document.querySelector('#detail-modal .modal');
+  if(modal) modal.classList.add('modal-wide');
+  const wrap=$('detail-table-wrap'); if(wrap) wrap.style.display='none';
+  const custom=$('detail-custom'); if(custom){ custom.style.display='block'; custom.innerHTML=tableHtml; }
+  openModal('detail-modal');
+}
+function openTiposFullDetail(){
+  const tiposTop = new Set((charts.tipos||[]).map(t=>String(t.label||'').trim()).filter(Boolean));
+  const rows = normAC(acRows)
+    .filter(r=>tiposTop.size?tiposTop.has(String(r.tipo||'').trim()):true)
+    .slice()
+    .sort((a,b)=>num(b.ahorroMin)-num(a.ahorroMin));
+  const tableHtml = `<div class="table-wrap"><table><thead><tr><th>Mes</th><th>Area</th><th>Tipo</th><th>A.Cambio</th><th>Proyecto</th><th>Frecuencia</th><th>Antes</th><th>Ahora</th><th>Ahorro</th><th>Link</th></tr></thead><tbody>${rows.map(r=>`<tr><td>${esc(r.mes)}</td><td>${esc(r.area)}</td><td>${esc(r.tipo)}</td><td>${esc(r.agenteCambio)}</td><td>${esc(r.proyecto)}</td><td>${esc(r.frecuencia)}</td><td>${esc(withMin(r.antes))}</td><td>${esc(withMin(r.ahora))}</td><td>${fmt(r.ahorroMin)} min</td><td style="text-align:center;">${r.linkUrl?`<a class="link-btn" href="${esc(r.linkUrl)}" target="_blank" rel="noopener">Ver detalle</a>`:'-'}</td></tr>`).join('')}</tbody></table></div>`;
+  $('detail-filter').style.display='none';
+  $('detail-title').textContent='Detalle: Top Tipos por Ahorro (todos los datos)';
   const modal=document.querySelector('#detail-modal .modal');
   if(modal) modal.classList.add('modal-wide');
   const wrap=$('detail-table-wrap'); if(wrap) wrap.style.display='none';
@@ -1046,7 +1081,11 @@ $('asistencia-form').addEventListener('submit',async(e)=>{
 $('content').addEventListener('click',(e)=>{
   const b=e.target.closest('button[data-chart]');
   if(b){
-    const k=b.dataset.chart, t={areas:'Top Areas por ahorro',tipos:'Top Tipos por ahorro',agentes:'Top Agentes de cambio',agentes_area:'Agentes de cambio por area'};
+    if(b.dataset.chart==='tipos_full'){
+      openTiposFullDetail();
+      return;
+    }
+    const k=b.dataset.chart, t={areas:'Top Areas por ahorro',tipos:'Top Tipos por ahorro',agentes:'Top Agentes de cambio',agentes_all:'Todos los agentes de cambio',agentes_area:'Agentes de cambio por area'};
     const hdr4 = $('detail-h4'); if(hdr4) hdr4.style.display='none';
     $('detail-filter').style.display='none';
     $('detail-title').textContent='Detalle: '+(t[k]||'Detalle');
@@ -1072,7 +1111,7 @@ $('content').addEventListener('click',(e)=>{
       $('detail-h2').textContent='Registros'; $('detail-h2').style.display='table-cell';
       $('detail-h3').textContent='Ahorro'; $('detail-h3').style.display='table-cell';
       // special case for agentes: show count, area(s), usuario and horas
-      if(k==='agentes'){
+      if(k==='agentes' || k==='agentes_all'){
         // show 4-column table: Cantidad proyectos, Area, Usuario, Horas ahorradas
         $('detail-h1').textContent='Cantidad proyectos'; $('detail-h1').style.display='table-cell';
         $('detail-h2').textContent='Area'; $('detail-h2').style.display='table-cell';
