@@ -23,7 +23,7 @@
     .kpi-compact .kpi-val { font-size:18px; }
     .kpi-subtle { font-size:11px; color:#64748b; margin-top:2px; }
     .areas-kpi-inline { display:grid; grid-template-columns:repeat(2,minmax(150px,1fr)); gap:8px; margin-bottom:10px; }
-    .summary-kpi-inline { display:grid; grid-template-columns:repeat(3,minmax(130px,1fr)); gap:8px; margin-bottom:10px; }
+    .summary-kpi-inline { display:grid; grid-template-columns:repeat(4,minmax(130px,1fr)); gap:8px; margin-bottom:10px; }
     .areas-kpi-box { border:1px solid #e2e8f0; border-radius:8px; background:#f8fafc; padding:8px 10px; }
     .areas-kpi-box .kpi-mini-title { font-size:10px; color:#475569; text-transform:uppercase; font-weight:700; letter-spacing:.02em; }
     .areas-kpi-box .kpi-mini-value { font-size:16px; font-weight:800; color:#0f172a; line-height:1.15; margin-top:2px; }
@@ -448,7 +448,7 @@ function uSummary(rows){
   const useColsRaw=d.length?d:all;
   // Count only classes with at least one asistencia registrada.
   const useCols=useColsRaw.filter(dc=>rows.some(r=>present(r[dc])));
-  if(!rows.length||!useCols.length) return {totalPersonas:rows.length,totalClases:0,promedio:0,faltas:[],areas:[]};
+  if(!rows.length||!useCols.length) return {totalPersonas:rows.length,totalClases:0,minutosClase:0,promedio:0,faltas:[],areas:[]};
   const byA=new Map(); const faltas=[]; let ta=0;
   rows.forEach(r=>{
     const a=String(r.AREA||'').trim()||'SIN AREA';
@@ -466,7 +466,7 @@ function uSummary(rows){
     ta+=as;
   });
   const areas=[...byA.values()].map(a=>({...a,prom:(a.asistencias/useCols.length),pct:a.cap?((a.asistencias/a.cap)*100):0})).sort((a,b)=>b.prom-a.prom);
-  return {totalPersonas:rows.length,totalClases:useCols.length,promedio:useCols.length?(ta/useCols.length):0,faltas:faltas.sort((a,b)=>b.faltas-a.faltas),areas};
+  return {totalPersonas:rows.length,totalClases:useCols.length,minutosClase:useCols.length*30,promedio:useCols.length?(ta/useCols.length):0,faltas:faltas.sort((a,b)=>b.faltas-a.faltas),areas};
 }
 function faltasBuckets(items){
   const b={1:0,2:0,3:0,4:0};
@@ -702,6 +702,7 @@ function render(){ const rows=normAC(acRows); const areaProjectCounts=countProje
         <div class="areas-kpi-box"><div class="kpi-mini-title">Participantes</div><div class="kpi-mini-value">${fmt(summary.totalPersonas)}</div><div class="kpi-mini-sub">Participantes</div></div>
         <div class="areas-kpi-box"><div class="kpi-mini-title">Promedio de participantes</div><div class="kpi-mini-value">${fmt(Math.ceil(summary.promedio||0))}</div><div class="kpi-mini-sub">Por clase registrada</div></div>
         <div class="areas-kpi-box"><div class="kpi-mini-title">Clases</div><div class="kpi-mini-value">${fmt(summary.totalClases)}</div><div class="kpi-mini-sub">Fechas de control</div></div>
+        <div class="areas-kpi-box"><div class="kpi-mini-title">Minutos de clase</div><div class="kpi-mini-value">${fmt(summary.minutosClase||0)} min</div><div class="kpi-mini-sub">${fmt(summary.totalClases)} clases x 30 min</div></div>
       </div>
       <div>${areaStackedBars(summary.areas)}</div>
     </div>
