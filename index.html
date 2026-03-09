@@ -1222,15 +1222,16 @@
             gap: 8px;
         }
 
-        /* --- MODAL KANBAN --- */
+        /* --- MODAL SPRINT --- */
         #kanban-modal {
             display: none;
             position: fixed;
             z-index: 5000;
-            left: 0; top: 0;
-            width: 100%; height: 100%;
+            inset: 0;
             overflow: auto;
-            background-color: rgba(0,0,0,0.6);
+            background: rgba(15,23,42,0.55);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
         }
 
         /* Gantt modal shares kanban-content styling but needs its own overlay id */
@@ -1238,100 +1239,260 @@
             display: none;
             position: fixed;
             z-index: 5000;
-            left: 0; top: 0;
-            width: 100%; height: 100%;
+            inset: 0;
             overflow: auto;
-            background-color: rgba(0,0,0,0.6);
+            background: rgba(15,23,42,0.55);
+            backdrop-filter: blur(4px);
         }
 
         .kanban-content {
-            background-color: #fefefe;
-            margin: 3% auto;
-            padding: 20px 25px;
-            border-radius: 8px;
-            width: 90%;
-            max-width: 1200px;
+            background: linear-gradient(135deg, #f8fafc 0%, #eef2ff 100%);
+            margin: 2% auto;
+            padding: 0;
+            border-radius: 16px;
+            width: 94%;
+            max-width: 1300px;
             position: relative;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+            overflow: hidden;
         }
 
-        #kanban-modal .modal-close {
-            top: 15px;
-            right: 25px;
+        .sprint-header {
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%);
+            padding: 24px 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
+        .sprint-header-left {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+        .sprint-header-icon {
+            width: 44px; height: 44px;
+            background: rgba(255,255,255,0.12);
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px;
+        }
+        .sprint-header h2 {
+            margin: 0;
+            color: #fff;
+            font-size: 1.35rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+        .sprint-header-sub {
+            color: rgba(255,255,255,0.6);
+            font-size: 0.8rem;
+            margin-top: 2px;
+        }
+        .sprint-close-btn {
+            width: 36px; height: 36px;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            border-radius: 10px;
+            color: rgba(255,255,255,0.7);
+            font-size: 22px;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.2s;
+        }
+        .sprint-close-btn:hover {
+            background: rgba(255,255,255,0.2);
+            color: #fff;
+        }
+
+        /* KPI summary strip */
+        .sprint-kpi-strip {
+            display: flex;
+            gap: 0;
+            background: #fff;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .sprint-kpi {
+            flex: 1;
+            padding: 16px 20px;
+            text-align: center;
+            border-right: 1px solid #f1f5f9;
+        }
+        .sprint-kpi:last-child { border-right: none; }
+        .sprint-kpi-value {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #0f172a;
+            line-height: 1;
+        }
+        .sprint-kpi-label {
+            font-size: 0.7rem;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-top: 4px;
+            font-weight: 600;
+        }
+        .sprint-kpi-value.kpi-green { color: #059669; }
+        .sprint-kpi-value.kpi-amber { color: #d97706; }
+        .sprint-kpi-value.kpi-red { color: #dc2626; }
+        .sprint-kpi-value.kpi-blue { color: #2563eb; }
 
         .kanban-board {
             display: flex;
-            gap: 15px;
-            justify-content: space-between;
-            min-height: 500px;
-            margin-top: 15px;
+            gap: 0;
+            min-height: 420px;
+            padding: 0;
         }
 
         .kanban-column {
             flex: 1;
-            background-color: #e9ecef;
-            border-radius: 5px;
-            padding: 10px;
+            padding: 20px 16px;
             display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            align-content: flex-start;
-            max-height: 60vh;
+            flex-direction: column;
+            gap: 10px;
+            max-height: 65vh;
             overflow-y: auto;
+            border-right: 1px solid #e2e8f0;
+        }
+        .kanban-column:last-child { border-right: none; }
+        .kanban-column.col-prev { background: #fafbfc; }
+        .kanban-column.col-current { background: #eff6ff; }
+        .kanban-column.col-next { background: #f0fdf4; }
+
+        .sprint-col-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding-bottom: 12px;
+            margin-bottom: 4px;
+            border-bottom: 2px solid rgba(0,0,0,0.06);
+            position: sticky;
+            top: -20px;
+            z-index: 10;
+            background: inherit;
+            padding-top: 4px;
+        }
+        .sprint-col-icon {
+            width: 32px; height: 32px;
+            border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 15px;
+            flex-shrink: 0;
+        }
+        .col-prev .sprint-col-icon { background: #f1f5f9; color: #64748b; }
+        .col-current .sprint-col-icon { background: #dbeafe; color: #2563eb; }
+        .col-next .sprint-col-icon { background: #dcfce7; color: #16a34a; }
+
+        .sprint-col-title {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #0f172a;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+        .sprint-col-dates {
+            font-size: 0.7rem;
+            color: #64748b;
+            font-weight: 500;
+        }
+        .sprint-col-count {
+            margin-left: auto;
+            background: rgba(0,0,0,0.07);
+            color: #334155;
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 20px;
         }
 
-        .kanban-column h3 {
-            text-align: center;
-            margin-top: 5px;
-            margin-bottom: 10px;
-            color: #495057;
-            font-family: 'Inter', sans-serif;
-            text-transform: uppercase;
-            font-size: 14px;
-            border-bottom: 2px solid #ced4da;
-            padding-bottom: 5px;
-            position: sticky;
-            top: -10px;
-            background-color: #e9ecef;
-            z-index: 10;
-            width: 100%;
-            order: -1;
+        .sprint-status-group {
+            margin-bottom: 4px;
         }
+        .sprint-status-label {
+            font-size: 0.68rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            padding: 6px 10px;
+            border-radius: 6px;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .sprint-status-label.st-terminado { background: #dcfce7; color: #166534; }
+        .sprint-status-label.st-en-proceso { background: #fef3c7; color: #92400e; }
+        .sprint-status-label.st-pendiente { background: #fee2e2; color: #991b1b; }
+        .sprint-status-dot {
+            width: 7px; height: 7px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        .st-terminado .sprint-status-dot { background: #22c55e; }
+        .st-en-proceso .sprint-status-dot { background: #f59e0b; }
+        .st-pendiente .sprint-status-dot { background: #ef4444; }
 
         .kanban-card {
-            background-color: white;
-            border-radius: 4px;
-            padding: 10px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            font-size: 11px;
-            cursor: grab;
-            width: calc(50% - 4px);
+            background: #fff;
+            border-radius: 10px;
+            padding: 14px 16px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+            font-size: 0.78rem;
+            cursor: default;
+            width: 100%;
             box-sizing: border-box;
+            border-left: 4px solid transparent;
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+        .kanban-card:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
 
         .kanban-card .card-title {
-            font-weight: bold;
-            margin-bottom: 5px;
-            font-size: 12px;
-            color: #333;
-            overflow-wrap: break-word;
-            word-break: break-word;
-            hyphens: auto;
+            font-weight: 700;
+            margin-bottom: 8px;
+            font-size: 0.82rem;
+            color: #0f172a;
+            line-height: 1.35;
         }
 
+        .card-meta-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4px 12px;
+        }
         .kanban-card .card-detail {
-            color: #555;
-            margin-bottom: 3px;
-            overflow-wrap: break-word;
-            word-break: break-word;
+            color: #64748b;
+            margin-bottom: 0;
+            font-size: 0.72rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 4px;
+            line-height: 1.4;
+        }
+        .kanban-card .card-detail strong {
+            color: #475569;
+            font-weight: 600;
+            white-space: nowrap;
         }
 
-        .kanban-card.color-1 { border-left: 4px solid #6f42c1; }
-        .kanban-card.color-2 { border-left: 4px solid #20c997; }
-        .kanban-card.color-3 { border-left: 4px solid #fd7e14; }
-        .kanban-card.color-4 { border-left: 4px solid #0dcaf0; }
-        .kanban-card.color-5 { border-left: 4px solid #ffc107; }
+        .kanban-card.card-terminado { border-left-color: #22c55e; }
+        .kanban-card.card-en-proceso { border-left-color: #f59e0b; }
+        .kanban-card.card-pendiente { border-left-color: #ef4444; }
+
+        .sprint-empty {
+            text-align: center;
+            padding: 32px 16px;
+            color: #94a3b8;
+            font-size: 0.82rem;
+            width: 100%;
+        }
+        .sprint-empty-icon {
+            font-size: 2rem;
+            margin-bottom: 8px;
+            opacity: 0.5;
+        }
 
         /* RESPONSIVE */
         @media (max-width: 992px) {
@@ -1381,18 +1542,25 @@
             }
 
             .kanban-content {
-                width: 95%;
-                margin: 5% auto;
-                padding: 15px;
+                width: 98%;
+                margin: 2% auto;
+                padding: 0;
             }
 
             .kanban-board {
                 flex-direction: column;
                 min-height: auto;
-                gap: 20px;
+                gap: 0;
             }
 
-            .kanban-column { max-height: 300px; }
+            .kanban-column { max-height: 350px; border-right: none; border-bottom: 1px solid #e2e8f0; }
+            .kanban-column:last-child { border-bottom: none; }
+
+            .sprint-kpi-strip { flex-wrap: wrap; }
+            .sprint-kpi { flex: 1 1 50%; border-bottom: 1px solid #f1f5f9; }
+
+            .sprint-header { padding: 16px 20px; }
+            .sprint-header h2 { font-size: 1.1rem; }
 
             .summary-actions {
                 width: 100%;
@@ -1492,7 +1660,7 @@
 
                 <div class="summary-actions">
                     <button id="gantt-button">Gantt</button>
-                    <button id="kanban-button">Kanban</button>
+                    <button id="kanban-button">Sprint</button>
                     <button id="acambio-button">Agentes de cambio</button>
                 </div>
             </div>
@@ -1836,21 +2004,24 @@
     </div>
 </div>
 
-<!-- MODAL KANBAN -->
+<!-- MODAL SPRINT -->
 <div id="kanban-modal">
     <div class="kanban-content">
-        <span class="modal-close" id="kanban-modal-close-button">&times;</span>
-        <h2>Vista Kanban</h2>
+        <div class="sprint-header">
+            <div class="sprint-header-left">
+                <div class="sprint-header-icon">&#9889;</div>
+                <div>
+                    <h2>Sprint Semanal</h2>
+                    <div class="sprint-header-sub" id="sprint-header-dates"></div>
+                </div>
+            </div>
+            <button class="sprint-close-btn" id="kanban-modal-close-button">&times;</button>
+        </div>
+        <div class="sprint-kpi-strip" id="sprint-kpi-strip"></div>
         <div class="kanban-board">
-            <div class="kanban-column" id="kanban-col-estacionamiento">
-                <h3>Estacionamiento</h3>
-            </div>
-            <div class="kanban-column" id="kanban-col-en-proceso">
-                <h3>En proceso</h3>
-            </div>
-            <div class="kanban-column" id="kanban-col-terminado">
-                <h3>Terminado</h3>
-            </div>
+            <div class="kanban-column col-prev" id="kanban-col-estacionamiento"></div>
+            <div class="kanban-column col-current" id="kanban-col-en-proceso"></div>
+            <div class="kanban-column col-next" id="kanban-col-terminado"></div>
         </div>
     </div>
 </div>
@@ -1871,12 +2042,12 @@
 
 <script>
 const SHEET_ID    = '1lRBoAr2JN2elTtB9QgmvIYNIq1zsxvBENpuwzjIuZt4';
+const SHEET_NAME_DATOS = 'Datos';
 const SHEET_NAME_BD = 'Bd';
-const SHEET_NAME_KANBAN = 'Kanban';
 const SHEET_NAME_ACAMBIO = 'A_cambio';
 const SHEET_NAME_UCOFACO = 'U_cofaco';
 
-const HORAS_COLUMN_NAME = 'HRS PROY.(AÑO)';
+const HORAS_COLUMN_NAME = 'HRS PROY.(A\u00d1O)';
 const HORAS_ACTUAL_COLUMN_NAME = 'HRS AHORRADO (ACTUAL)';
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -1887,7 +2058,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const showError = (msg) => { $error.textContent = msg; $error.style.display = 'block'; };
 
     let allRowsData = [];
-    let kanbanData = [];
     let aCambioData = [];
     let ucofacoData = [];
     let processedStats = {};
@@ -2318,6 +2488,58 @@ document.addEventListener('DOMContentLoaded', () => {
                 o[h] = cell && (cell.v !== null && cell.v !== undefined) ? cell.v : '';
             });
             return o;
+        });
+    }
+
+    function canonicalHeaderKey(value) {
+        return String(value || '')
+            .toUpperCase()
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .replace(/[^A-Z0-9]+/g, '');
+    }
+
+    function normalizeRowsForIndex(rows) {
+        const safeRows = Array.isArray(rows) ? rows : [];
+        return safeRows.map(row => {
+            const raw = row || {};
+            const keyMap = {};
+            Object.keys(raw).forEach(k => {
+                const c = canonicalHeaderKey(k);
+                if (!c) return;
+                if (keyMap[c] === undefined) keyMap[c] = k;
+            });
+
+            const pick = (candidates) => {
+                for (const candidate of candidates) {
+                    const mapKey = keyMap[canonicalHeaderKey(candidate)];
+                    if (mapKey === undefined) continue;
+                    const value = raw[mapKey];
+                    if (value === undefined || value === null) continue;
+                    if (String(value).trim() === '') continue;
+                    return value;
+                }
+                return '';
+            };
+
+            const normalized = { ...raw };
+            normalized.ESTADO = pick(['ESTADO', 'ESTADO_PROYECTO', 'ESTADO_TAREA', 'ESTADO_SUBTAREA']);
+            normalized['F.INICIO'] = pick(['F.INICIO', 'F_INCIO_PROYECTO', 'F_INICIO_PROYECTO', 'F_INCIO_TAREA', 'F_INICIO_TAREA', 'F_INCIO_SUBTAREA', 'F_INICIO_SUBTAREA']);
+            normalized['F.FIN'] = pick(['F.FIN', 'F_FIN_PROYECTO', 'F_FIN_TAREA', 'F_FIN_SUBTAREA']);
+            normalized.A_CAMBIO = pick(['A_CAMBIO', 'A.CAMBIO', 'A CAMBIO']);
+            normalized.EJECUTOR = pick(['EJECUTOR', 'RESPONSABLE']);
+            normalized.TAREA = pick(['TAREA', 'SUBTAREA']);
+            normalized[HORAS_COLUMN_NAME] = pick(['HRS_PROY_AÑO', 'HRS_PROY_ANO', 'HRS PROY.(A\u00d1O)', 'HRS PROY.(ANO)', 'HRS PROY A\u00d1O', 'HRS PROY ANO', 'HRS PROY']);
+            normalized[HORAS_ACTUAL_COLUMN_NAME] = pick(['HRS_AHORRADO_ACTUAL', 'HRS AHORRADO (ACTUAL)', 'HRS AHORRADO (Actual)', 'HRS AHORRADO ACTUAL']);
+
+            if (!String(normalized.OBSERVACION || '').trim()) {
+                normalized.OBSERVACION = pick(['OBSERVACION', 'QUE_SOLUCIONO_TAREA', 'QUE_SOLUCIONO', 'QUE SOLUCIONO TAREA', 'QUE SOLUCIONO']);
+            }
+            if (!String(normalized.HERRAMIENTA || '').trim()) {
+                normalized.HERRAMIENTA = pick(['HERRAMIENTA', 'TIPO_TAREA', 'TIPO_PROYECTO', 'TIPO_SUBTAREA', 'TIPO']);
+            }
+
+            return normalized;
         });
     }
 
@@ -2846,7 +3068,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 `).join('')}
             </ul>
             <div class="acambio-top-actions">
-                <button class="acambio-open-detail" data-chart="${escapeHtml(key)}">Ver detalle</button>
+                <button class="acambio-open-detail" data-chart="${escapeHtml(key === 'agentes' ? 'agentes_todos' : key)}">${key === 'agentes' ? 'Ver todos' : 'Ver detalle'}</button>
             </div>
         `;
     }
@@ -2951,6 +3173,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return {
                 totalPersonas: 0,
                 totalClases: 0,
+                minutosClase: 0,
                 promedioParticipantes: 0,
                 faltasPorPersona: [],
                 areaStats: []
@@ -3001,6 +3224,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return {
             totalPersonas,
             totalClases,
+            minutosClase: totalClases * 30,
             promedioParticipantes,
             faltasPorPersona,
             areaStats
@@ -3060,6 +3284,11 @@ document.addEventListener('DOMContentLoaded', () => {
                         <div class="ucofaco-kpi-value">${formatNumber(s.totalClases)}</div>
                         <div class="ucofaco-kpi-sub">Fechas de control</div>
                     </div>
+                    <div class="ucofaco-kpi-card">
+                        <div class="ucofaco-kpi-label">Minutos de clase</div>
+                        <div class="ucofaco-kpi-value">${formatNumber(s.minutosClase)} min</div>
+                        <div class="ucofaco-kpi-sub">${formatNumber(s.totalClases)} clases x 30 min</div>
+                    </div>
                 </div>
                 <div class="ucofaco-grid">
                     <div class="ucofaco-card">
@@ -3091,6 +3320,7 @@ document.addEventListener('DOMContentLoaded', () => {
             areas: 'Top Areas por ahorro',
             tipos: 'Top Tipos por ahorro',
             agentes: 'Top Agentes de cambio',
+            agentes_todos: 'Todos los agentes de cambio',
             meses: 'Top Meses por ahorro'
         };
         $acambioChartModalTitle.textContent = `Detalle: ${titles[chartKey] || 'Agentes de cambio'}`;
@@ -3128,7 +3358,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const topAreas = aggregateACambio(rows, 'area').slice(0, 7);
         const topTipos = aggregateACambio(rows, 'tipo').slice(0, 7);
-        const topAgentes = aggregateTopAgentesWithArea(rows, 7);
+        const topAgentes = aggregateTopAgentesWithArea(rows, 10);
+        const allAgentes = aggregateTopAgentesWithArea(rows, 9999);
         const topMeses = aggregateACambio(rows, 'mes').slice(0, 7);
 
         const rowsSorted = rows.slice().sort((a, b) => (b.ahorroMin - a.ahorroMin));
@@ -3137,6 +3368,7 @@ document.addEventListener('DOMContentLoaded', () => {
             areas: topAreas,
             tipos: topTipos,
             agentes: topAgentes,
+            agentes_todos: allAgentes,
             meses: topMeses
         };
 
@@ -3297,46 +3529,162 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // === KANBAN ===
-    function displayKanbanModal() {
-        if (!kanbanData || kanbanData.length === 0) {
-            showError("No se encontraron datos en la hoja 'Kanban' o aún no se han cargado.");
+    // === SPRINT SEMANAL ===
+    function getWeekStartMonday(date) {
+        const d = new Date(date);
+        d.setHours(0, 0, 0, 0);
+        const day = (d.getDay() + 6) % 7;
+        d.setDate(d.getDate() - day);
+        return d;
+    }
+
+    function addDays(date, days) {
+        const d = new Date(date);
+        d.setDate(d.getDate() + days);
+        return d;
+    }
+
+    function normalizeSprintStatus(value) {
+        const raw = String(value || '').trim().toLowerCase();
+        if (raw.includes('termin')) return 'terminado';
+        if (raw.includes('proceso')) return 'en proceso';
+        if (raw.includes('pend')) return 'pendiente';
+        if (raw.includes('estacion')) return 'pendiente';
+        return 'pendiente';
+    }
+
+    function buildSprintItems(rows) {
+        const safeRows = Array.isArray(rows) ? rows : [];
+        return safeRows.map(row => {
+            const tarea = String(row.TAREA || row.SUBTAREA || '').trim();
+            if (!tarea) return null;
+
+            const proyecto = String(row.PROYECTO || '').trim();
+            const area = String(row.AREA || '').trim();
+            const estado = normalizeSprintStatus(row.ESTADO || row.ESTADO_PROYECTO || row.ESTADO_SUBTAREA);
+            const agente = String(row.A_CAMBIO || row['A.CAMBIO'] || row['A CAMBIO'] || '').trim();
+            const ejecutor = String(row.EJECUTOR || row.RESPONSABLE || '').trim();
+            const inicio = parseDateValue(row['F.INICIO'] || row['F_INCIO_TAREA'] || row['F_INCIO_SUBTAREA'] || row['F_INCIO_PROYECTO']);
+            const fin = parseDateValue(row['F.FIN'] || row['F_FIN_TAREA'] || row['F_FIN_SUBTAREA'] || row['F_FIN_PROYECTO']);
+
+            return { tarea, proyecto, area, estado, agente, ejecutor, inicio, fin };
+        }).filter(Boolean);
+    }
+
+    function itemBelongsToWeek(item, weekStart, weekEnd) {
+        const start = item.inicio;
+        const end = item.fin;
+
+        if (item.estado === 'terminado') {
+            if (end) return end >= weekStart && end <= weekEnd;
+            if (start) return start >= weekStart && start <= weekEnd;
+            return false;
+        }
+
+        if (start && end) return start <= weekEnd && end >= weekStart;
+        if (start) return start >= weekStart && start <= weekEnd;
+        if (end) return end >= weekStart && end <= weekEnd;
+        return false;
+    }
+
+    function renderSprintColumn(targetEl, title, weekStart, weekEnd, items, iconSymbol) {
+        const inWeek = (items || []).filter(item => itemBelongsToWeek(item, weekStart, weekEnd));
+        const byStatusOrder = ['en proceso', 'pendiente', 'terminado'];
+        const statusLabel = { 'pendiente': 'Pendiente', 'en proceso': 'En proceso', 'terminado': 'Terminado' };
+        const statusCssClass = { 'pendiente': 'st-pendiente', 'en proceso': 'st-en-proceso', 'terminado': 'st-terminado' };
+        const cardClass = { 'pendiente': 'card-pendiente', 'en proceso': 'card-en-proceso', 'terminado': 'card-terminado' };
+
+        let html = `
+            <div class="sprint-col-header">
+                <div class="sprint-col-icon">${iconSymbol || '&#128197;'}</div>
+                <div>
+                    <div class="sprint-col-title">${escapeHtml(title)}</div>
+                    <div class="sprint-col-dates">${escapeHtml(formatShortDate(weekStart))} — ${escapeHtml(formatShortDate(weekEnd))}</div>
+                </div>
+                <div class="sprint-col-count">${inWeek.length}</div>
+            </div>
+        `;
+
+        if (inWeek.length === 0) {
+            html += `<div class="sprint-empty"><div class="sprint-empty-icon">&#128203;</div>Sin actividades para esta semana</div>`;
+            targetEl.innerHTML = html;
             return;
         }
 
-        $kanbanColEstacionamiento.innerHTML = '<h3>Estacionamiento</h3>';
-        $kanbanColEnProceso.innerHTML = '<h3>En proceso</h3>';
-        $kanbanColTerminado.innerHTML = '<h3>Terminado</h3>';
+        byStatusOrder.forEach(statusKey => {
+            const itemsByStatus = inWeek.filter(item => item.estado === statusKey);
+            if (itemsByStatus.length === 0) return;
 
-        let colorIndex = 1;
+            html += `<div class="sprint-status-group">`;
+            html += `<div class="sprint-status-label ${statusCssClass[statusKey]}"><span class="sprint-status-dot"></span> ${statusLabel[statusKey]} (${itemsByStatus.length})</div>`;
 
-        kanbanData.forEach(row => {
-            const estadoLower = (row.ESTADO || '').toLowerCase();
-            let targetColumn;
+            itemsByStatus.forEach(item => {
+                html += `
+                    <div class="kanban-card ${cardClass[statusKey]}">
+                        <div class="card-title">${escapeHtml(item.tarea || 'Sin tarea')}</div>
+                        <div class="card-meta-grid">
+                            <div class="card-detail"><strong>Proyecto</strong> ${escapeHtml(item.proyecto || '-')}</div>
+                            <div class="card-detail"><strong>Área</strong> ${escapeHtml(item.area || '-')}</div>
+                            <div class="card-detail"><strong>Agente</strong> ${escapeHtml(item.agente || '-')}</div>
+                            <div class="card-detail"><strong>Ejecutor</strong> ${escapeHtml(item.ejecutor || '-')}</div>
+                        </div>
+                    </div>
+                `;
+            });
 
-            if (estadoLower === 'estacionamiento') targetColumn = $kanbanColEstacionamiento;
-            else if (estadoLower === 'en proceso') targetColumn = $kanbanColEnProceso;
-            else if (estadoLower === 'terminado') targetColumn = $kanbanColTerminado;
-            else return;
-
-            const card = document.createElement('div');
-            card.className = `kanban-card color-${colorIndex}`;
-
-            card.innerHTML = `
-                <div class="card-title">${row.TAREA || 'Sin Tarea'}</div>
-                <div class="card-detail">Area: ${row.AREA || 'N/A'}</div>
-                <div class="card-detail">Responsable: ${row.RESPONSABLE || 'N/A'}</div>
-            `;
-
-            targetColumn.appendChild(card);
-            colorIndex = (colorIndex % 5) + 1;
+            html += `</div>`;
         });
+
+        targetEl.innerHTML = html;
+    }
+
+    function displaySprintModal() {
+        if (!allRowsData || allRowsData.length === 0) {
+            showError("No hay datos disponibles para construir el sprint semanal.");
+            return;
+        }
+
+        const sprintItems = buildSprintItems(allRowsData);
+        const now = new Date();
+        const currentStart = getWeekStartMonday(now);
+        const prevStart = addDays(currentStart, -7);
+        const nextStart = addDays(currentStart, 7);
+        const prevEnd = addDays(prevStart, 6);
+        const currentEnd = addDays(currentStart, 6);
+        const nextEnd = addDays(nextStart, 6);
+
+        // Update header dates
+        const $headerDates = document.getElementById('sprint-header-dates');
+        if ($headerDates) $headerDates.textContent = `${formatShortDate(prevStart)} — ${formatShortDate(nextEnd)}`;
+
+        // Build KPI strip
+        const prevItems = sprintItems.filter(item => itemBelongsToWeek(item, prevStart, prevEnd));
+        const currItems = sprintItems.filter(item => itemBelongsToWeek(item, currentStart, currentEnd));
+        const nextItems = sprintItems.filter(item => itemBelongsToWeek(item, nextStart, nextEnd));
+        const totalWeekItems = currItems.length;
+        const terminados = currItems.filter(i => i.estado === 'terminado').length;
+        const enProceso = currItems.filter(i => i.estado === 'en proceso').length;
+        const pendientes = currItems.filter(i => i.estado === 'pendiente').length;
+
+        const $kpiStrip = document.getElementById('sprint-kpi-strip');
+        if ($kpiStrip) {
+            $kpiStrip.innerHTML = `
+                <div class="sprint-kpi"><div class="sprint-kpi-value kpi-blue">${totalWeekItems}</div><div class="sprint-kpi-label">Esta semana</div></div>
+                <div class="sprint-kpi"><div class="sprint-kpi-value kpi-green">${terminados}</div><div class="sprint-kpi-label">Terminados</div></div>
+                <div class="sprint-kpi"><div class="sprint-kpi-value kpi-amber">${enProceso}</div><div class="sprint-kpi-label">En proceso</div></div>
+                <div class="sprint-kpi"><div class="sprint-kpi-value kpi-red">${pendientes}</div><div class="sprint-kpi-label">Pendientes</div></div>
+            `;
+        }
+
+        renderSprintColumn($kanbanColEstacionamiento, 'Semana pasada', prevStart, prevEnd, sprintItems, '&#9664;');
+        renderSprintColumn($kanbanColEnProceso, 'Esta semana', currentStart, currentEnd, sprintItems, '&#9733;');
+        renderSprintColumn($kanbanColTerminado, 'Semana siguiente', nextStart, nextEnd, sprintItems, '&#9654;');
 
         $kanbanModal.style.display = 'block';
     }
 
-    function setupKanbanModalListeners() {
-        $kanbanButton.addEventListener('click', displayKanbanModal);
+    function setupSprintModalListeners() {
+        $kanbanButton.addEventListener('click', displaySprintModal);
         $kanbanModalClose.addEventListener('click', () => $kanbanModal.style.display = 'none');
         $kanbanModal.addEventListener('click', (e) => {
             if (e.target === $kanbanModal) $kanbanModal.style.display = 'none';
@@ -3345,40 +3693,44 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- FLUJO PRINCIPAL ---
     showLoading();
-    loadSheetJSONP(SHEET_ID, SHEET_NAME_BD)
-        .then(rowsBd => {
-            if (!Array.isArray(rowsBd)) throw new Error(`La hoja "${SHEET_NAME_BD}" no devolvió datos válidos.`);
-            allRowsData = rowsBd;
+    const loadingFailsafe = setTimeout(() => {
+        try {
+            if ($loading && $loading.style.display !== 'none') {
+                hideLoading();
+                showError('Tiempo de espera agotado al cargar datos. Verifica conexión y permisos de la hoja.');
+                console.error('[Loading Failsafe] La carga excedió el tiempo esperado.');
+            }
+        } catch (e) {
+            console.error('[Loading Failsafe Error]', e);
+        }
+    }, 30000);
+
+    loadSheetJSONP(SHEET_ID, SHEET_NAME_DATOS)
+        .catch(errDatos => {
+            console.warn(`[Datos] No se pudo cargar la hoja "${SHEET_NAME_DATOS}". Se intentará "${SHEET_NAME_BD}".`, errDatos);
+            return loadSheetJSONP(SHEET_ID, SHEET_NAME_BD);
+        })
+        .then(rowsMain => {
+            if (!Array.isArray(rowsMain)) throw new Error('La hoja principal no devolvió datos válidos.');
+            allRowsData = normalizeRowsForIndex(rowsMain);
             updateMapWithData(allRowsData);
             setupDetailsModalListeners();
             return Promise.all([
-                loadSheetJSONP(SHEET_ID, SHEET_NAME_KANBAN).catch(() => []),
                 loadSheetJSONP(SHEET_ID, SHEET_NAME_ACAMBIO).catch(() => []),
                 loadSheetJSONP(SHEET_ID, SHEET_NAME_UCOFACO).catch(() => [])
             ]);
         })
-        .then(([rowsKanban, rowsACambio, rowsUcofaco]) => {
-            if (!Array.isArray(rowsKanban)) {
-                kanbanData = [];
-            } else {
-                kanbanData = rowsKanban;
-            }
-            if (!Array.isArray(rowsACambio)) {
-                aCambioData = [];
-            } else {
-                aCambioData = rowsACambio;
-            }
-            if (!Array.isArray(rowsUcofaco)) {
-                ucofacoData = [];
-            } else {
-                ucofacoData = rowsUcofaco;
-            }
-            setupKanbanModalListeners();
+        .then(([rowsACambio, rowsUcofaco]) => {
+            aCambioData = Array.isArray(rowsACambio) ? rowsACambio : [];
+            ucofacoData = Array.isArray(rowsUcofaco) ? rowsUcofaco : [];
+            setupSprintModalListeners();
             setupACambioSheetListeners();
+            clearTimeout(loadingFailsafe);
             hideLoading();
             alignColumnHeights();
         })
         .catch(err => {
+            clearTimeout(loadingFailsafe);
             hideLoading();
             alignColumnHeights();
             console.error('[GViz JSONP Error]', err);
@@ -3387,412 +3739,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     window.addEventListener('resize', alignColumnHeights);
 });
-</script>
-
-<!-- Embebido: vista Gantt (ahora modal) -->
-<div id="gantt-modal" style="display:none;">
-    <div class="kanban-content" style="max-width:1200px;width:95%;padding:20px;background:#ffffff;position:relative;max-height:86vh;overflow:auto;border-radius:10px;">
-        <span class="modal-close" id="gantt-close">&times;</span>
-    <div class="mb-6 flex justify-between items-center">
-        <div>
-            <h1 class="text-2xl font-bold text-slate-800">Panel de Control Maestro (Gantt)</h1>
-            <p class="text-slate-500">Gestión por Áreas y Cronograma Q1</p>
-        </div>
-        <div class="space-x-2">
-            <button id="gantt-back" class="bg-white border border-slate-200 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-slate-50">Volver</button>
-            <button id="gantt-open-window" class="bg-white border border-slate-200 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-slate-50">Abrir en ventana</button>
-            <button id="gantt-fit" class="bg-white border border-slate-200 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-slate-50">Ajustar ancho</button>
-            <button onclick="toggleAll(true)" class="bg-white border border-slate-200 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-slate-50">Expandir</button>
-            <button onclick="toggleAll(false)" class="bg-white border border-slate-200 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-slate-50">Contraer</button>
-        </div>
-    </div>
-
-    <div class="gantt-viewport overflow-x-auto shadow-xl rounded-xl border border-slate-200">
-        <div class="gantt-grid" id="mainGrid">
-            <!-- FILA 1: CABECERAS DE MESES -->
-            <div class="header-cell sticky-1"></div>
-            <div class="header-cell sticky-2">DATOS</div>
-            <div class="header-cell">GENERALES</div>
-            <div class="header-cell">DEL</div>
-            <div class="header-cell">PROYECTO</div>
-            <div class="header-cell">TAREA</div>
-            <div class="header-cell"> </div>
-            <div class="header-cell bg-blue-900" style="grid-column: span 4;">ENERO</div>
-            <div class="header-cell bg-indigo-900" style="grid-column: span 4;">FEBRERO</div>
-            <div class="header-cell bg-slate-800" style="grid-column: span 5;">MARZO</div>
-
-            <!-- FILA 2: TITULOS DE COLUMNAS REQUERIDOS -->
-            <div class="header-cell sticky-1 bg-slate-100 !text-slate-800"></div>
-            <div class="header-cell sticky-2 bg-slate-100 !text-slate-800">AREA</div>
-            <div class="header-cell bg-slate-100 !text-slate-800">TIPO</div>
-            <div class="header-cell bg-slate-100 !text-slate-800">F. INICIO</div>
-            <div class="header-cell bg-slate-100 !text-slate-800">PROYECTO</div>
-            <div class="header-cell bg-slate-100 !text-slate-800">TAREA</div>
-            <div class="header-cell bg-slate-100 !text-slate-800">EJECUTOR</div>
-            <div class="header-cell bg-slate-100 !text-slate-800">ESTADO</div>
-            <!-- Semanas S01 a S13 -->
-            <script>
-                for(let i=1; i<=13; i++) {
-                    document.write(`<div class="header-cell bg-slate-50 !text-slate-500 !font-medium border-slate-200">S${i.toString().padStart(2, '0')}</div>`);
-                }
-            </script>
-
-            <!-- CONTENIDO DINÁMICO -->
-        </div>
-    </div>
-
-    <script>
-        // Gantt embedded script (based on gantt.html) - adjusted to expose render as window.ganttRender
-        const projectData = [
-            {
-                id: "p1",
-                area: "HILANDERIA",
-                tipo: "PROYECTO",
-                inicio: "14/01",
-                nombre: "Digitalización y sistematización de planta",
-                ejecutor: "EO",
-                expanded: true,
-                tasks: [
-                    { tipo: "Proceso", inicio: "14/01", nombre: "Revisión y análisis de situación actual", ejecutor: "EO", gantt: [1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] },
-                    { tipo: "Digital", inicio: "21/01", nombre: "App capacidades de producción", ejecutor: "EO", gantt: [0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0] },
-                    { tipo: "Digital", inicio: "04/02", nombre: "Gantt de producción por máquinas", ejecutor: "EO", gantt: [0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0] },
-                    { tipo: "Digital", inicio: "18/02", nombre: "Sistematización de Hoja de Ruta", ejecutor: "EO", gantt: [0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0] },
-                    { tipo: "Digital", inicio: "25/02", nombre: "Control de piso (Continuas)", ejecutor: "EO", gantt: [0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0] }
-                ]
-            }
-        ];
-
-        let isPainting = false;
-        let paintValue = true;
-        let lastPaintedProject = null;
-
-        window.addEventListener('mouseup', () => {
-            if(isPainting) {
-                isPainting = false;
-                if(lastPaintedProject) {
-                            // restore user-select and refresh master visually
-                            document.body.style.userSelect = '';
-                            refreshMasterForProject(lastPaintedProject);
-                    lastPaintedProject = null;
-                }
-            }
-        });
-
-        function createWeekCellDirect(cell, isOn, pId, taskIndex, weekIndex) {
-            // Populate a pre-created div element with week cell content
-            cell.className = 'data-cell task-row-bg week-cell';
-            cell.dataset.projectId = pId;
-            cell.dataset.taskIndex = taskIndex;
-            cell.dataset.weekIndex = weekIndex;
-            // stable indicator element (no text) to toggle painted state without changing layout
-            const indicator = document.createElement('div');
-            indicator.className = 'gantt-block-indicator';
-            if(isOn) { indicator.classList.add('on'); cell.classList.add('on'); }
-            cell.appendChild(indicator);
-
-            cell.addEventListener('mousedown', (e) => {
-                e.preventDefault();
-                // prevent text selection while painting
-                document.body.style.userSelect = 'none';
-                const p = projectData.find(x => x.id === pId);
-                const current = !!p.tasks[taskIndex].gantt[weekIndex];
-                paintValue = !current;
-                p.tasks[taskIndex].gantt[weekIndex] = paintValue ? 1 : 0;
-                isPainting = true;
-                lastPaintedProject = pId;
-                if(paintValue) { indicator.classList.add('on'); cell.classList.add('on'); } else { indicator.classList.remove('on'); cell.classList.remove('on'); }
-            });
-
-            cell.addEventListener('mouseenter', () => {
-                if(!isPainting) return;
-                const p = projectData.find(x => x.id === pId);
-                p.tasks[taskIndex].gantt[weekIndex] = paintValue ? 1 : 0;
-                lastPaintedProject = pId;
-                if(paintValue) { indicator.classList.add('on'); cell.classList.add('on'); } else { indicator.classList.remove('on'); cell.classList.remove('on'); }
-            });
-        }
-
-        function updateStatusSelectClass(select, value) {
-            select.classList.remove('status-en-proceso','status-terminado','status-pendiente');
-            const v = (value || '').toString().toUpperCase();
-            if(v === 'EN PROCESO') select.classList.add('status-en-proceso');
-            else if(v === 'TERMINADO') select.classList.add('status-terminado');
-            else select.classList.add('status-pendiente');
-        }
-
-        function getProjectSpan(p) {
-            let min = 13, max = -1;
-            p.tasks.forEach(t => {
-                let first = -1, last = -1;
-                for(let i=0;i<t.gantt.length;i++) if(t.gantt[i] === 1) { first = i; break; }
-                for(let i=t.gantt.length-1;i>=0;i--) if(t.gantt[i] === 1) { last = i; break; }
-                if(first !== -1 && first < min) min = first;
-                if(last !== -1 && last > max) max = last;
-            });
-            if(min === 13 || max === -1) return null;
-            return { start: min, end: max };
-        }
-
-        function render() {
-            const grid = document.getElementById('mainGrid');
-            const cols = 21; // 8 fixed cols + 13 weeks
-            const headersCount = cols * 2;
-            while (grid.children.length > headersCount) {
-                grid.removeChild(grid.lastChild);
-            }
-
-            projectData.forEach((p, pIdx) => {
-                const span = getProjectSpan(p);
-
-                const arrowDiv = createCell(grid, p.expanded ? '▼' : '▶', `sticky-1 project-row-bg cursor-pointer justify-center`, () => toggle(p.id));
-                arrowDiv.dataset.projectId = p.id;
-                createCell(grid, p.area, `sticky-2 project-row-bg text-blue-700 font-bold`, () => toggle(p.id));
-                createCell(grid, p.tipo, `project-row-bg text-slate-400 font-medium`, () => toggle(p.id));
-                createCell(grid, p.inicio, `project-row-bg justify-center font-bold`, () => toggle(p.id));
-                const proyectoLabel = p.nombre;
-                createCell(grid, proyectoLabel, `project-row-bg truncate-text`, () => toggle(p.id));
-                const tareaDiv = document.createElement('div');
-                tareaDiv.className = 'data-cell project-row-bg';
-                const select = document.createElement('select');
-                select.className = 'w-full bg-transparent text-slate-800';
-                p.tasks.forEach((t, i) => {
-                    const opt = document.createElement('option');
-                    opt.value = i;
-                    opt.text = t.nombre;
-                    select.appendChild(opt);
-                });
-                tareaDiv.appendChild(select);
-                tareaDiv.onclick = () => toggle(p.id);
-                grid.appendChild(tareaDiv);
-
-                // project status cell (before weeks)
-                createCell(grid, p.ejecutor, `project-row-bg justify-center font-bold`, () => toggle(p.id));
-                const statusCell = createCell(grid, '', `project-row-bg justify-center`, () => toggle(p.id));
-                const projStatus = p.status || 'PENDIENTE';
-                const projSelect = document.createElement('select');
-                projSelect.className = 'status-select';
-                ['PENDIENTE','EN PROCESO','TERMINADO'].forEach(sv => {
-                    const o = document.createElement('option'); o.value = sv; o.text = sv; if(sv === projStatus) o.selected = true; projSelect.appendChild(o);
-                });
-                updateStatusSelectClass(projSelect, projStatus);
-                projSelect.addEventListener('change', (e) => { p.status = e.target.value; updateStatusSelectClass(projSelect, e.target.value); refreshMasterForProject(p.id); });
-                statusCell.appendChild(projSelect);
-
-                // compute project completion % based on tasks status
-                const totalTasks = p.tasks.length || 0;
-                const completedTasks = p.tasks.filter(t => (t.status || '').toString().toUpperCase() === 'TERMINADO').length;
-                const percent = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
-
-                for(let i=0; i<13; i++) {
-                    const cell = createCell(grid, '', `project-row-bg`);
-                    // create stable master container inside the cell to avoid reflows when toggling
-                    const mc = document.createElement('div');
-                    mc.className = 'gantt-master-container';
-                    const inner = document.createElement('div');
-                    inner.className = 'gantt-master-inner';
-                    const label = document.createElement('div');
-                    label.className = 'gantt-master-label';
-                    // show percent on the first week cell, keep project name as tooltip
-                    label.textContent = `${percent}%`;
-                    label.title = p.nombre;
-                    inner.appendChild(label);
-                    mc.appendChild(inner);
-                    cell.appendChild(mc);
-                    // Render master bar fully across weeks (complete bar for project)
-                    inner.classList.add('on');
-                    // show label only on first week
-                    if(i === 0) label.classList.remove('hidden'); else label.classList.add('hidden');
-                }
-
-                // Always render task rows (will toggle visibility by hiding their cells)
-                p.tasks.forEach((t, tIdx) => {
-                    for(let cellIdx = 0; cellIdx < 21; cellIdx++) {
-                        const cell = document.createElement('div');
-                        // annotate for toggling
-                        cell.dataset.projectId = p.id;
-                        cell.dataset.taskIndex = tIdx;
-                        if(cellIdx === 0) { cell.className = 'data-cell sticky-1 task-row-bg'; }
-                        else if(cellIdx === 1) { cell.className = 'data-cell sticky-2 task-row-bg text-slate-400 text-xs'; cell.textContent = p.area; }
-                        else if(cellIdx === 2) { cell.className = 'data-cell task-row-bg text-slate-500 font-medium'; cell.textContent = t.tipo; }
-                        else if(cellIdx === 3) { cell.className = 'data-cell task-row-bg justify-center text-slate-500'; cell.textContent = t.inicio; }
-                        else if(cellIdx === 4) { cell.className = 'data-cell task-row-bg pl-2 text-slate-500 text-sm'; cell.textContent = p.nombre; }
-                        else if(cellIdx === 5) { cell.className = 'data-cell task-row-bg pl-6 text-blue-600 font-medium italic'; cell.textContent = t.nombre; }
-                        else if(cellIdx === 6) { cell.className = 'data-cell task-row-bg justify-center'; cell.textContent = t.ejecutor; }
-                        else if(cellIdx === 7) {
-                            // status select per task
-                            cell.className = 'data-cell task-row-bg justify-center';
-                            const taskStatus = t.status || 'PENDIENTE';
-                            const sel = document.createElement('select');
-                            sel.className = 'status-select';
-                            ['PENDIENTE','EN PROCESO','TERMINADO'].forEach(sv => { const o = document.createElement('option'); o.value = sv; o.text = sv; if(sv===taskStatus) o.selected = true; sel.appendChild(o); });
-                            updateStatusSelectClass(sel, taskStatus);
-                            sel.addEventListener('change', (e) => { t.status = e.target.value; updateStatusSelectClass(sel, e.target.value); refreshMasterForProject(p.id); });
-                            cell.appendChild(sel);
-                        } else {
-                            // Week cells (indices 8-20)
-                            const weekIdx = cellIdx - 8;
-                            createWeekCellDirect(cell, !!t.gantt[weekIdx], p.id, tIdx, weekIdx);
-                        }
-                        // hide task cells if collapsed
-                        if(!p.expanded) cell.style.display = 'none';
-                        grid.appendChild(cell);
-                    }
-                });
-            });
-        }
-
-        function createCell(parent, content, className, clickFn) {
-            const div = document.createElement('div');
-            div.className = `data-cell ${className}`;
-            div.innerHTML = content;
-            if(clickFn) div.onclick = clickFn;
-            parent.appendChild(div);
-            return div;
-        }
-
-        function refreshMasterForProject(pId) {
-            const grid = document.getElementById('mainGrid');
-            const cols = 21;
-            let idx = -1;
-            for(let i=0;i<grid.children.length;i++){
-                const ch = grid.children[i];
-                if(ch.dataset && ch.dataset.projectId === pId) { idx = i; break; }
-            }
-            if(idx === -1) return;
-            const rowStart = Math.floor(idx / cols) * cols;
-            const p = projectData.find(x => x.id === pId);
-            // recompute percent and update master bar (we render full bar across weeks)
-            const totalTasks = p.tasks.length || 0;
-            const completedTasks = p.tasks.filter(t => (t.status || '').toString().toUpperCase() === 'TERMINADO').length;
-            const percent = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
-            for(let w=0; w<13; w++) {
-                const cell = grid.children[rowStart + 8 + w];
-                if(!cell) continue;
-                const inner = cell.querySelector('.gantt-master-inner');
-                const label = cell.querySelector('.gantt-master-label');
-                if(!inner) continue;
-                // ensure master bar is shown
-                inner.classList.add('on');
-                inner.classList.remove('start','end');
-                if(label) {
-                    label.textContent = `${percent}%`;
-                    label.title = p.nombre || '';
-                    if(w === 0) label.classList.remove('hidden'); else label.classList.add('hidden');
-                }
-            }
-        }
-
-        function toggle(id) {
-            const p = projectData.find(x => x.id === id);
-            p.expanded = !p.expanded;
-            const grid = document.getElementById('mainGrid');
-            // Update arrow in master row
-            for(let i=0; i<grid.children.length; i++) {
-                const ch = grid.children[i];
-                if(ch.dataset && ch.dataset.projectId === id && ch.classList.contains('sticky-1')) {
-                    ch.textContent = p.expanded ? '▼' : '▶';
-                    break;
-                }
-            }
-            // Toggle visibility of all task cells for this project
-            const taskCells = grid.querySelectorAll(`[data-project-id="${id}"][data-task-index]`);
-            taskCells.forEach(cell => {
-                cell.style.display = p.expanded ? '' : 'none';
-            });
-        }
-        function toggleAll(val) {
-            projectData.forEach(p => p.expanded = val);
-            const grid = document.getElementById('mainGrid');
-            // Update all master row arrows
-            projectData.forEach(p => {
-                for(let i=0; i<grid.children.length; i++) {
-                    const ch = grid.children[i];
-                    if(ch.dataset && ch.dataset.projectId === p.id && ch.classList.contains('sticky-1')) {
-                        ch.textContent = p.expanded ? '▼' : '▶';
-                        break;
-                    }
-                }
-                // Toggle visibility of all task cells for this project
-                const taskCells = grid.querySelectorAll(`[data-project-id="${p.id}"][data-task-index]`);
-                taskCells.forEach(cell => {
-                    cell.style.display = p.expanded ? '' : 'none';
-                });
-            });
-        }
-
-        // Fit-to-width control
-        let ganttFitEnabled = true;
-        function fitGanttToWidth() {
-            const viewport = document.querySelector('#gantt-modal .gantt-viewport');
-            const grid = document.querySelector('#gantt-modal .gantt-grid');
-            if(!viewport || !grid) return;
-            // reset transform to measure
-            grid.style.transform = 'none';
-            const vw = viewport.clientWidth;
-            const gw = grid.scrollWidth;
-            let scale = 1;
-            if (gw > 0) scale = Math.min(1, vw / gw);
-            grid.style.transform = `scale(${scale})`;
-            // adjust viewport height to scaled grid height so scroll behaves
-            const gridHeight = grid.getBoundingClientRect().height;
-            viewport.style.height = (gridHeight * scale) + 'px';
-        }
-
-        // Exponer la función render para llamarla desde la página principal
-        window.ganttRender = function(){ render(); if (ganttFitEnabled) fitGanttToWidth(); };
-
-        // Toggle fit button
-        document.addEventListener('click', (e) => {
-            if(e.target && e.target.id === 'gantt-fit'){
-                ganttFitEnabled = !ganttFitEnabled;
-                if(ganttFitEnabled) fitGanttToWidth(); else {
-                    const grid = document.querySelector('#gantt-modal .gantt-grid');
-                    const viewport = document.querySelector('#gantt-modal .gantt-viewport');
-                    if(grid) grid.style.transform = 'none';
-                    if(viewport) viewport.style.height = 'auto';
-                }
-            }
-        });
-
-        window.addEventListener('resize', () => {
-            const gv = document.getElementById('gantt-modal');
-            if(gv && gv.style.display !== 'none' && ganttFitEnabled) fitGanttToWidth();
-        });
-
-        // Back button handler
-        const closeGantt = () => {
-            const main = document.querySelector('.main-layout-container');
-            const ganttModal = document.getElementById('gantt-modal');
-            if (ganttModal) ganttModal.style.display = 'none';
-            if (main) main.style.display = '';
-        };
-        document.getElementById('gantt-back').addEventListener('click', closeGantt);
-        const gc = document.getElementById('gantt-close');
-        if(gc) gc.addEventListener('click', closeGantt);
-        // Open Gantt in a new window (static snapshot of rendered grid)
-        const openBtn = document.getElementById('gantt-open-window');
-        if(openBtn) openBtn.addEventListener('click', () => {
-            try {
-                const headStyles = Array.from(document.querySelectorAll('head style')).map(s => s.outerHTML).join('\n');
-                const headLinks = '<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">\n<script src="https://cdn.tailwindcss.com"></' + 'script>';
-                const grid = document.getElementById('mainGrid');
-                if(!grid) return alert('Gantt no renderizado aún. Abre el Gantt primero.');
-                const gridHtml = grid.outerHTML;
-                const html = `<!doctype html><html><head><meta charset="utf-8">${headLinks}${headStyles}<title>Gantt - Ventana</title></head><body style="margin:0;padding:18px;background:#f3f4f6;">${gridHtml}</body></html>`;
-                const w = window.open('', '_blank', 'width=1200,height=800,scrollbars=yes');
-                w.document.open();
-                w.document.write(html);
-                w.document.close();
-            } catch (e) { alert('No se pudo abrir la ventana: '+e.message); }
-        });
-        // Close when clicking outside the content
-        const ganttOverlay = document.getElementById('gantt-modal');
-        if(ganttOverlay) {
-            ganttOverlay.addEventListener('click', (e) => { if(e.target === ganttOverlay) closeGantt(); });
-        }
     </script>
-    </div>
-</div>
 
 </body>
 </html>
