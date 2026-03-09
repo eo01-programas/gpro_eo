@@ -16,8 +16,8 @@
         ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
         .app-container { display: flex; flex-direction: column; height: 100vh; }
         .main-content { display: flex; flex: 1; overflow: hidden; border-top: 1px solid #e2e8f0; }
-        .task-panel { width: 920px; flex-shrink: 0; background: white; border-right: 1px solid #e2e8f0; display: flex; flex-direction: column; z-index: 20; box-shadow: 4px 0 24px rgba(0,0,0,0.02); }
-        .gantt-panel { flex: 1; overflow: hidden; background: #fff; display: flex; flex-direction: column; position: relative; }
+        .task-panel { flex: 1 1 auto; min-width: 660px; width: auto; background: white; border-right: 1px solid #e2e8f0; display: flex; flex-direction: column; z-index: 20; box-shadow: 4px 0 24px rgba(0,0,0,0.02); }
+        .gantt-panel { flex: 0 0 var(--gantt-width, 560px); width: var(--gantt-width, 560px); max-width: var(--gantt-width, 560px); overflow: hidden; background: #fff; display: flex; flex-direction: column; position: relative; }
         .header-row { height: 50px; background: #f1f5f9; border-bottom: 2px solid #cbd5e1; display: flex; align-items: center; font-size: 0.75rem; font-weight: 700; color: #334155; text-transform: uppercase; letter-spacing: 0.08em; }
         .data-row { min-height: 48px; height: auto; border-bottom: 1px solid #f1f5f9; display: flex; align-items: center; font-size: 0.85rem; transition: background 0.1s; }
         .data-row:hover { background-color: #f8fafc; }
@@ -29,16 +29,18 @@
         .cell:hover { border-right-color: rgba(0,0,0,0.05); }
         .col-icon { width: 30px; justify-content: center; cursor: pointer; color: #94a3b8; flex-shrink: 0; align-self: stretch; }
         .col-area { width: 90px; color: #1e293b; font-size: 0.75rem; flex-shrink: 0; font-weight: 700; padding: 0 8px; }
-        .col-tipo { width: 90px; flex-shrink: 0; color: #1e293b; font-weight: 600; padding: 0 8px; }
+        .col-tipo { width: 110px; flex-shrink: 0; color: #1e293b; font-weight: 600; padding: 0 8px; }
         .col-estado { width: 120px; flex-shrink: 0; color: #1e293b; font-weight: 600; padding: 0 8px; }
         .col-inicio { width: 120px; font-size: 0.75rem; text-align: center; justify-content: center; flex-shrink: 0; color: #1e293b; font-weight: 600; }
-        .col-nombre { flex: 1; color: #1e293b; position: relative; min-width: 150px; padding-left: 10px; font-weight: 600; }
-        .col-prioridad { width: 100px; justify-content: center; flex-shrink: 0; color: #1e293b; font-weight: 600; display: flex; align-items: center; }
-        .col-ejecutor { width: 130px; justify-content: flex-start; padding: 0 8px; color: #1e293b; font-size: 0.75rem; flex-shrink: 0; font-weight: 600; display: flex; align-items: center; }
-        .col-acciones { width: 80px; justify-content: center; gap: 4px; flex-shrink: 0; }
+        .col-nombre { flex: 1; color: #1e293b; position: relative; min-width: 180px; padding-left: 10px; font-weight: 600; }
+        .col-ejecutor { width: 118px; justify-content: flex-start; padding: 0 8px; color: #1e293b; font-size: 0.75rem; flex-shrink: 0; font-weight: 600; display: flex; align-items: center; gap: 4px; }
+        .col-acciones { width: 96px; justify-content: center; gap: 4px; flex-shrink: 0; position: relative; z-index: 2; }
         .priority-indicator { font-size: 1.1rem; cursor: pointer; }
         .priority-alta { color: #f59e0b; }
         .priority-baja { color: #cbd5e1; }
+        .executor-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .priority-indicator-inline { font-size: 0.95rem; flex-shrink: 0; margin-left: 2px; cursor: default; }
+        .tipo-select { font-size: 0.74rem !important; text-align: left; text-align-last: left; padding-left: 8px; padding-right: 18px; }
         .table-input { width: 100%; background: transparent; border: 1px solid #cbd5e1; border-radius: 4px; padding: 4px; font-size: 0.75rem; color: inherit; transition: all 0.2s; text-align: center; cursor: pointer; }
         .filter-select { text-align: left !important; text-align-last: left !important; padding-left: 10px; }
         .filter-select option { text-align: left; }
@@ -78,7 +80,6 @@
         .kpi-sidebar-item.active { background-color: #eff6ff; border-color: #bfdbfe; color: #1d4ed8; font-weight: 600; }
         .action-btn { padding: 4px; border-radius: 4px; transition: all 0.2s; }
         .action-btn:hover { background-color: #f1f5f9; }
-        .refresh-spinning { animation: spin 1s linear infinite; }
         .context-menu { position: fixed; z-index: 80; min-width: 260px; background: white; border: 1px solid #cbd5e1; border-radius: 8px; box-shadow: 0 12px 20px rgba(15, 23, 42, 0.2); display: none; padding: 6px; }
         .context-menu.show { display: block; }
         .context-menu button { width: 100%; text-align: left; font-size: 0.78rem; font-weight: 600; color: #1e293b; border: none; background: transparent; padding: 7px 9px; border-radius: 6px; cursor: pointer; }
@@ -87,6 +88,30 @@
         .context-menu-sep { height: 1px; background: #e2e8f0; margin: 6px 2px; }
         .date-header-anchor { cursor: context-menu; }
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+        @media (max-width: 1500px) {
+            .cell { padding: 3px 6px; }
+            .col-nombre { min-width: 130px; }
+            .col-tipo { width: 96px; }
+            .col-estado { width: 100px; }
+            .col-inicio { width: 100px; }
+            .col-area { width: 80px; }
+            .col-ejecutor { width: 98px; }
+            .col-acciones { width: 84px; }
+            .status-badge-select { font-size: 0.65rem; padding: 3px 8px; }
+            .header-row { font-size: 0.68rem; letter-spacing: 0.06em; }
+        }
+
+        @media (max-width: 1366px) {
+            .col-nombre { min-width: 100px; }
+            .col-tipo { width: 90px; }
+            .col-estado { width: 92px; }
+            .col-inicio { width: 92px; }
+            .col-area { width: 72px; }
+            .col-ejecutor { width: 88px; }
+            .col-acciones { width: 78px; }
+            .status-badge-select { font-size: 0.62rem; }
+        }
     </style>
 </head>
 <body>
@@ -119,9 +144,6 @@
                     <i class="fa-solid fa-clock text-slate-400"></i>
                     <span id="lastUpdateTime">Cargando...</span>
                 </div>
-                <button id="btn-refresh" onclick="refreshDataManual()" class="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-50 transition" title="Refrescar datos ahora">
-                    <i id="refresh-icon" class="fa-solid fa-redo"></i> Refrescar
-                </button>
                 <div class="h-6 w-px bg-slate-200"></div>
                 <button id="btn-priority" onclick="togglePriority()" class="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-50 transition" title="Mostrar solo proyectos prioritarios">
                     <i class="fa-solid fa-star"></i> Prioridad
@@ -138,12 +160,11 @@
             <div class="task-panel">
                 <div id="taskHeaderRow" class="header-row px-2">
                     <div class="col-icon"></div>
-                    <div class="col-nombre">PROYECTO / TAREA</div>
+                    <div class="col-nombre">PROYECTO / TAREA / SUBTAREA</div>
                     <div class="col-tipo">TIPO</div>
                     <div class="col-estado">ESTADO</div>
                     <div id="headerFechaInicio" class="col-inicio date-header-anchor" title="Click derecho: ordenar por fecha">F. INICIO</div>
                     <div class="col-area">AREA</div>
-                    <div class="col-prioridad">PRIORIDAD</div>
                     <div class="col-ejecutor">EJECUTOR</div>
                     <div class="col-acciones"></div>
                 </div>
@@ -186,7 +207,7 @@
                 <div class="flex items-center gap-3">
                     <div class="w-8 h-8 rounded bg-white/10 flex items-center justify-center"><i class="fa-solid fa-chart-line"></i></div>
                     <div>
-                        <h3 class="text-sm font-bold uppercase tracking-wider">Gestión de KPIs</h3>
+                        <h3 class="text-sm font-bold uppercase tracking-wider">Indicador de proyecto</h3>
                         <p id="kpiModalProjectTitle" class="text-xs text-blue-200">Nombre del Proyecto</p>
                     </div>
                 </div>
@@ -194,15 +215,15 @@
             </div>
             <div class="flex flex-1 overflow-hidden">
                 <div class="w-64 bg-slate-50 border-r border-slate-200 p-4 flex flex-col">
-                    <h4 class="text-xs font-bold text-slate-500 uppercase mb-3">Mis Indicadores</h4>
+                    <h4 class="text-xs font-bold text-slate-500 uppercase mb-3">Indicadores</h4>
                     <div id="kpiListContainer" class="flex-1 overflow-y-auto mb-4"></div>
-                    <button onclick="createNewKpi()" class="w-full py-2 bg-white border border-slate-300 rounded text-sm text-blue-600 font-bold hover:bg-blue-50 transition shadow-sm"><i class="fa-solid fa-plus"></i> Nuevo KPI</button>
+                    <button onclick="createNewKpi()" class="w-full py-2 bg-white border border-slate-300 rounded text-sm text-blue-600 font-bold hover:bg-blue-50 transition shadow-sm"><i class="fa-solid fa-plus"></i> Nuevo indicador</button>
                 </div>
                 <div class="flex-1 p-6 overflow-y-auto" id="kpiFormContainer"></div>
             </div>
             <div class="px-6 py-3 border-t border-slate-200 bg-white flex justify-end gap-3 flex-shrink-0">
                 <button onclick="closeKpiModal()" class="px-4 py-2 text-sm font-bold text-slate-600 bg-slate-100 rounded-lg hover:bg-slate-200 transition">Cerrar</button>
-                <button onclick="saveCurrentKpi()" class="px-5 py-2 text-sm font-bold text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition shadow-lg shadow-blue-200">Guardar KPI Actual</button>
+                <button onclick="saveCurrentKpi()" class="px-5 py-2 text-sm font-bold text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition shadow-lg shadow-blue-200">Guardar indicador</button>
             </div>
         </div>
     </div>
@@ -228,7 +249,7 @@
                     </div>
                     <label class="block"><span class="text-xs font-bold text-slate-500 uppercase mb-1 block">Tipo</span><select id="cf-tipo" class="w-full border border-slate-300 rounded p-2 text-sm bg-white outline-none"></select></label>
                     <div id="div-cf-task" class="block col-span-2" style="display:none;">
-                        <label class="block"><span class="text-xs font-bold text-slate-500 uppercase mb-1 block">Nombre de la Tarea</span><input id="cf-task" class="w-full border border-slate-300 rounded p-2 text-sm outline-none" placeholder="Nombre de la tarea"></label>
+                        <label class="block"><span id="cf-task-label" class="text-xs font-bold text-slate-500 uppercase mb-1 block">Nombre de la Tarea</span><input id="cf-task" class="w-full border border-slate-300 rounded p-2 text-sm outline-none" placeholder="Nombre de la tarea"></label>
                     </div>
                     <label class="block"><span class="text-xs font-bold text-slate-500 uppercase mb-1 block">F. Inicio</span><input id="cf-inicio" type="date" class="w-full border border-slate-300 rounded p-2 text-sm outline-none"></label>
                     <div id="div-cf-ejecutor">
@@ -287,16 +308,40 @@
                     <label class="block"><span class="text-xs font-bold text-slate-500 uppercase mb-1 block">F. Inicio</span><input id="edit-project-inicio" type="date" class="w-full border border-slate-300 rounded p-2 text-sm outline-none"></label>
                 </div>
             </div>
-            <div class="px-6 py-3 border-t border-slate-200 bg-white flex justify-end">
-                <button onclick="closeEditProjectModal()" class="px-4 py-2 mr-2 bg-slate-100 text-slate-600 font-medium rounded hover:bg-slate-200 transition">Cancelar</button>
-                <button onclick="saveEditedProject()" class="px-4 py-2 bg-emerald-600 text-white font-medium rounded hover:bg-emerald-700 transition shadow-lg shadow-emerald-200">Guardar Cambios</button>
+            <div class="px-6 py-3 border-t border-slate-200 bg-white flex items-center justify-between">
+                <button onclick="deleteProjectFromEditModal()" class="px-4 py-2 bg-red-600 text-white font-medium rounded hover:bg-red-700 transition shadow-lg shadow-red-200">Eliminar Proyecto</button>
+                <div>
+                    <button onclick="closeEditProjectModal()" class="px-4 py-2 mr-2 bg-slate-100 text-slate-600 font-medium rounded hover:bg-slate-200 transition">Cancelar</button>
+                    <button onclick="saveEditedProject()" class="px-4 py-2 bg-emerald-600 text-white font-medium rounded hover:bg-emerald-700 transition shadow-lg shadow-emerald-200">Guardar Cambios</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Objetivo de Tarea/Subtarea -->
+    <div id="taskObjectiveModal" class="modal-overlay" style="display:none;">
+        <div class="modal-card modal-card-lg" style="height: 78vh;">
+            <div class="flex items-center justify-between px-6 py-4 bg-blue-900 text-white flex-shrink-0">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded bg-white/10 flex items-center justify-center"><i class="fa-solid fa-chart-line"></i></div>
+                    <div>
+                        <h3 class="text-sm font-bold uppercase tracking-wider">Detalle de tarea e indicador</h3>
+                        <p id="taskObjectiveTitle" class="text-xs text-blue-200">Detalle</p>
+                        <p id="taskObjectiveMeta" class="text-[11px] text-blue-200/90 mt-0.5">Proyecto | Agente | Ejecutor</p>
+                    </div>
+                </div>
+                <button onclick="closeTaskObjectiveModal()" class="text-white/80 hover:text-white text-xl transition"><i class="fa-solid fa-times"></i></button>
+            </div>
+            <div id="taskObjectiveContent" class="flex-1 p-6 bg-white text-sm text-slate-700 overflow-y-auto"></div>
+            <div class="px-6 py-3 border-t border-slate-200 bg-white flex justify-end gap-3 flex-shrink-0">
+                <button onclick="closeTaskObjectiveModal()" class="px-4 py-2 text-sm font-bold text-slate-600 bg-slate-100 rounded-lg hover:bg-slate-200 transition">Cerrar</button>
             </div>
         </div>
     </div>
 
     <script>
         // ========= CONFIG & GLOBALS =========
-        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxBmb9mGdOs_GPbhqm_asyxqux4ySEAfJXXKPq46-cu6yaAm5NLp81ROBnZNRTOCiVS/exec';
+        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxqIthmPIyj_iI7zsfKcg_-v7NbrS51lciqgpKdWic6sDLh5EvP2LDIllKxW--p3NPr/exec';
         const PROJECT_TYPES = ['Digital', 'Digital + IA', 'Maquina', 'Proceso'];
         const STATUS_BADGE_CLASSES = { 1: 'sb-pendiente', 2: 'sb-proceso', 3: 'sb-terminado' };
         const STATE_ICONS = { 0: '', 1: '!', 2: '▶', 3: '✓' };
@@ -307,7 +352,7 @@
         let currentKpiProject = null;
         let activeKpiIndex = 0;
         let SHOW_PRIORITY = true;
-        let SHOW_COMPLETED = false;
+        let SHOW_COMPLETED = true;
         let SHOW_ALL_TASKS = true; // when true, list every task in the left panel regardless of GANTT view range
         const FILTERS = { month: 'all', area: '', project: '' };
         const DATE_VIEW = { sort: 'none' };
@@ -316,13 +361,13 @@
         let confirmCallback = null;
         let createMode = 'project'; 
         let targetProjectId = null;
+        let targetParentTaskContext = null;
         let renderScheduled = false; // Debounce render
         const ganttMinMaxCache = new Map(); // Cache min/max for gantt arrays
+        const taskGroupExpandedState = new Map(); // Persist expand/collapse for task groups
         
-        // === AUTO-REFRESH CONFIGURATION ===
+        // === TIMESTAMP CONFIGURATION ===
         let lastUpdateTime = null;
-        const AUTO_REFRESH_INTERVAL = 5 * 60 * 1000; // 5 minutos en milisegundos
-        let autoRefreshTimerId = null;
         let isLoadingData = false;
         
         // === CACHED COLUMNS DATA (Para optimizar modal) ===
@@ -334,6 +379,7 @@
             const _btn = document.getElementById('btn-priority');
             if (_btn) _btn.classList.add('btn-priority-active');
         }
+        updateShowCompletedButton();
 
         // 12 Months Config (Master)
         const FULL_MONTHS_CONFIG = [
@@ -343,17 +389,15 @@
             { name: 'Oct', weeks: 4, color: 'bg-slate-600' }, { name: 'Nov', weeks: 4, color: 'bg-slate-700' }, { name: 'Dic', weeks: 5, color: 'bg-slate-800' }
         ];
 
-        // --- DYNAMIC DATE CALCULATIONS ---
-        // Start view: begin from the current month and show next 6 months (wrap year)
+        // --- DATE CALCULATIONS (6 MESES FIJOS) ---
+        // Start view: include previous month when possible to avoid clipping tasks at month boundaries
         const today = new Date();
-        let startMonthIndex = today.getMonth(); // start at current month (0-based)
-        const visibleCount = 6; // show current month + 5 following months
-
-        // Generate VISIBLE_MONTHS allowing wrap-around at year end
-        const VISIBLE_MONTHS = [];
-        for (let i = 0; i < visibleCount; i++) {
-            VISIBLE_MONTHS.push(FULL_MONTHS_CONFIG[(startMonthIndex + i) % 12]);
-        }
+        let startMonthIndex = Math.max(0, today.getMonth() - 1); // include one month back when possible
+        const WEEK_CELL_PX = 20;
+        const VISIBLE_MONTH_COUNT = 6;
+        const VISIBLE_MONTHS = Array.from({ length: VISIBLE_MONTH_COUNT }, (_, i) => {
+            return FULL_MONTHS_CONFIG[(startMonthIndex + i) % 12];
+        });
 
         // Calculate weeks before start month to offset rendering (weeks from Jan to month-1)
         let offsetWeeks = 0;
@@ -381,14 +425,14 @@
             VISIBLE_MONTHS.forEach(m => {
                 const monthDiv = document.createElement('div');
                 monthDiv.className = `gantt-header-month ${m.color} text-xs tracking-wider`;
-                monthDiv.style.width = `${m.weeks * 20}px`;
+                monthDiv.style.width = `${m.weeks * WEEK_CELL_PX}px`;
                 monthDiv.textContent = m.name;
                 mHeader.appendChild(monthDiv);
 
                 for (let i = 0; i < m.weeks; i++) {
                     const weekDiv = document.createElement('div');
                     weekDiv.className = 'flex items-center justify-center text-[9px] text-slate-400 font-medium border-r border-slate-200';
-                    weekDiv.style.width = '20px';
+                    weekDiv.style.width = `${WEEK_CELL_PX}px`;
                     // Calculate absolute week index from start of year (0-based), then display 1-based week number
                     const absoluteWeek = (OFFSET_WEEKS_INDEX + columnIndex) % MAX_YEAR_WEEKS;
                     const displayWeek = absoluteWeek + 1; // week numbers: 1..52
@@ -397,12 +441,13 @@
                     columnIndex++;
                 }
             });
-            const fullWidth = VISIBLE_TOTAL_WEEKS * 20;
+            const fullWidth = VISIBLE_TOTAL_WEEKS * WEEK_CELL_PX;
             mHeader.style.minWidth = `${fullWidth}px`; wHeader.style.minWidth = `${fullWidth}px`;
             return fullWidth;
         }
         
         const FULL_WIDTH_PX = initHeaders();
+        document.documentElement.style.setProperty('--gantt-width', `${FULL_WIDTH_PX + 2}px`);
 
         function syncRowHeights() {
             const leftScroll = taskContainer;
@@ -553,6 +598,14 @@
             }
             return str;
         }
+        function escapeHtml(value) {
+            return String(value === undefined || value === null ? '' : value)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
         function sortDateValue(dateStr) {
             if (!dateStr) return Number.POSITIVE_INFINITY;
             const normalized = formatDateDMY(dateStr);
@@ -620,12 +673,20 @@
         }
         function closeConfirmModal() { document.getElementById('confirmModal').style.display = 'none'; confirmCallback = null; }
         document.getElementById('confirmBtnAction').addEventListener('click', () => { if (confirmCallback) confirmCallback(); closeConfirmModal(); });
+        const taskObjectiveOverlay = document.getElementById('taskObjectiveModal');
+        if (taskObjectiveOverlay) {
+            taskObjectiveOverlay.addEventListener('click', (e) => {
+                if (e.target === taskObjectiveOverlay) closeTaskObjectiveModal();
+            });
+        }
 
         function isPriorityProject(p) {
-            // Un proyecto es prioridad si alguno de sus KPIs tiene PRIORIDAD = 'ALTA'
-            // Si no tiene KPIs, por defecto es BAJA
-            if (!p.kpis || p.kpis.length === 0) return false;
-            return p.kpis.some(kpi => (kpi.prioridad || '').toUpperCase().trim() === 'ALTA');
+            // Prioridad por columna de proyecto (PRIORIDAD en hoja Datos)
+            const projectPriority = String(p && p.prioridad || '').toUpperCase().trim();
+            if (projectPriority) return projectPriority === 'ALTA';
+            // Compatibilidad con estructura anterior
+            if (!p || !p.kpis || p.kpis.length === 0) return false;
+            return p.kpis.some(kpi => String(kpi.prioridad || '').toUpperCase().trim() === 'ALTA');
         }
         
         function normalizeAreaName(areaValue) {
@@ -777,16 +838,23 @@
             render();
         }
 
-        function toggleShowCompleted() {
-            SHOW_COMPLETED = !SHOW_COMPLETED;
+        function updateShowCompletedButton() {
             const btn = document.getElementById('btn-show-complete');
+            if (!btn) return;
             if (SHOW_COMPLETED) {
                 btn.classList.add('btn-priority-active');
                 btn.textContent = 'Ocultar completados';
+                btn.title = 'Ocultar proyectos terminados';
             } else {
                 btn.classList.remove('btn-priority-active');
                 btn.textContent = 'Ver completo';
+                btn.title = 'Mostrar proyectos terminados';
             }
+        }
+
+        function toggleShowCompleted() {
+            SHOW_COMPLETED = !SHOW_COMPLETED;
+            updateShowCompletedButton();
             render();
         }
 
@@ -842,35 +910,32 @@
                     ? 'VARIAS'
                     : (projectAreas.size === 1 ? Array.from(projectAreas)[0] : '');
                 const projectAgents = Array.from(new Set((p.kpis || []).map(k => String(k.a_cambio || '').trim()).filter(Boolean)));
-                let projectAgentDisplay = '';
-                if (projectAgents.length === 1) {
-                    projectAgentDisplay = projectAgents[0];
-                } else if (projectAgents.length > 1) {
-                    projectAgentDisplay = `${projectAgents[0]} +${projectAgents.length - 1}`;
-                } else {
-                    const taskExecutors = Array.from(new Set((p.tasks || []).map(t => String(t.ejecutor || '').trim()).filter(Boolean)));
-                    if (taskExecutors.length === 1) projectAgentDisplay = taskExecutors[0];
-                    else if (taskExecutors.length > 1) projectAgentDisplay = `${taskExecutors[0]} +${taskExecutors.length - 1}`;
-                    else projectAgentDisplay = String(p.ejecutor || '').trim();
-                }
-                const projectAgentsTitle = projectAgents.length > 0 ? projectAgents.join(', ') : projectAgentDisplay;
+                const projectAgentDisplay = projectAgents.length > 0 ? projectAgents[0] : '';
+                const projectAgentLabel = projectAgentDisplay || '-';
+                const projectAgentsTitle = projectAgents.length > 0 ? projectAgents.join(', ') : projectAgentLabel;
+                const projectPriorityActive = isPriorityProject(p);
+                const projectPriorityTitle = projectPriorityActive ? 'ALTA' : (String(p.prioridad || 'BAJA').toUpperCase().trim() || 'BAJA');
 
                 const pRowLeft = document.createElement('div');
                 pRowLeft.className = `data-row project-row cursor-pointer group`; 
                 pRowLeft.innerHTML = `
                     <div class="cell col-icon group-hover:text-blue-600 transition" onclick="toggleProject('${p.id}')"><i class="fa-solid fa-chevron-${p.expanded ? 'down' : 'right'}"></i></div>
-                    <div class="cell col-nombre font-bold text-slate-700 group-hover:text-blue-800 transition"><span onclick="toggleProject('${p.id}')">${p.nombre}</span></div>
+                    <div class="cell col-nombre font-bold text-slate-700 group-hover:text-blue-800 transition">
+                        <button onclick="event.stopPropagation(); openEditProjectModal('${p.id}')" class="action-btn text-xs text-slate-500 hover:text-blue-600 mr-1" title="Editar Proyecto"><i class="fa-solid fa-pen-to-square"></i></button>
+                        <span onclick="toggleProject('${p.id}')">${p.nombre}</span>
+                    </div>
                     <div class="cell col-tipo text-xs font-bold text-slate-700">${calculatedType}</div>
                     <div class="cell col-estado"><div class="status-badge-select ${statusClass}" style="cursor: default; pointer-events: none;">${statusText}</div></div>
                     <div class="cell col-inicio">
                         <input type="text" inputmode="numeric" placeholder="dd/mm/aaaa" maxlength="10" class="table-input text-center font-bold" value="${formatDateDMY(p.inicio)}" onchange="updateProjectDate('${p.id}', formatDateDMY(this.value))" onclick="event.stopPropagation()">
                     </div>
                     <div class="cell col-area text-blue-700">${projectAreaDisplay}</div>
-                    <div class="cell col-prioridad"><i class="fa-solid fa-star priority-indicator ${isPriorityProject(p) ? 'priority-alta' : 'priority-baja'}" title="${p.prioridad || 'BAJA'}"></i></div>
-                    <div class="cell col-ejecutor font-bold text-slate-600" title="${projectAgentsTitle}">${projectAgentDisplay}</div>
+                    <div class="cell col-ejecutor font-bold text-slate-600" title="${projectAgentsTitle}">
+                        <span class="executor-name">${escapeHtml(projectAgentLabel)}</span>
+                        <i class="fa-solid fa-star priority-indicator priority-indicator-inline ${projectPriorityActive ? 'priority-alta' : 'priority-baja'}" title="Prioridad ${projectPriorityTitle}"></i>
+                    </div>
                     <div class="cell col-acciones">
-                        <button onclick="event.stopPropagation(); openEditProjectModal('${p.id}')" class="action-btn text-xs text-slate-500 hover:text-blue-600" title="Editar Proyecto"><i class="fa-solid fa-pen-to-square"></i></button>
-                        <button onclick="event.stopPropagation(); openKpiModal('${p.id}')" class="action-btn text-xs text-emerald-600 hover:text-emerald-700" title="Ver KPIs"><i class="fa-solid fa-chart-pie"></i></button>
+                        <button onclick="event.stopPropagation(); openKpiModal('${p.id}')" class="action-btn text-xs text-emerald-600 hover:text-emerald-700" title="Ver indicador"><i class="fa-solid fa-chart-pie"></i></button>
                         <button onclick="event.stopPropagation(); openCreateTaskModal('${p.id}')" class="action-btn text-xs text-blue-600 hover:text-blue-700" title="Agregar Tarea"><i class="fa-solid fa-plus"></i></button>
                     </div>
                 `;
@@ -902,10 +967,18 @@
                     const viewEndIdx = OFFSET_WEEKS_INDEX + VISIBLE_TOTAL_WEEKS - 1;
                     const drawStart = Math.max(minStart, viewStartIdx);
                     const drawEnd = Math.min(maxEnd, viewEndIdx);
-                    const leftPx = (drawStart - viewStartIdx) * 20;
-                    const widthPx = (drawEnd - drawStart + 1) * 20;
+                    const leftPx = (drawStart - viewStartIdx) * WEEK_CELL_PX;
+                    const widthPx = (drawEnd - drawStart + 1) * WEEK_CELL_PX;
                     const totalCount = p.tasks.length;
                     const progressPct = Math.round((completedCount / totalCount) * 100);
+                    const progressLabel = `${completedCount}/${totalCount} • ${progressPct}%`;
+                    const showLabelOutside = widthPx < 94;
+                    const placeLabelLeft = showLabelOutside && drawEnd >= (viewEndIdx - 1);
+                    const labelPositionClass = showLabelOutside
+                        ? (placeLabelLeft
+                            ? 'right-full mr-1.5 text-slate-700 bg-white/95 border border-slate-200 rounded px-1.5 py-0.5 shadow-sm'
+                            : 'left-full ml-1.5 text-slate-700 bg-white/95 border border-slate-200 rounded px-1.5 py-0.5 shadow-sm')
+                        : 'left-1/2 -translate-x-1/2 text-white';
                     
                     const barContainer = document.createElement('div');
                     barContainer.className = 'absolute top-1/2 -translate-y-1/2 h-5 bg-slate-200 rounded text-xs font-bold text-slate-700 flex items-center justify-center z-20 pointer-events-none overflow-visible whitespace-nowrap shadow-sm border border-slate-300';
@@ -913,9 +986,8 @@
                     barContainer.style.width = `${widthPx}px`;
                     
                     barContainer.innerHTML = `
-                        <div class="absolute left-0 top-0 h-full bg-blue-400 rounded-l transition-all duration-700 opacity-80 flex items-center justify-center overflow-hidden" style="width: ${progressPct}%; border-radius: inherit;">
-                            <span class="z-10 px-2 drop-shadow-md text-[10px] text-white font-semibold truncate">${completedCount}/${totalCount} • ${progressPct}%</span>
-                        </div>
+                        <div class="absolute left-0 top-0 h-full bg-blue-400 rounded-l transition-all duration-700 opacity-80" style="width: ${progressPct}%; border-radius: inherit;"></div>
+                        <span class="absolute top-1/2 -translate-y-1/2 z-20 text-[10px] font-semibold whitespace-nowrap drop-shadow-md ${labelPositionClass}">${progressLabel}</span>
                     `;
                     pRowRight.appendChild(barContainer);
                 }
@@ -941,83 +1013,249 @@
                             const cmp = taskDateSortDesc ? (b.sortKey - a.sortKey) : (a.sortKey - b.sortKey);
                             return cmp || (a.tIndex - b.tIndex);
                         });
-                    tasksForRender.forEach(({ t, tIndex }) => {
-                        // TASK VISIBILITY FILTER (Inside Project)
-                        // Hide finished tasks unless SHOW_COMPLETED is enabled
-                        if (t.status === 3 && !SHOW_COMPLETED) return;
-                        let showTask = true;
-                        const taskAreaDisplay = normalizeAreaName(t.area) || normalizeAreaName(p.area);
-                        
-                        const viewStartIdx = OFFSET_WEEKS_INDEX;
-                        const viewEndIdx = OFFSET_WEEKS_INDEX + VISIBLE_TOTAL_WEEKS - 1;
-                        
-                        const taskStartW = dateToWeekIndex(t.inicio);
-                        let taskEndW = t.gantt.lastIndexOf(1);
+                    const viewStartIdx = OFFSET_WEEKS_INDEX;
+                    const viewEndIdx = OFFSET_WEEKS_INDEX + VISIBLE_TOTAL_WEEKS - 1;
+
+                    const isTaskRenderable = (task) => {
+                        if (!task) return false;
+                        if (task.status === 3 && !SHOW_COMPLETED) return false;
+                        if (SHOW_ALL_TASKS) return true;
+                        const taskStartW = dateToWeekIndex(task.inicio);
+                        const taskGantt = Array.isArray(task.gantt) ? task.gantt : [];
+                        let taskEndW = taskGantt.lastIndexOf(1);
                         if (taskEndW < taskStartW) taskEndW = taskStartW;
-                        
-                        // If SHOW_ALL_TASKS is true we always list the task in the left panel
-                        if (!SHOW_ALL_TASKS) {
-                            if (taskEndW < viewStartIdx || taskStartW > viewEndIdx) {
-                                showTask = false;
-                            }
-                        }
+                        return !(taskEndW < viewStartIdx || taskStartW > viewEndIdx);
+                    };
 
-                        if (!showTask) return;
-
+                    const renderTaskLeafRow = (taskEntry, options = {}) => {
+                        const { t, tIndex } = taskEntry;
+                        const taskAreaDisplay = normalizeAreaName(t.area) || normalizeAreaName(p.area);
                         const tRowLeft = document.createElement('div');
-                        tRowLeft.className = 'data-row hover:bg-slate-50';
-                        const tStatus = t.status || 1; 
+                        tRowLeft.className = options.leftRowClass || 'data-row hover:bg-slate-50';
+                        const tStatus = t.status || 1;
                         const statusSelectTask = `<select class="status-badge-select ${STATUS_BADGE_CLASSES[tStatus]}" onchange="updateTaskStatus('${p.id}', ${tIndex}, this.value)" onclick="event.stopPropagation()"><option value="1" ${tStatus == 1 ? 'selected' : ''}>Pendiente</option><option value="2" ${tStatus == 2 ? 'selected' : ''}>En Proceso</option><option value="3" ${tStatus == 3 ? 'selected' : ''}>Terminado</option></select>`;
-                        const taskTipoOptions = PROJECT_TYPES.map(type => `<option value="${type}" ${ (t.tipo || PROJECT_TYPES[0]) === type ? 'selected' : ''}>${type}</option>`).join('');
-                        const tipoSelectTask = `<select class="table-input" style="font-size:0.7rem;" onchange="updateTaskType('${p.id}', ${tIndex}, this.value)" onclick="event.stopPropagation()">${taskTipoOptions}</select>`;
+                        const taskTipoOptions = PROJECT_TYPES.map(type => `<option value="${type}" ${(t.tipo || PROJECT_TYPES[0]) === type ? 'selected' : ''}>${type}</option>`).join('');
+                        const tipoSelectTask = `<select class="table-input tipo-select" onchange="updateTaskType('${p.id}', ${tIndex}, this.value)" onclick="event.stopPropagation()">${taskTipoOptions}</select>`;
+                        const taskTitle = escapeHtml(t.tarea || t.nombre || 'Sin tarea');
+                        const subtaskTitle = escapeHtml(t.subtarea || '');
+                        const defaultTaskNameHtml = t.subtarea
+                            ? `<div class="leading-tight"><div class="font-semibold text-slate-700">${taskTitle}</div><div class="text-[11px] font-semibold text-emerald-700 mt-0.5">Subtarea: ${subtaskTitle}</div></div>`
+                            : `<div class="leading-tight"><div class="font-semibold text-slate-700">${taskTitle}</div></div>`;
+                        const taskNameHtml = options.customNameHtml || defaultTaskNameHtml;
+                        const iconCellHtml = options.iconCellHtml || '<div class="cell col-icon"></div>';
+                        const namePaddingClass = options.namePaddingClass || 'pl-6';
+                        const treeDecorHtml = options.showTreeDecor === false
+                            ? ''
+                            : '<span class="tree-line-v"></span><span class="tree-line-h"></span><div class="tree-connector"></div>';
+                        const canAddSubtask = String(t.subtarea || '').trim() === '';
+                        const addSubtaskBtn = canAddSubtask
+                            ? `<button onclick="event.stopPropagation(); openCreateSubtaskModal('${p.id}', ${tIndex})" class="text-blue-600 hover:text-blue-700 p-1.5 transition" title="Agregar subtarea"><i class="fa-solid fa-plus"></i></button>`
+                            : '';
 
                         tRowLeft.innerHTML = `
-                            <div class="cell col-icon"></div><div class="cell col-nombre pl-6 text-sm"><span class="tree-line-v"></span><span class="tree-line-h"></span><div class="tree-connector"></div>${t.nombre}</div>
+                            ${iconCellHtml}<div class="cell col-nombre ${namePaddingClass} text-sm">${treeDecorHtml}<div class="flex items-start gap-1 w-full min-w-0"><button onclick="event.stopPropagation(); openEditTaskModal('${p.id}', ${tIndex})" class="action-btn text-xs text-slate-500 hover:text-blue-600 mt-0.5" title="Editar tarea"><i class="fa-solid fa-pen-to-square"></i></button><div class="min-w-0">${taskNameHtml}</div></div></div>
                             <div class="cell col-tipo">${tipoSelectTask}</div><div class="cell col-estado">${statusSelectTask}</div>
                             <div class="cell col-inicio"><input type="text" inputmode="numeric" placeholder="dd/mm/aaaa" maxlength="10" class="table-input text-center font-bold text-xs" value="${formatDateDMY(t.inicio || p.inicio)}" onchange="updateTaskDate('${p.id}', ${tIndex}, formatDateDMY(this.value))" onclick="event.stopPropagation()"></div>
-                            <div class="cell col-area text-slate-500 text-xs">${taskAreaDisplay}</div>
-                            <div class="cell col-prioridad"></div>
-                            <div class="cell col-ejecutor text-xs text-slate-500">${t.ejecutor}</div>
+                            <div class="cell col-area text-slate-500 text-xs">${escapeHtml(taskAreaDisplay)}</div>
+                            <div class="cell col-ejecutor text-xs text-slate-500">${escapeHtml(t.ejecutor || '')}</div>
                             <div class="cell col-acciones">
-                                <button onclick="event.stopPropagation(); openEditTaskModal('${p.id}', ${tIndex})" class="text-slate-500 hover:text-blue-600 p-1.5 transition"><i class="fa-solid fa-pen-to-square"></i></button>
+                                ${addSubtaskBtn}
+                                <button onclick="event.stopPropagation(); openTaskObjectiveModal('${p.id}', ${tIndex})" class="text-emerald-600 hover:text-emerald-700 p-1.5 transition" title="Ver indicador"><i class="fa-solid fa-chart-pie"></i></button>
                                 <button onclick="event.stopPropagation(); deleteTaskConfirm('${p.id}', ${tIndex})" class="text-slate-400 hover:text-red-500 p-1.5 transition"><i class="fa-solid fa-trash"></i></button>
                             </div>
                         `;
                         taskFragment.appendChild(tRowLeft);
 
                         const tRowRight = document.createElement('div');
-                        tRowRight.className = 'data-row hover:bg-slate-50 relative';
-                        
-                        // --- Draw Continuous Bar for Tasks ---
+                        tRowRight.className = options.rightRowClass || 'data-row hover:bg-slate-50 relative';
+
                         let tMin = 9999, tMax = -1;
-                        t.gantt.forEach((v, idx) => { if (v > 0) { if (idx < tMin) tMin = idx; if (idx > tMax) tMax = idx; } });
+                        const taskGantt = Array.isArray(t.gantt) ? t.gantt : [];
+                        taskGantt.forEach((v, idx) => { if (v > 0) { if (idx < tMin) tMin = idx; if (idx > tMax) tMax = idx; } });
 
                         if (tMin <= tMax && tMax >= viewStartIdx && tMin <= viewEndIdx) {
                             const drawStart = Math.max(tMin, viewStartIdx);
                             const drawEnd = Math.min(tMax, viewEndIdx);
-                            const leftPx = (drawStart - viewStartIdx) * 20;
-                            const widthPx = (drawEnd - drawStart + 1) * 20;
-                            
+                            const leftPx = (drawStart - viewStartIdx) * WEEK_CELL_PX;
+                            const widthPx = (drawEnd - drawStart + 1) * WEEK_CELL_PX;
+                            const insetPx = widthPx <= WEEK_CELL_PX ? 1 : 2;
+                            const visualWidthPx = Math.max(8, widthPx - (insetPx * 2));
                             const barColorClass = STATE_COLORS[tStatus] || 'bg-blue-400';
-
                             const bar = document.createElement('div');
                             bar.className = `absolute top-1/2 -translate-y-1/2 h-6 ${barColorClass} rounded shadow-sm z-0 pointer-events-none transition-all duration-300 opacity-80`;
-                            bar.style.left = `${leftPx + 2}px`; 
-                            bar.style.width = `${widthPx - 4}px`; 
-                            
+                            bar.style.left = `${leftPx + insetPx}px`;
+                            bar.style.width = `${visualWidthPx}px`;
                             tRowRight.appendChild(bar);
                         }
 
-                        // Render clickable cells
-                        for(let i=0; i<VISIBLE_TOTAL_WEEKS; i++) {
-                            const actualWeekIdx = OFFSET_WEEKS_INDEX + i;
-                            
+                        for (let i = 0; i < VISIBLE_TOTAL_WEEKS; i++) {
                             const cell = document.createElement('div');
                             cell.className = 'gantt-week-col';
-                            cell.onclick = (e) => toggleCell(p.id, tIndex, i);
+                            cell.onclick = () => toggleCell(p.id, tIndex, i);
                             tRowRight.appendChild(cell);
                         }
                         ganttFragment.appendChild(tRowRight);
+                    };
+
+                    const groupsInOrder = [];
+                    const groupsByName = new Map();
+                    tasksForRender.forEach((taskEntry) => {
+                        const groupName = String(taskEntry.t.tarea || taskEntry.t.nombre || '').trim() || `Tarea ${taskEntry.tIndex + 1}`;
+                        if (!groupsByName.has(groupName)) {
+                            const newGroup = { name: groupName, items: [], hasSubtasks: false };
+                            groupsByName.set(groupName, newGroup);
+                            groupsInOrder.push(newGroup);
+                        }
+                        const group = groupsByName.get(groupName);
+                        group.items.push(taskEntry);
+                        if (String(taskEntry.t.subtarea || '').trim()) group.hasSubtasks = true;
+                    });
+
+                    groupsInOrder.forEach((group) => {
+                        if (!group.hasSubtasks) {
+                            group.items.forEach((taskEntry) => {
+                                if (!isTaskRenderable(taskEntry.t)) return;
+                                renderTaskLeafRow(taskEntry);
+                            });
+                            return;
+                        }
+
+                        const parentTasks = group.items.filter(item => String(item.t.subtarea || '').trim() === '');
+                        const subtasks = group.items.filter(item => String(item.t.subtarea || '').trim() !== '');
+                        const visibleParents = parentTasks.filter(item => isTaskRenderable(item.t));
+                        const visibleSubtasks = subtasks.filter(item => isTaskRenderable(item.t));
+                        const aggregateItems = [...visibleParents, ...visibleSubtasks];
+                        if (aggregateItems.length === 0) return;
+
+                        const groupExpanded = isTaskGroupExpanded(p.id, group.name);
+                        const groupStatuses = aggregateItems.map(item => item.t.status || 1);
+                        const groupStatus = groupStatuses.every(s => s === 3) ? 3 : (groupStatuses.some(s => s === 2) ? 2 : 1);
+                        const groupStatusText = { 1: 'Pendiente', 2: 'En proceso', 3: 'Terminado' }[groupStatus];
+                        const groupTypeCount = {};
+                        aggregateItems.forEach(item => {
+                            const typeName = String(item.t.tipo || 'Proceso').trim() || 'Proceso';
+                            groupTypeCount[typeName] = (groupTypeCount[typeName] || 0) + 1;
+                        });
+                        const groupType = Object.keys(groupTypeCount).sort((a, b) => groupTypeCount[b] - groupTypeCount[a])[0] || 'Proceso';
+                        const groupStartEntry = aggregateItems
+                            .map(item => ({ item, sortKey: sortDateValue(item.t.inicio || p.inicio) }))
+                            .sort((a, b) => a.sortKey - b.sortKey)[0];
+                        const groupStart = groupStartEntry ? (groupStartEntry.item.t.inicio || p.inicio) : p.inicio;
+                        const groupAreas = Array.from(new Set(aggregateItems.map(item => normalizeAreaName(item.t.area) || normalizeAreaName(p.area)).filter(Boolean)));
+                        const groupAreaDisplay = groupAreas.length > 1 ? 'VARIAS' : (groupAreas[0] || '');
+                        const groupExecutors = Array.from(new Set(aggregateItems.map(item => String(item.t.ejecutor || '').trim()).filter(Boolean)));
+                        const groupExecutorDisplay = groupExecutors.length > 1
+                            ? `${groupExecutors[0]} +${groupExecutors.length - 1}`
+                            : (groupExecutors[0] || '');
+                        const objectiveSource = aggregateItems.find(item => {
+                            const t = item.t || {};
+                            const hasTaskMonthly = Object.values(t.monthly_tarea || {}).some(v => String(v || '').trim() !== '');
+                            return String(t.que_soluciono_tarea || '').trim() !== '' ||
+                                String(t.indicador_tarea || '').trim() !== '' ||
+                                String(t.l_base_tarea || '').trim() !== '' ||
+                                String(t.meta_tarea || '').trim() !== '' ||
+                                String(t.numerador_tarea || '').trim() !== '' ||
+                                String(t.denominador_tarea || '').trim() !== '' ||
+                                hasTaskMonthly;
+                        }) || aggregateItems[0];
+                        const primaryParent = visibleParents[0] || parentTasks[0] || null;
+                        const groupParentTaskName = String((primaryParent && (primaryParent.t.sheet_tarea || primaryParent.t.tarea || primaryParent.t.nombre)) || group.name || '').trim();
+                        const groupParentArea = normalizeAreaName((primaryParent && primaryParent.t.area) || (aggregateItems[0] && aggregateItems[0].t.area) || p.area) || '';
+                        const groupEditButton = primaryParent
+                            ? `<button class="action-btn text-xs text-slate-500 hover:text-blue-600 task-group-edit" title="Editar tarea"><i class="fa-solid fa-pen-to-square"></i></button>`
+                            : '';
+                        const groupActionButtons = `
+                            <button class="text-blue-600 hover:text-blue-700 p-1.5 transition task-group-add-subtask" title="Agregar subtarea"><i class="fa-solid fa-plus"></i></button>
+                            <button class="text-emerald-600 hover:text-emerald-700 p-1.5 transition task-group-objective" title="Ver indicador"><i class="fa-solid fa-chart-pie"></i></button>
+                        `;
+
+                        const groupRowLeft = document.createElement('div');
+                        groupRowLeft.className = 'data-row bg-slate-50';
+                        groupRowLeft.innerHTML = `
+                            <div class="cell col-icon text-slate-500 hover:text-blue-600 cursor-pointer task-group-toggle"><i class="fa-solid fa-chevron-${groupExpanded ? 'down' : 'right'}"></i></div>
+                            <div class="cell col-nombre text-sm">
+                                <div class="leading-tight">
+                                    <div class="flex items-center gap-1">${groupEditButton}<div class="font-bold text-slate-700 cursor-pointer task-group-name">${escapeHtml(group.name)}</div></div>
+                                    <div class="text-[11px] text-slate-500">${visibleSubtasks.length} subtarea(s)</div>
+                                </div>
+                            </div>
+                            <div class="cell col-tipo text-xs font-bold text-slate-700">${escapeHtml(groupType)}</div>
+                            <div class="cell col-estado"><div class="status-badge-select ${STATUS_BADGE_CLASSES[groupStatus]}" style="cursor: default; pointer-events: none;">${groupStatusText}</div></div>
+                            <div class="cell col-inicio text-xs font-bold text-slate-700 justify-center">${formatDateDMY(groupStart)}</div>
+                            <div class="cell col-area text-slate-500 text-xs">${escapeHtml(groupAreaDisplay)}</div>
+                            <div class="cell col-ejecutor text-xs text-slate-500">${escapeHtml(groupExecutorDisplay)}</div>
+                            <div class="cell col-acciones">${groupActionButtons}</div>
+                        `;
+                        const groupToggleEl = groupRowLeft.querySelector('.task-group-toggle');
+                        const groupNameEl = groupRowLeft.querySelector('.task-group-name');
+                        const groupEditEl = groupRowLeft.querySelector('.task-group-edit');
+                        const groupAddSubtaskEl = groupRowLeft.querySelector('.task-group-add-subtask');
+                        const groupObjectiveEl = groupRowLeft.querySelector('.task-group-objective');
+                        if (groupToggleEl) groupToggleEl.addEventListener('click', (e) => { e.stopPropagation(); toggleTaskGroup(p.id, group.name); });
+                        if (groupNameEl) groupNameEl.addEventListener('click', (e) => { e.stopPropagation(); toggleTaskGroup(p.id, group.name); });
+                        if (groupEditEl && primaryParent) {
+                            groupEditEl.addEventListener('click', (e) => {
+                                e.stopPropagation();
+                                openEditTaskModal(p.id, primaryParent.tIndex);
+                            });
+                        }
+                        if (groupAddSubtaskEl) {
+                            groupAddSubtaskEl.addEventListener('click', (e) => {
+                                e.stopPropagation();
+                                openCreateSubtaskByName(p.id, groupParentTaskName, groupParentArea);
+                            });
+                        }
+                        if (groupObjectiveEl && objectiveSource) {
+                            groupObjectiveEl.addEventListener('click', (e) => {
+                                e.stopPropagation();
+                                openTaskObjectiveModal(p.id, objectiveSource.tIndex);
+                            });
+                        }
+                        taskFragment.appendChild(groupRowLeft);
+
+                        const groupRowRight = document.createElement('div');
+                        groupRowRight.className = 'data-row bg-slate-50 relative';
+                        const groupGantt = new Array(MAX_YEAR_WEEKS).fill(0);
+                        aggregateItems.forEach((item) => {
+                            const rowGantt = Array.isArray(item.t.gantt) ? item.t.gantt : [];
+                            rowGantt.forEach((v, idx) => { if (v > 0) groupGantt[idx] = 1; });
+                        });
+                        let gMin = 9999, gMax = -1;
+                        groupGantt.forEach((v, idx) => { if (v > 0) { if (idx < gMin) gMin = idx; if (idx > gMax) gMax = idx; } });
+                        if (gMin <= gMax && gMax >= viewStartIdx && gMin <= viewEndIdx) {
+                            const drawStart = Math.max(gMin, viewStartIdx);
+                            const drawEnd = Math.min(gMax, viewEndIdx);
+                            const leftPx = (drawStart - viewStartIdx) * WEEK_CELL_PX;
+                            const widthPx = (drawEnd - drawStart + 1) * WEEK_CELL_PX;
+                            const insetPx = widthPx <= WEEK_CELL_PX ? 1 : 2;
+                            const visualWidthPx = Math.max(8, widthPx - (insetPx * 2));
+                            const barColorClass = STATE_COLORS[groupStatus] || 'bg-blue-400';
+                            const bar = document.createElement('div');
+                            bar.className = `absolute top-1/2 -translate-y-1/2 h-6 ${barColorClass} rounded shadow-sm z-0 pointer-events-none transition-all duration-300 opacity-70`;
+                            bar.style.left = `${leftPx + insetPx}px`;
+                            bar.style.width = `${visualWidthPx}px`;
+                            groupRowRight.appendChild(bar);
+                        }
+                        for (let i = 0; i < VISIBLE_TOTAL_WEEKS; i++) {
+                            const cell = document.createElement('div');
+                            cell.className = 'gantt-week-col';
+                            groupRowRight.appendChild(cell);
+                        }
+                        ganttFragment.appendChild(groupRowRight);
+
+                        if (!groupExpanded) return;
+                        visibleSubtasks.forEach((taskEntry) => {
+                            const subtaskName = escapeHtml(taskEntry.t.subtarea || taskEntry.t.nombre || 'Subtarea');
+                            const customNameHtml = `<div class="leading-tight"><div class="text-[11px] text-slate-400">Subtarea</div><div class="font-semibold text-slate-700">${subtaskName}</div></div>`;
+                            renderTaskLeafRow(taskEntry, {
+                                iconCellHtml: '<div class="cell col-icon"></div>',
+                                namePaddingClass: 'pl-10',
+                                showTreeDecor: false,
+                                leftRowClass: 'data-row hover:bg-slate-50',
+                                rightRowClass: 'data-row hover:bg-slate-50 relative',
+                                customNameHtml
+                            });
+                        });
                     });
                 }
             });
@@ -1125,6 +1363,19 @@
             scheduleRender();
         }
 
+        function taskGroupStateKey(pid, taskName) {
+            return `${String(pid || '').trim()}::${String(taskName || '').trim().toLowerCase()}`;
+        }
+        function isTaskGroupExpanded(pid, taskName) {
+            const key = taskGroupStateKey(pid, taskName);
+            if (!taskGroupExpandedState.has(key)) taskGroupExpandedState.set(key, false);
+            return taskGroupExpandedState.get(key);
+        }
+        function toggleTaskGroup(pid, taskName) {
+            const key = taskGroupStateKey(pid, taskName);
+            taskGroupExpandedState.set(key, !isTaskGroupExpanded(pid, taskName));
+            scheduleRender();
+        }
         function toggleProject(pid) { const p = projectMap.get(pid); if (p) { p.expanded = !p.expanded; scheduleRender(); } }
         function toggleAll(expand) { projectData.forEach(p => p.expanded = expand); scheduleRender(); }
         
@@ -1186,15 +1437,18 @@
         async function saveToSheetAsync(pid, tidx, oldIdentity = null) {
             const p = projectMap.get(pid); if (!p) return;
             const task = tidx >= 0 ? p.tasks[tidx] : null;
-            const statusText = task ? {1: 'PENDIENTE', 2: 'EN PROCESO', 3: 'TERMINADO'}[task.status] : {1: 'PENDIENTE', 2: 'EN PROCESO', 3: 'TERMINADO'}[p.status];
+            const statusText = task ? {1: 'Pendiente', 2: 'En proceso', 3: 'Terminado'}[task.status] : {1: 'Pendiente', 2: 'En proceso', 3: 'Terminado'}[p.status];
             const currentGantt = task ? task.gantt : p.gantt;
             const currentStart = task ? dateToISO(task.inicio) : dateToISO(p.inicio);
             const calculatedEndWeek = calculateEndWeekFromGantt(currentGantt);
             const calculatedStartSheet = dateFromISO(currentStart); 
+            const taskTareaKey = task ? String(task.sheet_tarea !== undefined ? task.sheet_tarea : (task.tarea || task.nombre || '')).trim() : '';
+            const taskSubtareaKey = task ? String(task.sheet_subtarea !== undefined ? task.sheet_subtarea : (task.subtarea || '')).trim() : '';
             const taskObj = { 
               area: task ? (normalizeAreaName(task.area) || p.area) : p.area, 
               proyecto: p.nombre, 
-              tarea: task ? task.nombre : '', 
+              tarea: task ? taskTareaKey : '', 
+              subtarea: task ? taskSubtareaKey : '',
               tipo: task ? task.tipo : p.tipo, 
               estado: statusText, 
               ejecutor: task ? task.ejecutor : p.ejecutor, 
@@ -1205,24 +1459,148 @@
                 if (oldIdentity.area !== undefined) taskObj.old_area = oldIdentity.area;
                 if (oldIdentity.proyecto !== undefined) taskObj.old_proyecto = oldIdentity.proyecto;
                 if (oldIdentity.tarea !== undefined) taskObj.old_tarea = oldIdentity.tarea;
+                if (oldIdentity.subtarea !== undefined) taskObj.old_subtarea = oldIdentity.subtarea;
             }
             try { await fetch(APPS_SCRIPT_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'saveTaskData', payload: taskObj }) }); } catch(e) { console.error('Error guardando en Sheet:', e); }
         }
 
-        async function deleteTaskAsync(area, proyecto, tarea) {
-            try { await fetch(APPS_SCRIPT_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'deleteTaskData', payload: { area, proyecto, tarea } }) }); } catch(e) { console.error(e); }
+        async function deleteTaskAsync(area, proyecto, tarea, subtarea = '') {
+            try { await fetch(APPS_SCRIPT_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'deleteTaskData', payload: { area, proyecto, tarea, subtarea } }) }); } catch(e) { console.error(e); }
+        }
+
+        async function deleteProjectAsync(proyecto, area = '') {
+            try {
+                const response = await fetch(APPS_SCRIPT_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify({ action: 'deleteProjectData', payload: { proyecto, area } })
+                });
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                return await response.json();
+            } catch (e) {
+                console.error('Error eliminando proyecto en Sheet:', e);
+                return { success: false, error: String(e) };
+            }
+        }
+
+        function openTaskObjectiveModal(pid, tidx) {
+            const p = projectMap.get(pid);
+            if (!p || !p.tasks || !p.tasks[tidx]) return;
+            const t = p.tasks[tidx];
+
+            const tareaLabel = String(t.tarea || t.nombre || '').trim();
+            const subtareaLabel = String(t.subtarea || '').trim();
+            const title = subtareaLabel
+                ? `${tareaLabel} > ${subtareaLabel}`
+                : (tareaLabel || 'Tarea');
+
+            const projectIndicator = ((p.kpis || [])[0] || {});
+            const projectSolution = String(projectIndicator.que_soluciono || '').trim();
+            const projectMetric = String(projectIndicator.indicador || '').trim();
+            const projectLBase = String(projectIndicator.l_base || '').trim();
+            const projectMeta = String(projectIndicator.meta || '').trim();
+            const projectNumerador = String(projectIndicator.numerador || '').trim();
+            const projectDenominador = String(projectIndicator.denominador || '').trim();
+            const projectMonthly = projectIndicator.monthly || {};
+
+            const taskSolution = String(t.que_soluciono_tarea || '').trim();
+            const taskMetric = String(t.indicador_tarea || '').trim();
+            const taskLBase = String(t.l_base_tarea || '').trim();
+            const taskMeta = String(t.meta_tarea || '').trim();
+            const taskNumerador = String(t.numerador_tarea || '').trim();
+            const taskDenominador = String(t.denominador_tarea || '').trim();
+            const taskMonthly = t.monthly_tarea || {};
+
+            const ejecutor = String(t.ejecutor || '').trim();
+            const proyecto = String(p.nombre || '').trim();
+            const meta = `Proyecto: ${proyecto || '-'} | Ejecutor: ${ejecutor || '-'}`;
+            const monthKeys = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+            const monthLabels = { ene: 'ENE', feb: 'FEB', mar: 'MAR', abr: 'ABR', may: 'MAY', jun: 'JUN', jul: 'JUL', ago: 'AGO', sep: 'SEP', oct: 'OCT', nov: 'NOV', dic: 'DIC' };
+            const renderMonthTable = (monthly) => `
+                <div class="grid grid-cols-3 md:grid-cols-6 lg:grid-cols-12 gap-2 mt-3">
+                    ${monthKeys.map(m => `
+                        <div class="border border-slate-200 rounded bg-white p-2">
+                            <div class="text-[10px] font-bold text-slate-500">${monthLabels[m]}</div>
+                            <div class="text-xs text-slate-700 mt-1 break-words">${escapeHtml(String((monthly && monthly[m]) || '').trim() || '-')}</div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+
+            const content = `
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div>
+                        <span class="block text-xs font-bold uppercase text-slate-500 mb-1">Tarea</span>
+                        <div class="w-full border border-slate-300 rounded p-2.5 text-sm text-slate-700 bg-white min-h-[44px]">${escapeHtml(tareaLabel || '-')}</div>
+                    </div>
+                    <div>
+                        <span class="block text-xs font-bold uppercase text-slate-500 mb-1">Subtarea</span>
+                        <div class="w-full border border-slate-300 rounded p-2.5 text-sm text-slate-700 bg-white min-h-[44px]">${escapeHtml(subtareaLabel || '-')}</div>
+                    </div>
+                    <div class="md:col-span-2">
+                        <span class="block text-xs font-bold uppercase text-slate-500 mb-1">Proyecto: ¿Qué solucionó?</span>
+                        <div class="w-full border border-slate-300 rounded p-3 text-sm text-slate-700 bg-white min-h-[64px] whitespace-pre-wrap">${escapeHtml(projectSolution || 'Sin detalle registrado.')}</div>
+                    </div>
+                    <div class="md:col-span-2">
+                        <span class="block text-xs font-bold uppercase text-slate-500 mb-1">Proyecto: Indicador</span>
+                        <div class="w-full border border-slate-300 rounded p-3 bg-white">
+                            <div class="text-sm text-slate-700 font-semibold">${escapeHtml(projectMetric || '-')}</div>
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mt-3">
+                                <div><div class="text-[10px] uppercase font-bold text-slate-500">Línea base</div><div class="text-sm text-slate-700">${escapeHtml(projectLBase || '-')}</div></div>
+                                <div><div class="text-[10px] uppercase font-bold text-slate-500">Meta</div><div class="text-sm text-slate-700">${escapeHtml(projectMeta || '-')}</div></div>
+                                <div><div class="text-[10px] uppercase font-bold text-slate-500">Numerador</div><div class="text-sm text-slate-700">${escapeHtml(projectNumerador || '-')}</div></div>
+                                <div><div class="text-[10px] uppercase font-bold text-slate-500">Denominador</div><div class="text-sm text-slate-700">${escapeHtml(projectDenominador || '-')}</div></div>
+                            </div>
+                            ${renderMonthTable(projectMonthly)}
+                        </div>
+                    </div>
+                    <div class="md:col-span-2">
+                        <span class="block text-xs font-bold uppercase text-slate-500 mb-1">Tarea/Subtarea: ¿Qué solucionó?</span>
+                        <div class="w-full border border-slate-300 rounded p-3 text-sm text-slate-700 bg-white min-h-[64px] whitespace-pre-wrap">${escapeHtml(taskSolution || 'Sin detalle registrado.')}</div>
+                    </div>
+                    <div class="md:col-span-2">
+                        <span class="block text-xs font-bold uppercase text-slate-500 mb-1">Tarea/Subtarea: Indicador</span>
+                        <div class="w-full border border-slate-300 rounded p-3 bg-white">
+                            <div class="text-sm text-slate-700 font-semibold">${escapeHtml(taskMetric || '-')}</div>
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mt-3">
+                                <div><div class="text-[10px] uppercase font-bold text-slate-500">Línea base</div><div class="text-sm text-slate-700">${escapeHtml(taskLBase || '-')}</div></div>
+                                <div><div class="text-[10px] uppercase font-bold text-slate-500">Meta</div><div class="text-sm text-slate-700">${escapeHtml(taskMeta || '-')}</div></div>
+                                <div><div class="text-[10px] uppercase font-bold text-slate-500">Numerador</div><div class="text-sm text-slate-700">${escapeHtml(taskNumerador || '-')}</div></div>
+                                <div><div class="text-[10px] uppercase font-bold text-slate-500">Denominador</div><div class="text-sm text-slate-700">${escapeHtml(taskDenominador || '-')}</div></div>
+                            </div>
+                            ${renderMonthTable(taskMonthly)}
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            const titleEl = document.getElementById('taskObjectiveTitle');
+            const metaEl = document.getElementById('taskObjectiveMeta');
+            const contentEl = document.getElementById('taskObjectiveContent');
+            if (titleEl) titleEl.textContent = title;
+            if (metaEl) metaEl.textContent = meta;
+            if (contentEl) contentEl.innerHTML = content;
+            document.getElementById('taskObjectiveModal').style.display = 'flex';
+        }
+
+        function closeTaskObjectiveModal() {
+            const modal = document.getElementById('taskObjectiveModal');
+            if (modal) modal.style.display = 'none';
         }
 
         // ========= MODALS LOGIC =========
         
         // --- Open Modal Wrapper ---
-        function openModal(mode, projectObj = null) {
-            createMode = mode; // 'project' or 'task'
+        function openModal(mode, projectObj = null, options = {}) {
+            createMode = mode; // 'project', 'task' or 'subtask'
             targetProjectId = projectObj ? projectObj.id : null;
+            targetParentTaskContext = null;
             
             const modal = document.getElementById('createFieldModal');
             const titleEl = document.getElementById('cf-modal-title');
             const subtitleEl = document.getElementById('cf-modal-subtitle');
+            const taskLabelEl = document.getElementById('cf-task-label');
+            const taskInputEl = document.getElementById('cf-task');
             
             // Refrescar columnas desde datos ya cargados (instantáneo, sin fetch)
             refreshCachedColumns();
@@ -1251,6 +1629,7 @@
             if (mode === 'project') {
                 titleEl.textContent = "CREAR NUEVO PROYECTO";
                 subtitleEl.textContent = "Definir nuevo proyecto maestro";
+                if (taskLabelEl) taskLabelEl.textContent = "Nombre de la Tarea";
                 
                 divProjInput.style.display = 'block';
                 divProjReadonly.style.display = 'none';
@@ -1263,9 +1642,10 @@
                 $area.placeholder = "Selecciona o escribe una nueva área";
                 $area.disabled = false;
                 
-            } else { // mode === 'task'
+            } else if (mode === 'task') {
                 titleEl.textContent = "AGREGAR TAREA";
                 subtitleEl.textContent = `Al proyecto: ${projectObj.nombre}`;
+                if (taskLabelEl) taskLabelEl.textContent = "Nombre de la Tarea";
                 
                 divProjInput.style.display = 'none';
                 divProjReadonly.style.display = 'block';
@@ -1274,9 +1654,38 @@
                 
                 // Pre-fill fields
                 document.getElementById('cf-project-readonly').value = projectObj.nombre;
-                document.getElementById('cf-task').value = '';
+                if (taskInputEl) {
+                    taskInputEl.value = '';
+                    taskInputEl.placeholder = "Nombre de la tarea";
+                }
                 const projectArea = normalizeAreaName(projectObj.area);
                 $area.value = projectArea || '';
+                $area.placeholder = "Selecciona o escribe una nueva área";
+                $area.disabled = false;
+            } else { // mode === 'subtask'
+                const parentTaskName = String(options.parentTaskName || '').trim();
+                const parentArea = normalizeAreaName(options.parentArea || '') || normalizeAreaName(projectObj.area) || '';
+                targetParentTaskContext = {
+                    parentTaskName,
+                    parentArea,
+                    baseTaskIndex: Number.isInteger(options.baseTaskIndex) ? options.baseTaskIndex : null
+                };
+
+                titleEl.textContent = "AGREGAR SUBTAREA";
+                subtitleEl.textContent = `A la tarea: ${parentTaskName || '(sin tarea padre)'}`;
+                if (taskLabelEl) taskLabelEl.textContent = "Nombre de la Subtarea";
+
+                divProjInput.style.display = 'none';
+                divProjReadonly.style.display = 'block';
+                divTask.style.display = 'block';
+                divExec.style.display = 'block';
+
+                document.getElementById('cf-project-readonly').value = projectObj.nombre;
+                if (taskInputEl) {
+                    taskInputEl.value = '';
+                    taskInputEl.placeholder = "Nombre de la subtarea";
+                }
+                $area.value = parentArea || '';
                 $area.placeholder = "Selecciona o escribe una nueva área";
                 $area.disabled = false;
             }
@@ -1298,6 +1707,28 @@
         function openCreateTaskModal(projectId) {
             const p = projectMap.get(projectId);
             if (p) openModal('task', p); // No await, la tarea se abre rápido
+        }
+        function openCreateSubtaskModal(projectId, taskIndex) {
+            const p = projectMap.get(projectId);
+            if (!p || !Array.isArray(p.tasks) || !p.tasks[taskIndex]) return;
+            const t = p.tasks[taskIndex];
+            const parentTaskName = String(t.sheet_tarea !== undefined ? t.sheet_tarea : (t.tarea || t.nombre || '')).trim();
+            const parentArea = normalizeAreaName(t.area) || normalizeAreaName(p.area) || '';
+            if (!parentTaskName) {
+                showToast('No se pudo identificar la tarea padre para la subtarea', 'error');
+                return;
+            }
+            openModal('subtask', p, { parentTaskName, parentArea, baseTaskIndex: taskIndex });
+        }
+        function openCreateSubtaskByName(projectId, parentTaskName, parentArea = '') {
+            const p = projectMap.get(projectId);
+            if (!p) return;
+            const name = String(parentTaskName || '').trim();
+            if (!name) {
+                showToast('No se pudo identificar la tarea padre para la subtarea', 'error');
+                return;
+            }
+            openModal('subtask', p, { parentTaskName: name, parentArea: normalizeAreaName(parentArea) || normalizeAreaName(p.area) || '' });
         }
 
         document.getElementById('createFieldClose')?.addEventListener('click', () => document.getElementById('createFieldModal').style.display='none');
@@ -1324,21 +1755,39 @@
             // Logic split
             let proyecto = "";
             let tarea = "";
+            let subtarea = "";
             let ejecutor = "";
 
             if (createMode === 'project') {
                 proyecto = (document.getElementById('cf-project-input').value || 'Nuevo Proyecto').trim();
                 tarea = ""; 
                 ejecutor = ""; 
-            } else {
+            } else if (createMode === 'task') {
                 if (!areaInput) {
                     showToast('Selecciona un área para la tarea', 'error');
                     return;
                 }
                 // Task Mode - usar projectMap en lugar de .find() para O(1) lookup
                 const p = projectMap.get(targetProjectId);
+                if (!p) return;
                 proyecto = p.nombre;
                 tarea = (document.getElementById('cf-task').value || 'Nueva Tarea').trim();
+                ejecutor = (document.getElementById('cf-ejecutor').value || 'Equipo').trim();
+            } else {
+                if (!areaInput) {
+                    showToast('Selecciona un área para la subtarea', 'error');
+                    return;
+                }
+                const p = projectMap.get(targetProjectId);
+                if (!p) return;
+                const parentTaskName = String(targetParentTaskContext && targetParentTaskContext.parentTaskName || '').trim();
+                if (!parentTaskName) {
+                    showToast('No se identificó la tarea padre de la subtarea', 'error');
+                    return;
+                }
+                proyecto = p.nombre;
+                tarea = parentTaskName;
+                subtarea = (document.getElementById('cf-task').value || 'Nueva Subtarea').trim();
                 ejecutor = (document.getElementById('cf-ejecutor').value || 'Equipo').trim();
             }
 
@@ -1354,18 +1803,55 @@
                 };
                 projectData.push(newProject);
                 projectMap.set(newId, newProject);
+            } else if (createMode === 'task') {
+                const p = projectMap.get(targetProjectId);
+                if (p) {
+                    const newTaskId = p.id + 't' + (p.tasks.length + 1);
+                    p.tasks.push({
+                        id: newTaskId,
+                        nombre: tarea,
+                        tarea: tarea,
+                        subtarea: '',
+                        sheet_tarea: tarea,
+                        sheet_subtarea: '',
+                        tipo,
+                        ejecutor,
+                        status: 1,
+                        gantt: ganttArr,
+                        inicio: inicio,
+                        area: area
+                    });
+                }
             } else {
                 const p = projectMap.get(targetProjectId);
                 if (p) {
                     const newTaskId = p.id + 't' + (p.tasks.length + 1);
-                    p.tasks.push({ id: newTaskId, nombre: tarea, tipo, ejecutor, status: 1, gantt: ganttArr, inicio: inicio, area: area });
+                    p.tasks.push({
+                        id: newTaskId,
+                        nombre: subtarea,
+                        tarea: tarea,
+                        subtarea: subtarea,
+                        sheet_tarea: tarea,
+                        sheet_subtarea: subtarea,
+                        tipo,
+                        ejecutor,
+                        status: 1,
+                        gantt: ganttArr,
+                        inicio: inicio,
+                        area: area
+                    });
                 }
             }
 
             // Actualizar UI inmediatamente (no esperar al servidor)
             scheduleRender();
             document.getElementById('createFieldModal').style.display = 'none';
-            showToast(createMode === 'project' ? 'Proyecto creado' : 'Tarea agregada', 'success');
+            showToast(
+                createMode === 'project'
+                    ? 'Proyecto creado'
+                    : (createMode === 'task' ? 'Tarea agregada' : 'Subtarea agregada'),
+                'success'
+            );
             
             // Guardar en servidor
             if (createMode === 'project') {
@@ -1398,19 +1884,20 @@
                         console.error('Error guardando proyecto:', e);
                         showToast('Advertencia: Posible error al guardar proyecto', 'error');
                     });
-            } else if (createMode === 'task') {
+            } else {
                 const taskObj = {
                     area: area,
                     proyecto: proyecto,
                     tarea: tarea,
+                    subtarea: subtarea,
                     tipo: tipo,
                     f_inicio: inicio,
                     ejecutor: ejecutor,
-                    estado: 'PENDIENTE',
+                    estado: 'Pendiente',
                     f_fin: fFinCalculada
                 };
-                
-                console.log('Guardando tarea:', taskObj);
+                 
+                console.log(createMode === 'task' ? 'Guardando tarea:' : 'Guardando subtarea:', taskObj);
                 
                 // Guardar en background con mejor manejo de errores
                 fetch(APPS_SCRIPT_URL, {
@@ -1454,12 +1941,25 @@
         function saveEditedTask() {
             if (!currentEdit) return;
             const { pid, tidx } = currentEdit; const p = projectMap.get(pid); if (!p) return; const t = p.tasks[tidx];
+            const oldTaskKey = String(t.sheet_tarea !== undefined ? t.sheet_tarea : (t.tarea || t.nombre || '')).trim();
+            const oldSubtaskKey = String(t.sheet_subtarea !== undefined ? t.sheet_subtarea : (t.subtarea || '')).trim();
             const oldIdentity = {
                 area: normalizeAreaName(t.area) || p.area,
                 proyecto: p.nombre,
-                tarea: t.nombre
+                tarea: oldTaskKey,
+                subtarea: oldSubtaskKey
             };
-            t.nombre = document.getElementById('edit-task-name').value.trim() || t.nombre; t.tipo = document.getElementById('edit-task-tipo').value || t.tipo;
+            const newName = document.getElementById('edit-task-name').value.trim() || t.nombre;
+            if (oldSubtaskKey) {
+                t.subtarea = newName;
+                t.sheet_subtarea = newName;
+                t.nombre = newName;
+            } else {
+                t.tarea = newName;
+                t.sheet_tarea = newName;
+                t.nombre = newName;
+            }
+            t.tipo = document.getElementById('edit-task-tipo').value || t.tipo;
             t.status = parseInt(document.getElementById('edit-task-estado').value, 10) || t.status;
             // Convertir de formato YYYY-MM-DD a DD/MM/YYYY
             const inicioValue = document.getElementById('edit-task-inicio').value;
@@ -1472,8 +1972,14 @@
         }
         function deleteTaskConfirm(pid, tidx) {
             const p = projectMap.get(pid); if (!p) return; const t = p.tasks[tidx]; if (!t) return;
-            showConfirm(`¿Eliminar la tarea "${t.nombre}"?`, () => {
-                p.tasks.splice(tidx, 1); deleteTaskAsync((normalizeAreaName(t.area) || p.area), p.nombre, t.nombre); scheduleRender(); showToast('Tarea eliminada', 'success');
+            const taskDisplayName = String(t.subtarea || t.nombre || '').trim() || 'tarea';
+            const taskKey = String(t.sheet_tarea !== undefined ? t.sheet_tarea : (t.tarea || t.nombre || '')).trim();
+            const subtaskKey = String(t.sheet_subtarea !== undefined ? t.sheet_subtarea : (t.subtarea || '')).trim();
+            showConfirm(`¿Eliminar la tarea "${taskDisplayName}"?`, () => {
+                p.tasks.splice(tidx, 1);
+                deleteTaskAsync((normalizeAreaName(t.area) || p.area), p.nombre, taskKey, subtaskKey);
+                scheduleRender();
+                showToast('Tarea eliminada', 'success');
             });
         }
 
@@ -1506,6 +2012,30 @@
         function closeEditProjectModal() { 
             document.getElementById('editProjectModal').style.display = 'none'; 
             currentEditProject = null; 
+        }
+
+        function deleteProjectFromEditModal() {
+            if (!currentEditProject) return;
+            const pid = currentEditProject;
+            const p = projectMap.get(pid);
+            if (!p) return;
+            const projectName = String(p.nombre || '').trim() || 'proyecto';
+
+            showConfirm(`¿Eliminar el proyecto "${projectName}" y todas sus tareas?`, async () => {
+                projectData = projectData.filter(item => item.id !== pid);
+                projectMap.delete(pid);
+                if (currentKpiProject && currentKpiProject.id === pid) currentKpiProject = null;
+
+                closeEditProjectModal();
+                scheduleRender();
+                showToast('Proyecto eliminado', 'success');
+
+                const result = await deleteProjectAsync(projectName);
+                if (!result || result.success === false) {
+                    const message = (result && (result.message || result.error)) || 'Posible error al eliminar en la hoja.';
+                    showToast(message, 'error');
+                }
+            });
         }
         
         function saveEditedProject() {
@@ -1572,9 +2102,17 @@
             const project = projectMap.get(projectId); if (!project) return;
             currentKpiProject = project;
             document.getElementById('kpiModalProjectTitle').innerText = `${project.nombre}`;
-            if (!project.kpis || project.kpis.length === 0) {
-                project.kpis = [{ id: 'new_' + Date.now(), objetivo: '', l_base: '', meta: '', indicador: '', numerador: '', denominador: '', monthly: {} }];
-            }
+            const firstKpi = (project.kpis && project.kpis.length > 0) ? project.kpis[0] : {};
+            project.kpis = [{
+                id: firstKpi.id || ('new_' + Date.now()),
+                que_soluciono: firstKpi.que_soluciono || '',
+                l_base: firstKpi.l_base || '',
+                meta: firstKpi.meta || '',
+                indicador: firstKpi.indicador || '',
+                numerador: firstKpi.numerador || '',
+                denominador: firstKpi.denominador || '',
+                monthly: firstKpi.monthly || {}
+            }];
             activeKpiIndex = 0; 
             renderKpiModalContent();
             document.getElementById('kpiModal').style.display = 'flex';
@@ -1594,7 +2132,7 @@
                 
                 // Title span
                 const span = document.createElement('span');
-                const title = kpi.objetivo || `Indicador ${idx + 1}`; 
+                const title = kpi.indicador || kpi.que_soluciono || `Indicador ${idx + 1}`; 
                 span.textContent = title.length > 18 ? title.substring(0, 18) + '...' : title;
                 span.className = "flex-1";
                 span.onclick = () => { activeKpiIndex = idx; renderKpiModalContent(); };
@@ -1638,11 +2176,11 @@
         }
         
         async function deleteKpiAsync(kpi) {
-             try { await fetch(APPS_SCRIPT_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'deleteKpiData', payload: { id: kpi.id, proyecto: currentKpiProject.nombre } }) }); showToast('KPI eliminado', 'success'); } catch(e) { console.error(e); }
+             try { await fetch(APPS_SCRIPT_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'deleteKpiData', payload: { id: kpi.id, proyecto: currentKpiProject.nombre } }) }); showToast('Indicador eliminado', 'success'); } catch(e) { console.error(e); }
         }
         
         function createNewKpi() {
-            currentKpiProject.kpis.push({ id: 'new_' + Date.now() + Math.random().toString(36).substr(2, 5), a_cambio: '', prioridad: 'BAJA', que_soluciono: '', objetivo: '', l_base: '', meta: '', indicador: '', numerador: '', denominador: '', monthly: {} });
+            currentKpiProject.kpis.push({ id: 'new_' + Date.now() + Math.random().toString(36).substr(2, 5), que_soluciono: '', l_base: '', meta: '', indicador: '', numerador: '', denominador: '', monthly: {} });
             activeKpiIndex = currentKpiProject.kpis.length - 1; renderKpiModalContent();
         }
 
@@ -1651,7 +2189,7 @@
             if (!currentKpiProject || !currentKpiProject.kpis[activeKpiIndex]) return;
             const kpi = currentKpiProject.kpis[activeKpiIndex];
             kpi[field] = value;
-            if (field === 'objetivo') renderKpiList(); // Update sidebar title live
+            if (field === 'indicador' || field === 'que_soluciono') renderKpiList(); // Update sidebar title live
         }
 
         function updateKpiMonth(month, value) {
@@ -1669,21 +2207,9 @@
             
             let fieldsHTML = `
                 <div class="mb-6 grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Agentes de cambio</label>
-                        <input class="w-full border border-slate-300 rounded p-2 text-sm" value="${kpi.a_cambio || ''}" placeholder="Agente de cambio" oninput="updateKpiField('a_cambio', this.value)">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Prioridad</label>
-                        <select class="w-full border border-slate-300 rounded p-2 text-sm" onchange="updateKpiField('prioridad', this.value)"><option value="BAJA" ${(kpi.prioridad || '').toUpperCase() === 'BAJA' ? 'selected' : ''}>BAJA</option><option value="ALTA" ${(kpi.prioridad || '').toUpperCase() === 'ALTA' ? 'selected' : ''}>ALTA</option></select>
-                    </div>
-                    <div>
+                    <div class="col-span-2">
                         <label class="block text-xs font-bold text-slate-500 uppercase mb-1">¿Qué soluciono?</label>
-                        <input class="w-full border border-slate-300 rounded p-2 text-sm col-span-2" value="${kpi.que_soluciono || ''}" placeholder="Descripción de la solución" oninput="updateKpiField('que_soluciono', this.value)">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Objetivo</label>
-                        <input class="w-full border border-slate-300 rounded p-2 text-sm" value="${kpi.objetivo || ''}" placeholder="Ej: Reducir costos..." oninput="updateKpiField('objetivo', this.value)">
+                        <input class="w-full border border-slate-300 rounded p-2 text-sm" value="${kpi.que_soluciono || ''}" placeholder="Descripción de la solución" oninput="updateKpiField('que_soluciono', this.value)">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Indicador</label>
@@ -1729,7 +2255,7 @@
 
         async function saveCurrentKpi() {
             if (!currentKpiProject || !currentKpiProject.kpis || !currentKpiProject.kpis[activeKpiIndex]) {
-                showToast('Error: KPI no válido', 'error');
+                showToast('Error: indicador no válido', 'error');
                 return;
             }
             const kpi = currentKpiProject.kpis[activeKpiIndex];
@@ -1738,10 +2264,9 @@
                 proyecto: currentKpiProject.nombre,
                 id: kpi.id,
                 f_inicio: currentKpiProject.inicio,
-                a_cambio: kpi.a_cambio,
-                prioridad: kpi.prioridad,
+                a_cambio: '',
                 que_soluciono: kpi.que_soluciono,
-                objetivo: kpi.objetivo,
+                objetivo: '',
                 l_base: kpi.l_base,
                 meta: kpi.meta,
                 indicador: kpi.indicador,
@@ -1750,23 +2275,23 @@
                 datos_mensuales: kpi.monthly
             };
             try {
-                showToast('Guardando KPI...', 'info');
+                showToast('Guardando indicador...', 'info');
                 const response = await fetch(APPS_SCRIPT_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                     body: JSON.stringify({ action: 'saveKpiData', payload: kpiPayload })
                 });
                 const result = await response.json();
-                console.log('KPI Saved:', result);
+                console.log('Indicador guardado:', result);
                 if (result.success) {
-                    showToast('KPI guardado', 'success');
+                    showToast('Indicador guardado', 'success');
                     renderKpiList();
                 } else {
-                    showToast(result.message || 'Error al guardar KPI', 'error');
+                    showToast(result.message || 'Error al guardar indicador', 'error');
                     console.error('Backend error:', result);
                 }
             } catch(e) {
-                console.error('Error guardando KPI:', e);
+                console.error('Error guardando indicador:', e);
                 showToast('Error: ' + e.message, 'error');
             }
         }
@@ -1782,38 +2307,6 @@
             const timeStr = `${hours}:${minutes}:${seconds}`;
             lastUpdateTime = timeStr;
             document.getElementById('lastUpdateTime').textContent = `Última actualización: ${timeStr}`;
-        }
-        
-        // Refrescar datos manualmente
-        async function refreshDataManual() {
-            if (isLoadingData) return; // Evitar múltiples clicks
-            
-            const btn = document.getElementById('btn-refresh');
-            const icon = document.getElementById('refresh-icon');
-            icon.classList.add('refresh-spinning');
-            btn.disabled = true;
-            
-            showToast('Refrescando datos...', 'info');
-            await loadDataFromSheet();
-            
-            updateLastUpdateTime();
-            icon.classList.remove('refresh-spinning');
-            btn.disabled = false;
-            showToast('Datos actualizados', 'success');
-        }
-        
-        // Inicializar auto-refresh cada 5 minutos
-        function initAutoRefresh() {
-            // Actualizar time display inmediatamente
-            updateLastUpdateTime();
-            
-            // Auto-refresh cada 5 minutos
-            if (autoRefreshTimerId) clearInterval(autoRefreshTimerId);
-            autoRefreshTimerId = setInterval(async () => {
-                console.log('Auto-refreshing datos...');
-                await loadDataFromSheet();
-                updateLastUpdateTime();
-            }, AUTO_REFRESH_INTERVAL);
         }
         
         // ========= LOAD DATA =========
@@ -1832,6 +2325,7 @@
                     // Ensure all projects start collapsed by default
                     projectData.forEach(p => p.expanded = false);
                     updateProjectMap();
+                    updateLastUpdateTime();
                     showToast('Datos cargados', 'success');
                 } else { projectData = []; } 
                 populateFilterOptions(); render();
@@ -1849,24 +2343,88 @@
         }
 
         function transformSheetDataToGantt(datosData, kpiData) {
+            const rows = Array.isArray(datosData) ? datosData : [];
             const proyectosMap = new Map();
             const kpiMap = new Map();
+            const kpiSeenByProject = new Map();
 
             const slugify = (value) => String(value || '')
                 .toLowerCase()
                 .replace(/[^a-z0-9]+/g, '_')
                 .replace(/^_+|_+$/g, '');
 
-            // Group projects strictly by project name (same name => same project group)
+            const canonicalKey = (value) => String(value || '')
+                .toUpperCase()
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .replace(/[^A-Z0-9]+/g, '');
+
+            const normalizeValue = (value) => String(value === undefined || value === null ? '' : value).trim();
             const buildProjectKey = (projectName) => `${projectName}`;
 
+            const setCanonValue = (obj, key, value) => {
+                if (!key) return;
+                const current = obj[key];
+                if (current === undefined || normalizeValue(current) === '') obj[key] = value;
+            };
+
+            const toCanonicalRow = (row) => {
+                const canonical = {};
+                Object.entries(row || {}).forEach(([rawKey, value]) => {
+                    const key = canonicalKey(rawKey);
+                    if (!key) return;
+                    setCanonValue(canonical, key, value);
+                    const baseKey = key.replace(/\d+$/, '');
+                    if (baseKey && baseKey !== key) setCanonValue(canonical, baseKey, value);
+                });
+                return canonical;
+            };
+
+            const pick = (row, candidates) => {
+                for (const candidate of candidates) {
+                    const key = canonicalKey(candidate);
+                    if (!key || row[key] === undefined) continue;
+                    const val = row[key];
+                    if (normalizeValue(val) !== '') return val;
+                }
+                return '';
+            };
+
+            const monthMap = {
+                ene: ['ENE'],
+                feb: ['FEB'],
+                mar: ['MAR'],
+                abr: ['ABR'],
+                may: ['MAY'],
+                jun: ['JUN'],
+                jul: ['JUL'],
+                ago: ['AGO'],
+                sep: ['SEP'],
+                oct: ['OCT'],
+                nov: ['NOV'],
+                dic: ['DIC']
+            };
+
+            const normalizedRows = rows.map(raw => ({
+                raw,
+                row: toCanonicalRow(raw)
+            }));
+
             const knownAreasByProject = new Map();
+            const knownTasksByProject = new Map();
             const registerKnownArea = (projectName, areaName) => {
-                const project = String(projectName || '').trim();
+                const project = normalizeValue(projectName);
                 const area = normalizeAreaName(areaName);
                 if (!project || !area) return;
                 if (!knownAreasByProject.has(project)) knownAreasByProject.set(project, new Set());
                 knownAreasByProject.get(project).add(area);
+            };
+            const registerKnownTask = (projectName, taskName) => {
+                const project = normalizeValue(projectName);
+                const task = normalizeValue(taskName);
+                if (!project || !task) return;
+                if (!knownTasksByProject.has(project)) knownTasksByProject.set(project, new Set());
+                knownTasksByProject.get(project).add(task);
             };
 
             const resolveAreaForRow = (projectName, rowArea) => {
@@ -1877,50 +2435,129 @@
                 return 'GENERAL';
             };
 
-            datosData.forEach(row => {
-                const projectName = String(row['PROYECTO'] || '').trim();
+            normalizedRows.forEach(({ row }) => {
+                const projectName = normalizeValue(pick(row, ['PROYECTO']));
                 if (!projectName) return;
-                registerKnownArea(projectName, row['AREA']);
+                registerKnownArea(projectName, pick(row, ['AREA']));
+                registerKnownTask(projectName, pick(row, ['TAREA']));
             });
 
-            if (kpiData) {
-                kpiData.forEach(k => {
-                    const projectName = String(k['PROYECTO'] || '').trim();
-                    if (!projectName) return;
-                    const kpiKey = buildProjectKey(projectName);
-                    if (!kpiMap.has(kpiKey)) kpiMap.set(kpiKey, []);
-                    kpiMap.get(kpiKey).push({
-                        id: k['ID'] || ('k_' + Math.random().toString(36).substr(2, 5)),
-                        f_inicio: k['F INICIO'], a_cambio: k['A. CAMBIO'], prioridad: k['PRIORIDAD'] || 'BAJA', que_soluciono: k['¿QUE SOLUCIONO?'] || k['\u00C2\u00BFQUE SOLUCIONO?'], objetivo: k['OBJETIVO'], l_base: k['L_BASE'], meta: k['META'], indicador: k['INDICADOR'], denominador: k['DENOMINADOR'], numerador: k['NUMERADOR'],
-                        monthly: { ene: k['ENE'], feb: k['FEB'], mar: k['MAR'], abr: k['ABR'], may: k['MAY'], jun: k['JUN'], jul: k['JUL'], ago: k['AGO'], sep: k['SEP'], oct: k['OCT'], nov: k['NOV'], dic: k['DIC'] }
-                    });
+            const registerKpi = (rowObj) => {
+                const projectName = normalizeValue(pick(rowObj, ['PROYECTO']));
+                if (!projectName) return;
+                const hasTaskLevelIdentity = normalizeValue(pick(rowObj, ['TAREA'])) !== '' || normalizeValue(pick(rowObj, ['SUBTAREA'])) !== '';
+                // Nuevo modelo: KPI del proyecto solo desde la fila de proyecto (sin TAREA/SUBTAREA)
+                if (hasTaskLevelIdentity) return;
+                const kpiKey = buildProjectKey(projectName);
+                if (!kpiMap.has(kpiKey)) kpiMap.set(kpiKey, []);
+                if (!kpiSeenByProject.has(kpiKey)) kpiSeenByProject.set(kpiKey, new Set());
+
+                const monthly = {};
+                Object.entries(monthMap).forEach(([month, candidates]) => {
+                    monthly[month] = pick(rowObj, candidates);
                 });
+
+                const kpiItem = {
+                    id: 'k_' + Math.random().toString(36).substr(2, 5),
+                    f_inicio: pick(rowObj, ['F_INCIO_PROYECTO', 'F_INICIO_PROYECTO', 'F.INICIO', 'F INICIO']),
+                    que_soluciono: pick(rowObj, ['¿QUE SOLUCIONO?', 'QUE SOLUCIONO', 'Â¿QUE SOLUCIONO?']),
+                    l_base: pick(rowObj, ['L_BASE', 'LINEA BASE', 'L BASE']),
+                    meta: pick(rowObj, ['META']),
+                    indicador: pick(rowObj, ['INDICADOR']),
+                    denominador: pick(rowObj, ['DENOMINADOR']),
+                    numerador: pick(rowObj, ['NUMERADOR']),
+                    monthly: monthly
+                };
+
+                const hasMonthly = Object.values(monthly).some(v => normalizeValue(v) !== '');
+                const hasKpiData =
+                    normalizeValue(kpiItem.que_soluciono) !== '' ||
+                    normalizeValue(kpiItem.l_base) !== '' ||
+                    normalizeValue(kpiItem.meta) !== '' ||
+                    normalizeValue(kpiItem.indicador) !== '' ||
+                    normalizeValue(kpiItem.denominador) !== '' ||
+                    normalizeValue(kpiItem.numerador) !== '' ||
+                    hasMonthly;
+                if (!hasKpiData) return;
+
+                const fingerprint = JSON.stringify({
+                    f_inicio: normalizeValue(kpiItem.f_inicio),
+                    que_soluciono: normalizeValue(kpiItem.que_soluciono),
+                    l_base: normalizeValue(kpiItem.l_base),
+                    meta: normalizeValue(kpiItem.meta),
+                    indicador: normalizeValue(kpiItem.indicador),
+                    denominador: normalizeValue(kpiItem.denominador),
+                    numerador: normalizeValue(kpiItem.numerador),
+                    monthly: Object.fromEntries(Object.entries(monthly).map(([k, v]) => [k, normalizeValue(v)]))
+                });
+                const seenSet = kpiSeenByProject.get(kpiKey);
+                if (seenSet.has(fingerprint)) return;
+                seenSet.add(fingerprint);
+                kpiMap.get(kpiKey).push(kpiItem);
+            };
+
+            normalizedRows.forEach(({ row }) => registerKpi(row));
+
+            if (Array.isArray(kpiData)) {
+                kpiData.forEach(k => registerKpi(toCanonicalRow(k)));
             }
 
-            datosData.forEach(row => {
-                const projectName = String(row['PROYECTO'] || '').trim();
+            normalizedRows.forEach(({ row }) => {
+                const projectName = normalizeValue(pick(row, ['PROYECTO']));
                 if (!projectName) return;
 
-                const taskName = String(row['TAREA'] || '').trim();
+                const sheetTareaName = normalizeValue(pick(row, ['TAREA']));
+                const sheetSubtareaName = normalizeValue(pick(row, ['SUBTAREA']));
+                let parentTaskName = sheetTareaName;
+                if (!parentTaskName && sheetSubtareaName) {
+                    const knownTasks = knownTasksByProject.get(projectName);
+                    if (knownTasks && knownTasks.size === 1) {
+                        parentTaskName = Array.from(knownTasks)[0];
+                    } else if (knownTasks && knownTasks.size > 1) {
+                        parentTaskName = 'Tarea general';
+                    } else {
+                        parentTaskName = 'Tarea general';
+                    }
+                }
+                const taskName = sheetSubtareaName || parentTaskName;
                 const isTaskRow = taskName.length > 0;
-                const areaName = resolveAreaForRow(projectName, row['AREA']);
+                const areaName = resolveAreaForRow(projectName, pick(row, ['AREA']));
 
-                const inicioRaw = row['F.INICIO'] && String(row['F.INICIO']).trim() !== '' ? row['F.INICIO'] : '';
-                const inicioNorm = inicioRaw ? formatDateDMY(inicioRaw) : '';
-                const inicioFinal = inicioNorm || getTodayFormatted();
+                const projectStartRaw = pick(row, ['F_INCIO_PROYECTO', 'F_INICIO_PROYECTO', 'F.INICIO']);
+                const taskStartRaw = pick(row, ['F_INCIO_TAREA', 'F_INICIO_TAREA', 'F_INCIO_SUBTAREA', 'F_INICIO_SUBTAREA', 'F.INICIO']);
+                const projectStartNorm = normalizeValue(projectStartRaw) ? formatDateDMY(projectStartRaw) : '';
+                const taskStartNorm = normalizeValue(taskStartRaw) ? formatDateDMY(taskStartRaw) : '';
+                const projectStartFinal = projectStartNorm || taskStartNorm || getTodayFormatted();
+                const taskStartFinal = taskStartNorm || projectStartNorm || getTodayFormatted();
+
+                const projectType = pick(row, ['TIPO_PROYECTO', 'TIPO']);
+                const taskType = pick(row, ['TIPO_TAREA', 'TIPO_SUBTAREA', 'TIPO']);
+                const projectStatusRaw = pick(row, ['ESTADO_PROYECTO', 'ESTADO']);
+                const taskStatusRaw = pick(row, ['ESTADO_TAREA', 'ESTADO_SUBTAREA', 'ESTADO']);
+                const priorityRaw = pick(row, ['PRIORIDAD']);
+                const taskSolution = normalizeValue(pick(row, ['QUE_SOLUCIONO_TAREA', 'QUE_SOLUCIONO', '¿QUE SOLUCIONO_TAREA?', '¿QUE SOLUCIONO?']));
+                const taskIndicator = normalizeValue(pick(row, ['INDICADOR']));
+                const taskLBase = normalizeValue(pick(row, ['L_BASE', 'LINEA BASE', 'L BASE']));
+                const taskMeta = normalizeValue(pick(row, ['META']));
+                const taskNumerador = normalizeValue(pick(row, ['NUMERADOR']));
+                const taskDenominador = normalizeValue(pick(row, ['DENOMINADOR']));
+                const taskMonthly = {};
+                Object.entries(monthMap).forEach(([month, candidates]) => {
+                    taskMonthly[month] = normalizeValue(pick(row, candidates));
+                });
 
                 const projectKey = buildProjectKey(projectName);
                 if (!proyectosMap.has(projectKey)) {
                     proyectosMap.set(projectKey, {
                         id: 'p_' + slugify(projectName) + '_' + String(proyectosMap.size),
                         area: areaName,
-                        tipo: row['TIPO'] || 'Proceso',
-                        prioridad: row['PRIORIDAD'] || '',
-                        inicio: inicioFinal,
+                        tipo: normalizeValue(projectType || taskType) || 'Proceso',
+                        prioridad: normalizeValue(priorityRaw),
+                        inicio: projectStartFinal,
                         nombre: projectName,
                         ejecutor: '',
                         expanded: false,
-                        status: getStatusFromText(row['ESTADO'] || ''),
+                        status: getStatusFromText(projectStatusRaw || taskStatusRaw || ''),
                         gantt: padGantt([]),
                         kpis: kpiMap.get(projectKey) || [],
                         tasks: []
@@ -1933,18 +2570,31 @@
                 }
 
                 if (!isTaskRow) {
-                    if (row['TIPO']) proyecto.tipo = row['TIPO'];
-                    if (row['PRIORIDAD']) proyecto.prioridad = row['PRIORIDAD'];
-                    if (inicioNorm) proyecto.inicio = inicioNorm;
-                    if (row['ESTADO']) proyecto.status = getStatusFromText(row['ESTADO']);
+                    if (normalizeValue(projectType)) proyecto.tipo = projectType;
+                    if (normalizeValue(priorityRaw)) proyecto.prioridad = priorityRaw;
+                    if (projectStartNorm) proyecto.inicio = projectStartNorm;
+                    if (normalizeValue(projectStatusRaw)) proyecto.status = getStatusFromText(projectStatusRaw);
                     return;
                 }
 
                 let taskGantt = padGantt([]);
-                if (inicioNorm && row['F. FIN']) {
-                    const startW = dateToWeekIndex(inicioNorm);
-                    const endW = parseInt(row['F. FIN'], 10) - 1;
-                    if (startW >= 0 && endW >= startW && startW < MAX_YEAR_WEEKS) {
+                if (taskStartFinal) {
+                    const startW = dateToWeekIndex(taskStartFinal);
+                    if (startW >= 0) {
+                        let endW = startW;
+                        const endRaw = pick(row, ['F_FIN_TAREA', 'F_FIN_SUBTAREA', 'F.FIN', 'F_FIN']);
+                        const endText = normalizeValue(endRaw);
+                        if (endText) {
+                            if (/^-?\d+$/.test(endText)) {
+                                endW = parseInt(endText, 10) - 1;
+                            } else {
+                                const endNorm = formatDateDMY(endRaw);
+                                const endFromDate = dateToWeekIndex(endNorm);
+                                if (endFromDate >= 0) endW = endFromDate;
+                            }
+                        }
+                        if (!Number.isFinite(endW)) endW = startW;
+                        if (endW < startW) endW = startW;
                         for (let i = startW; i <= Math.min(MAX_YEAR_WEEKS - 1, endW); i++) {
                             taskGantt[i] = 1;
                         }
@@ -1954,12 +2604,23 @@
                 proyecto.tasks.push({
                     id: 't_' + slugify(projectName) + '_' + slugify(taskName) + '_' + Math.random().toString(36).substr(2, 5),
                     nombre: taskName,
+                    tarea: parentTaskName || taskName,
+                    subtarea: sheetSubtareaName,
+                    sheet_tarea: sheetTareaName,
+                    sheet_subtarea: sheetSubtareaName,
                     area: areaName,
-                    tipo: row['TIPO'] || 'Proceso',
-                    prioridad: row['PRIORIDAD'] || '',
-                    ejecutor: row['EJECUTOR'] || '',
-                    inicio: inicioFinal,
-                    status: getStatusFromText(row['ESTADO'] || ''),
+                    tipo: normalizeValue(taskType || projectType) || 'Proceso',
+                    prioridad: normalizeValue(priorityRaw),
+                    que_soluciono_tarea: taskSolution,
+                    indicador_tarea: taskIndicator,
+                    l_base_tarea: taskLBase,
+                    meta_tarea: taskMeta,
+                    numerador_tarea: taskNumerador,
+                    denominador_tarea: taskDenominador,
+                    monthly_tarea: taskMonthly,
+                    ejecutor: normalizeValue(pick(row, ['EJECUTOR'])),
+                    inicio: taskStartFinal,
+                    status: getStatusFromText(taskStatusRaw || projectStatusRaw || ''),
                     gantt: taskGantt
                 });
             });
@@ -1990,7 +2651,6 @@
             await loadDataFromSheet();
             // Extraer columnas inmediatamente después de cargar datos
             refreshCachedColumns();
-            initAutoRefresh();
         })();
     </script>
 </body>
