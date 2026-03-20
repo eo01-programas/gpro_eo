@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,119 +9,755 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-        
-        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; color: #334155; height: 100vh; overflow: hidden; }
-        ::-webkit-scrollbar { width: 8px; height: 8px; }
-        ::-webkit-scrollbar-track { background: #f1f5f9; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-        .app-container { display: flex; flex-direction: column; height: 100vh; }
-        .main-content { display: flex; flex: 1; overflow: hidden; border-top: 1px solid #e2e8f0; }
-        .task-panel { flex: 1 1 auto; min-width: 660px; width: auto; background: white; border-right: 1px solid #e2e8f0; display: flex; flex-direction: column; z-index: 20; box-shadow: 4px 0 24px rgba(0,0,0,0.02); }
-        .gantt-panel { flex: 0 0 var(--gantt-width, 560px); width: var(--gantt-width, 560px); max-width: var(--gantt-width, 560px); overflow: hidden; background: #fff; display: flex; flex-direction: column; position: relative; }
-        .header-row { height: 50px; background: #f1f5f9; border-bottom: 2px solid #cbd5e1; display: flex; align-items: center; font-size: 0.75rem; font-weight: 700; color: #334155; text-transform: uppercase; letter-spacing: 0.08em; }
-        .data-row { min-height: 48px; height: auto; border-bottom: 1px solid #f1f5f9; display: flex; align-items: center; font-size: 0.85rem; transition: background 0.1s; }
-        .data-row:hover { background-color: #f8fafc; }
-        .data-row.project-row { background-color: #f8fafc; font-weight: 600; }
-        .data-row.project-row:hover { background-color: #f1f5f9; }
-        .task-scroll-area { overflow-y: auto; flex: 1; }
-        .gantt-scroll-area { overflow-y: auto; flex: 1; overflow-x: auto; }
-        .cell { padding: 4px 8px; display: flex; align-items: center; overflow: hidden; white-space: normal; word-wrap: break-word; border-right: 1px solid transparent; line-height: 1.3; }
-        .cell:hover { border-right-color: rgba(0,0,0,0.05); }
-        .col-icon { width: 30px; justify-content: center; cursor: pointer; color: #94a3b8; flex-shrink: 0; align-self: stretch; }
-        .col-area { width: 90px; color: #1e293b; font-size: 0.75rem; flex-shrink: 0; font-weight: 700; padding: 0 8px; }
-        .col-tipo { width: 110px; flex-shrink: 0; color: #1e293b; font-weight: 600; padding: 0 8px; }
-        .col-estado { width: 120px; flex-shrink: 0; color: #1e293b; font-weight: 600; padding: 0 8px; }
-        .col-inicio { width: 120px; font-size: 0.75rem; text-align: center; justify-content: center; flex-shrink: 0; color: #1e293b; font-weight: 600; }
-        .col-nombre { flex: 1; color: #1e293b; position: relative; min-width: 180px; padding-left: 10px; font-weight: 600; }
-        .col-ejecutor { width: 118px; justify-content: flex-start; padding: 0 8px; color: #1e293b; font-size: 0.75rem; flex-shrink: 0; font-weight: 600; display: flex; align-items: center; gap: 4px; }
-        .col-acciones { width: 96px; justify-content: center; gap: 4px; flex-shrink: 0; position: relative; z-index: 2; }
-        .priority-indicator { font-size: 1.1rem; cursor: pointer; }
-        .priority-alta { color: #f59e0b; }
-        .priority-baja { color: #cbd5e1; }
-        .executor-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .priority-indicator-inline { font-size: 0.95rem; flex-shrink: 0; margin-left: 2px; cursor: default; }
-        .tipo-select { font-size: 0.74rem !important; text-align: left; text-align-last: left; padding-left: 8px; padding-right: 18px; }
-        .table-input { width: 100%; background: transparent; border: 1px solid #cbd5e1; border-radius: 4px; padding: 4px; font-size: 0.75rem; color: inherit; transition: all 0.2s; text-align: center; cursor: pointer; }
-        .filter-select { text-align: left !important; text-align-last: left !important; padding-left: 10px; }
-        .filter-select option { text-align: left; }
-        .table-input:hover { background: white; border-color: #94a3b8; }
-        .table-input:focus { background: white; border-color: #3b82f6; outline: none; box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1); }
-        .status-badge-select { appearance: none; -webkit-appearance: none; width: 100%; text-align: center; text-align-last: center; font-weight: 700; font-size: 0.7rem; border-radius: 20px; padding: 4px 12px; cursor: pointer; border: 1px solid transparent; transition: all 0.2s ease; text-transform: uppercase; letter-spacing: 0.02em; }
-        .status-badge-select:focus { outline: none; box-shadow: 0 0 0 2px rgba(0,0,0,0.1); }
-        .sb-pendiente { background-color: #fee2e2; color: #991b1b; border-color: #fecaca; }
-        .sb-proceso { background-color: #fef3c7; color: #92400e; border-color: #fde68a; }
-        .sb-terminado { background-color: #dcfce7; color: #166534; border-color: #bbf7d0; }
-        .gantt-header-month { display: flex; justify-content: center; align-items: center; border-right: 1px solid #e2e8f0; font-weight: 700; color: white; }
-        .gantt-week-col { min-width: 20px; border-right: 1px dashed #e2e8f0; display: flex; justify-content: center; align-items: center; cursor: pointer; position: relative; flex-shrink: 0; height: 100%; transition: background 0.1s; }
-        .gantt-week-col:hover { background-color: rgba(0,0,0,0.03); }
-        .status-pill { height: 22px; width: 26px; border-radius: 4px; display: flex; justify-content: center; align-items: center; font-size: 9px; font-weight: 700; color: white; box-shadow: 0 1px 2px rgba(0,0,0,0.1); transition: transform 0.1s; pointer-events: none; }
-        .st-1 { background: #ef4444; } .st-2 { background: #f59e0b; } .st-3 { background: #10b981; }
-        .tree-line-v { position: absolute; left: 10px; top: 0; bottom: 50%; width: 1px; background-color: #cbd5e1; }
-        .tree-line-h { position: absolute; left: 10px; top: 50%; width: 12px; height: 1px; background-color: #cbd5e1; }
-        .tree-connector { position: absolute; left: 6px; top: 50%; transform: translateY(-50%); width: 8px; height: 8px; border-radius: 50%; border: 1px solid #cbd5e1; background: white; z-index: 2; }
-        .kpi-table { border-collapse: collapse; width: 100%; white-space: nowrap; font-size: 0.75rem; }
-        .kpi-table th { background: #1e293b; color: white; font-weight: 600; padding: 8px 10px; text-align: center; border: 1px solid #334155; }
-        .kpi-table td { border: 1px solid #e2e8f0; padding: 4px 8px; text-align: right; color: #334155; }
-        .kpi-table input { width: 100%; background: transparent; border: none; text-align: right; outline: none; font-family: inherit; font-size: inherit; color: inherit; }
-        .kpi-table input:focus { background: #f0f9ff; }
-        .kpi-table td.text-left { text-align: left; }
-        .kpi-table tr:nth-child(even) { background-color: #f8fafc; }
-        .modal-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.5); backdrop-filter: blur(4px); z-index: 50; display: none; align-items: center; justify-content: center; }
-        .modal-card { background: white; border-radius: 12px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); width: 90%; max-width: 900px; max-height: 85vh; display: flex; flex-direction: column; overflow: hidden; animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
-        .modal-card-lg { max-width: 1200px; width: 95%; }
-        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        .toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 60; display: flex; flex-direction: column; gap: 10px; }
-        .toast { background: white; padding: 12px 20px; border-radius: 8px; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); border-left: 4px solid #3b82f6; font-size: 0.85rem; font-weight: 500; display: flex; align-items: center; gap: 10px; animation: slideInRight 0.3s ease; max-width: 300px; }
-        .toast.success { border-left-color: #10b981; } .toast.error { border-left-color: #ef4444; }
-        @keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-        .btn-priority-active { background-color: #f59e0b !important; color: white !important; border-color: #d97706 !important; }
-        .kpi-sidebar-item { padding: 10px; cursor: pointer; border-radius: 6px; margin-bottom: 4px; font-size: 0.8rem; border: 1px solid transparent; transition: all 0.2s; display: flex; justify-content: space-between; align-items: center; }
-        .kpi-sidebar-item:hover { background-color: #f1f5f9; }
-        .kpi-sidebar-item.active { background-color: #eff6ff; border-color: #bfdbfe; color: #1d4ed8; font-weight: 600; }
-        .action-btn { padding: 4px; border-radius: 4px; transition: all 0.2s; }
-        .action-btn:hover { background-color: #f1f5f9; }
-        .context-menu { position: fixed; z-index: 80; min-width: 260px; background: white; border: 1px solid #cbd5e1; border-radius: 8px; box-shadow: 0 12px 20px rgba(15, 23, 42, 0.2); display: none; padding: 6px; }
-        .context-menu.show { display: block; }
-        .context-menu button { width: 100%; text-align: left; font-size: 0.78rem; font-weight: 600; color: #1e293b; border: none; background: transparent; padding: 7px 9px; border-radius: 6px; cursor: pointer; }
-        .context-menu button:hover { background: #f1f5f9; }
-        .context-menu button.active { background: #eff6ff; color: #1d4ed8; }
-        .context-menu-sep { height: 1px; background: #e2e8f0; margin: 6px 2px; }
-        .date-header-anchor { cursor: context-menu; }
-        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+            color: #334155;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        .app-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        .main-content {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .task-panel {
+            flex: 1 1 auto;
+            min-width: 660px;
+            width: auto;
+            background: white;
+            border-right: 1px solid #e2e8f0;
+            display: flex;
+            flex-direction: column;
+            z-index: 20;
+            box-shadow: 4px 0 24px rgba(0, 0, 0, 0.02);
+        }
+
+        .gantt-panel {
+            flex: 0 0 var(--gantt-width, 560px);
+            width: var(--gantt-width, 560px);
+            max-width: var(--gantt-width, 560px);
+            overflow: hidden;
+            background: #fff;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .header-row {
+            height: 50px;
+            background: #f1f5f9;
+            border-bottom: 2px solid #cbd5e1;
+            display: flex;
+            align-items: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #334155;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        .data-row {
+            min-height: 48px;
+            height: auto;
+            border-bottom: 1px solid #f1f5f9;
+            display: flex;
+            align-items: center;
+            font-size: 0.85rem;
+            transition: background 0.1s;
+        }
+
+        .data-row:hover {
+            background-color: #f8fafc;
+        }
+
+        .data-row.project-row {
+            background-color: #eff6ff;
+            font-weight: 600;
+            border-left: 4px solid #3b82f6;
+        }
+
+        .data-row.project-row:hover {
+            background-color: #dbeafe;
+        }
+
+        .data-row.task-row {
+            border-left: 4px solid #f59e0b;
+            background-color: #fffbeb;
+        }
+
+        .data-row.task-row:hover {
+            background-color: #fef3c7;
+        }
+
+        .data-row.subtask-row {
+            border-left: 4px solid #94a3b8;
+            background-color: #ffffff;
+        }
+
+        .data-row.subtask-row:hover {
+            background-color: #f8fafc;
+        }
+
+        .task-scroll-area {
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .gantt-scroll-area {
+            overflow-y: auto;
+            flex: 1;
+            overflow-x: auto;
+        }
+
+        .cell {
+            padding: 4px 8px;
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+            white-space: normal;
+            word-wrap: break-word;
+            border-right: 1px solid transparent;
+            line-height: 1.3;
+        }
+
+        .cell:hover {
+            border-right-color: rgba(0, 0, 0, 0.05);
+        }
+
+        .col-icon {
+            width: 30px;
+            justify-content: center;
+            cursor: pointer;
+            color: #94a3b8;
+            flex-shrink: 0;
+            align-self: stretch;
+        }
+
+        .col-area {
+            width: 90px;
+            color: #1e293b;
+            font-size: 0.75rem;
+            flex-shrink: 0;
+            font-weight: 700;
+            padding: 0 8px;
+        }
+
+        .col-tipo {
+            width: 110px;
+            flex-shrink: 0;
+            color: #1e293b;
+            font-weight: 600;
+            padding: 0 8px;
+        }
+
+        .col-estado {
+            width: 120px;
+            flex-shrink: 0;
+            color: #1e293b;
+            font-weight: 600;
+            padding: 0 8px;
+        }
+
+        .col-inicio {
+            width: 120px;
+            font-size: 0.75rem;
+            text-align: center;
+            justify-content: center;
+            flex-shrink: 0;
+            color: #1e293b;
+            font-weight: 600;
+        }
+
+        .col-nombre {
+            flex: 1;
+            color: #1e293b;
+            position: relative;
+            min-width: 180px;
+            padding-left: 10px;
+            font-weight: 600;
+        }
+
+        .col-ejecutor {
+            width: 118px;
+            justify-content: flex-start;
+            padding: 0 8px;
+            color: #1e293b;
+            font-size: 0.75rem;
+            flex-shrink: 0;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .col-acciones {
+            width: 96px;
+            justify-content: center;
+            gap: 4px;
+            flex-shrink: 0;
+            position: relative;
+            z-index: 2;
+        }
+
+        .priority-indicator {
+            font-size: 1.1rem;
+            cursor: pointer;
+        }
+
+        .priority-alta {
+            color: #f59e0b;
+        }
+
+        .priority-baja {
+            color: #cbd5e1;
+        }
+
+        .executor-name {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .priority-indicator-inline {
+            font-size: 0.95rem;
+            flex-shrink: 0;
+            margin-left: 2px;
+            cursor: default;
+        }
+
+        .tipo-select {
+            font-size: 0.74rem !important;
+            text-align: left;
+            text-align-last: left;
+            padding-left: 8px;
+            padding-right: 18px;
+        }
+
+        .table-input {
+            width: 100%;
+            background: transparent;
+            border: 1px solid #cbd5e1;
+            border-radius: 4px;
+            padding: 4px;
+            font-size: 0.75rem;
+            color: inherit;
+            transition: all 0.2s;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .filter-select {
+            text-align: left !important;
+            text-align-last: left !important;
+            padding-left: 10px;
+        }
+
+        .filter-select option {
+            text-align: left;
+        }
+
+        .table-input:hover {
+            background: white;
+            border-color: #94a3b8;
+        }
+
+        .table-input:focus {
+            background: white;
+            border-color: #3b82f6;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+        }
+
+        .status-badge-select {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 100%;
+            text-align: center;
+            text-align-last: center;
+            font-weight: 700;
+            font-size: 0.7rem;
+            border-radius: 20px;
+            padding: 4px 12px;
+            cursor: pointer;
+            border: 1px solid transparent;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
+        }
+
+        .status-badge-select:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
+        }
+
+        .sb-pendiente {
+            background-color: #fee2e2;
+            color: #991b1b;
+            border-color: #fecaca;
+        }
+
+        .sb-proceso {
+            background-color: #fef3c7;
+            color: #92400e;
+            border-color: #fde68a;
+        }
+
+        .sb-terminado {
+            background-color: #dcfce7;
+            color: #166534;
+            border-color: #bbf7d0;
+        }
+
+        .gantt-header-month {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-right: 1px solid #e2e8f0;
+            font-weight: 700;
+            color: white;
+        }
+
+        .gantt-week-col {
+            min-width: 20px;
+            border-right: 1px dashed #e2e8f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            position: relative;
+            flex-shrink: 0;
+            height: 100%;
+            transition: background 0.1s;
+        }
+
+        .gantt-week-col:hover {
+            background-color: rgba(0, 0, 0, 0.03);
+        }
+
+        .status-pill {
+            height: 22px;
+            width: 26px;
+            border-radius: 4px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 9px;
+            font-weight: 700;
+            color: white;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+            transition: transform 0.1s;
+            pointer-events: none;
+        }
+
+        .st-1 {
+            background: #ef4444;
+        }
+
+        .st-2 {
+            background: #f59e0b;
+        }
+
+        .st-3 {
+            background: #10b981;
+        }
+
+        .tree-line-v {
+            position: absolute;
+            left: 10px;
+            top: 0;
+            bottom: 50%;
+            width: 1px;
+            background-color: #cbd5e1;
+        }
+
+        .tree-line-h {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            width: 12px;
+            height: 1px;
+            background-color: #cbd5e1;
+        }
+
+        .tree-connector {
+            position: absolute;
+            left: 6px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            border: 1px solid #cbd5e1;
+            background: white;
+            z-index: 2;
+        }
+
+        .hierarchy-label {
+            font-size: 10px;
+            line-height: 1;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: #94a3b8;
+            margin-bottom: 4px;
+        }
+
+        .task-parent-row {
+            background: #fffbeb;
+            border-left: 4px solid #f59e0b;
+        }
+
+        .task-parent-row:hover {
+            background: #fef3c7;
+        }
+
+        .kpi-table {
+            border-collapse: collapse;
+            width: 100%;
+            white-space: nowrap;
+            font-size: 0.75rem;
+        }
+
+        .kpi-table th {
+            background: #1e293b;
+            color: white;
+            font-weight: 600;
+            padding: 8px 10px;
+            text-align: center;
+            border: 1px solid #334155;
+        }
+
+        .kpi-table td {
+            border: 1px solid #e2e8f0;
+            padding: 4px 8px;
+            text-align: right;
+            color: #334155;
+        }
+
+        .kpi-table input {
+            width: 100%;
+            background: transparent;
+            border: none;
+            text-align: right;
+            outline: none;
+            font-family: inherit;
+            font-size: inherit;
+            color: inherit;
+        }
+
+        .kpi-table input:focus {
+            background: #f0f9ff;
+        }
+
+        .kpi-table td.text-left {
+            text-align: left;
+        }
+
+        .kpi-table tr:nth-child(even) {
+            background-color: #f8fafc;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.5);
+            backdrop-filter: blur(4px);
+            z-index: 50;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 900px;
+            max-height: 85vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .modal-card-lg {
+            max-width: 1200px;
+            width: 95%;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .toast-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 60;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .toast {
+            background: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            border-left: 4px solid #3b82f6;
+            font-size: 0.85rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: slideInRight 0.3s ease;
+            max-width: 300px;
+        }
+
+        .toast.success {
+            border-left-color: #10b981;
+        }
+
+        .toast.error {
+            border-left-color: #ef4444;
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .btn-priority-active {
+            background-color: #f59e0b !important;
+            color: white !important;
+            border-color: #d97706 !important;
+        }
+
+        .kpi-sidebar-item {
+            padding: 10px;
+            cursor: pointer;
+            border-radius: 6px;
+            margin-bottom: 4px;
+            font-size: 0.8rem;
+            border: 1px solid transparent;
+            transition: all 0.2s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .kpi-sidebar-item:hover {
+            background-color: #f1f5f9;
+        }
+
+        .kpi-sidebar-item.active {
+            background-color: #eff6ff;
+            border-color: #bfdbfe;
+            color: #1d4ed8;
+            font-weight: 600;
+        }
+
+        .action-btn {
+            padding: 4px;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .action-btn:hover {
+            background-color: #f1f5f9;
+        }
+
+        .context-menu {
+            position: fixed;
+            z-index: 80;
+            min-width: 260px;
+            background: white;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            box-shadow: 0 12px 20px rgba(15, 23, 42, 0.2);
+            display: none;
+            padding: 6px;
+        }
+
+        .context-menu.show {
+            display: block;
+        }
+
+        .context-menu button {
+            width: 100%;
+            text-align: left;
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: #1e293b;
+            border: none;
+            background: transparent;
+            padding: 7px 9px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .context-menu button:hover {
+            background: #f1f5f9;
+        }
+
+        .context-menu button.active {
+            background: #eff6ff;
+            color: #1d4ed8;
+        }
+
+        .context-menu-sep {
+            height: 1px;
+            background: #e2e8f0;
+            margin: 6px 2px;
+        }
+
+        .date-header-anchor {
+            cursor: context-menu;
+        }
+
+        @keyframes spin {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
 
         @media (max-width: 1500px) {
-            .cell { padding: 3px 6px; }
-            .col-nombre { min-width: 130px; }
-            .col-tipo { width: 96px; }
-            .col-estado { width: 100px; }
-            .col-inicio { width: 100px; }
-            .col-area { width: 80px; }
-            .col-ejecutor { width: 98px; }
-            .col-acciones { width: 84px; }
-            .status-badge-select { font-size: 0.65rem; padding: 3px 8px; }
-            .header-row { font-size: 0.68rem; letter-spacing: 0.06em; }
+            .cell {
+                padding: 3px 6px;
+            }
+
+            .col-nombre {
+                min-width: 130px;
+            }
+
+            .col-tipo {
+                width: 96px;
+            }
+
+            .col-estado {
+                width: 100px;
+            }
+
+            .col-inicio {
+                width: 100px;
+            }
+
+            .col-area {
+                width: 80px;
+            }
+
+            .col-ejecutor {
+                width: 98px;
+            }
+
+            .col-acciones {
+                width: 84px;
+            }
+
+            .status-badge-select {
+                font-size: 0.65rem;
+                padding: 3px 8px;
+            }
+
+            .header-row {
+                font-size: 0.68rem;
+                letter-spacing: 0.06em;
+            }
         }
 
         @media (max-width: 1366px) {
-            .col-nombre { min-width: 100px; }
-            .col-tipo { width: 90px; }
-            .col-estado { width: 92px; }
-            .col-inicio { width: 92px; }
-            .col-area { width: 72px; }
-            .col-ejecutor { width: 88px; }
-            .col-acciones { width: 78px; }
-            .status-badge-select { font-size: 0.62rem; }
+            .col-nombre {
+                min-width: 100px;
+            }
+
+            .col-tipo {
+                width: 90px;
+            }
+
+            .col-estado {
+                width: 92px;
+            }
+
+            .col-inicio {
+                width: 92px;
+            }
+
+            .col-area {
+                width: 72px;
+            }
+
+            .col-ejecutor {
+                width: 88px;
+            }
+
+            .col-acciones {
+                width: 78px;
+            }
+
+            .status-badge-select {
+                font-size: 0.62rem;
+            }
         }
     </style>
 </head>
+
 <body>
 
     <div class="app-container">
         <!-- Header -->
         <header class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-6 z-30">
             <div class="flex items-center gap-4">
-                <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center text-white text-xl shadow-lg shadow-blue-200">
+                <div
+                    class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center text-white text-xl shadow-lg shadow-blue-200">
                     <i class="fa-solid fa-layer-group"></i>
                 </div>
                 <div>
@@ -134,7 +771,8 @@
                     <select id="filter-area" class="table-input filter-select" style="width:150px; font-size:0.8rem;">
                         <option value="">Todas las áreas</option>
                     </select>
-                    <select id="filter-project" class="table-input filter-select" style="width:220px; font-size:0.8rem;">
+                    <select id="filter-project" class="table-input filter-select"
+                        style="width:220px; font-size:0.8rem;">
                         <option value="">Buscar proyecto (todos)</option>
                     </select>
                 </div>
@@ -145,14 +783,22 @@
                     <span id="lastUpdateTime">Cargando...</span>
                 </div>
                 <div class="h-6 w-px bg-slate-200"></div>
-                <button id="btn-priority" onclick="togglePriority()" class="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-50 transition" title="Mostrar solo proyectos prioritarios">
+                <button id="btn-priority" onclick="togglePriority()"
+                    class="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-50 transition"
+                    title="Mostrar solo proyectos prioritarios">
                     <i class="fa-solid fa-star"></i> Prioridad
                 </button>
-                <button id="btn-show-complete" onclick="toggleShowCompleted()" class="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-50 transition" title="Mostrar proyectos terminados">Ver completo</button>
+                <button id="btn-show-complete" onclick="toggleShowCompleted()"
+                    class="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-50 transition"
+                    title="Mostrar proyectos terminados">Ver completo</button>
                 <div class="h-6 w-px bg-slate-200"></div>
-                <button onclick="toggleAll(false)" class="text-slate-500 hover:text-blue-600 transition" title="Contraer Todo"><i class="fa-solid fa-compress-alt"></i></button>
-                <button onclick="toggleAll(true)" class="text-slate-500 hover:text-blue-600 transition" title="Expandir Todo"><i class="fa-solid fa-expand-alt"></i></button>
-                <button id="create-project-button" class="text-white bg-blue-600 hover:bg-blue-700 px-3 py-1.5 rounded text-xs font-bold transition shadow-sm" title="Crear Nuevo Proyecto">+ Nuevo Proyecto</button>
+                <button onclick="toggleAll(false)" class="text-slate-500 hover:text-blue-600 transition"
+                    title="Contraer Todo"><i class="fa-solid fa-compress-alt"></i></button>
+                <button onclick="toggleAll(true)" class="text-slate-500 hover:text-blue-600 transition"
+                    title="Expandir Todo"><i class="fa-solid fa-expand-alt"></i></button>
+                <button id="create-project-button"
+                    class="text-white bg-blue-600 hover:bg-blue-700 px-3 py-1.5 rounded text-xs font-bold transition shadow-sm"
+                    title="Crear Nuevo Proyecto">+ Nuevo Proyecto</button>
             </div>
         </header>
 
@@ -163,7 +809,8 @@
                     <div class="col-nombre">PROYECTO / TAREA / SUBTAREA</div>
                     <div class="col-tipo">TIPO</div>
                     <div class="col-estado">ESTADO</div>
-                    <div id="headerFechaInicio" class="col-inicio date-header-anchor" title="Click derecho: ordenar por fecha">F. INICIO</div>
+                    <div id="headerFechaInicio" class="col-inicio date-header-anchor"
+                        title="Click derecho: ordenar por fecha">F. INICIO</div>
                     <div class="col-area">AREA</div>
                     <div class="col-ejecutor">EJECUTOR</div>
                     <div class="col-acciones"></div>
@@ -171,8 +818,10 @@
                 <div class="task-scroll-area" id="taskListContainer"></div>
             </div>
             <div class="gantt-panel">
-                <div class="flex border-b border-slate-200 bg-slate-50 sticky top-0 z-10" id="ganttMonthsHeader" style="height: 25px;"></div>
-                <div class="flex border-b border-slate-200 bg-white sticky top-[25px] z-10 header-row" id="ganttWeeksHeader" style="height: 25px;"></div>
+                <div class="flex border-b border-slate-200 bg-slate-50 sticky top-0 z-10" id="ganttMonthsHeader"
+                    style="height: 25px;"></div>
+                <div class="flex border-b border-slate-200 bg-white sticky top-[25px] z-10 header-row"
+                    id="ganttWeeksHeader" style="height: 25px;"></div>
                 <div class="gantt-scroll-area" id="ganttGridContainer"></div>
             </div>
         </div>
@@ -187,14 +836,18 @@
     <div id="confirmModal" class="modal-overlay">
         <div class="modal-card" style="max-width: 400px;">
             <div class="p-6 text-center">
-                <div class="w-12 h-12 rounded-full bg-red-100 text-red-600 flex items-center justify-center mx-auto mb-4 text-xl">
+                <div
+                    class="w-12 h-12 rounded-full bg-red-100 text-red-600 flex items-center justify-center mx-auto mb-4 text-xl">
                     <i class="fa-solid fa-exclamation-triangle"></i>
                 </div>
                 <h3 class="text-lg font-bold text-slate-800 mb-2">¿Estás seguro?</h3>
                 <p id="confirmMessage" class="text-sm text-slate-500 mb-6"></p>
                 <div class="flex justify-center gap-3">
-                    <button onclick="closeConfirmModal()" class="px-4 py-2 bg-slate-100 rounded text-slate-700 font-medium hover:bg-slate-200 transition">Cancelar</button>
-                    <button id="confirmBtnAction" class="px-4 py-2 bg-red-600 text-white rounded font-medium hover:bg-red-700 transition shadow-lg shadow-red-200">Si, Eliminar</button>
+                    <button onclick="closeConfirmModal()"
+                        class="px-4 py-2 bg-slate-100 rounded text-slate-700 font-medium hover:bg-slate-200 transition">Cancelar</button>
+                    <button id="confirmBtnAction"
+                        class="px-4 py-2 bg-red-600 text-white rounded font-medium hover:bg-red-700 transition shadow-lg shadow-red-200">Si,
+                        Eliminar</button>
                 </div>
             </div>
         </div>
@@ -205,25 +858,32 @@
         <div class="modal-card modal-card-lg" style="height: 80vh;">
             <div class="flex items-center justify-between px-6 py-4 bg-blue-900 text-white flex-shrink-0">
                 <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 rounded bg-white/10 flex items-center justify-center"><i class="fa-solid fa-chart-line"></i></div>
+                    <div class="w-8 h-8 rounded bg-white/10 flex items-center justify-center"><i
+                            class="fa-solid fa-chart-line"></i></div>
                     <div>
                         <h3 class="text-sm font-bold uppercase tracking-wider">Indicador de proyecto</h3>
                         <p id="kpiModalProjectTitle" class="text-xs text-blue-200">Nombre del Proyecto</p>
                     </div>
                 </div>
-                <button onclick="closeKpiModal()" class="text-white/70 hover:text-white text-xl transition"><i class="fa-solid fa-times"></i></button>
+                <button onclick="closeKpiModal()" class="text-white/70 hover:text-white text-xl transition"><i
+                        class="fa-solid fa-times"></i></button>
             </div>
             <div class="flex flex-1 overflow-hidden">
                 <div class="w-64 bg-slate-50 border-r border-slate-200 p-4 flex flex-col">
                     <h4 class="text-xs font-bold text-slate-500 uppercase mb-3">Indicadores</h4>
                     <div id="kpiListContainer" class="flex-1 overflow-y-auto mb-4"></div>
-                    <button onclick="createNewKpi()" class="w-full py-2 bg-white border border-slate-300 rounded text-sm text-blue-600 font-bold hover:bg-blue-50 transition shadow-sm"><i class="fa-solid fa-plus"></i> Nuevo indicador</button>
+                    <button onclick="createNewKpi()"
+                        class="w-full py-2 bg-white border border-slate-300 rounded text-sm text-blue-600 font-bold hover:bg-blue-50 transition shadow-sm"><i
+                            class="fa-solid fa-plus"></i> Nuevo indicador</button>
                 </div>
                 <div class="flex-1 p-6 overflow-y-auto" id="kpiFormContainer"></div>
             </div>
             <div class="px-6 py-3 border-t border-slate-200 bg-white flex justify-end gap-3 flex-shrink-0">
-                <button onclick="closeKpiModal()" class="px-4 py-2 text-sm font-bold text-slate-600 bg-slate-100 rounded-lg hover:bg-slate-200 transition">Cerrar</button>
-                <button onclick="saveCurrentKpi()" class="px-5 py-2 text-sm font-bold text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition shadow-lg shadow-blue-200">Guardar indicador</button>
+                <button onclick="closeKpiModal()"
+                    class="px-4 py-2 text-sm font-bold text-slate-600 bg-slate-100 rounded-lg hover:bg-slate-200 transition">Cerrar</button>
+                <button onclick="saveCurrentKpi()"
+                    class="px-5 py-2 text-sm font-bold text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition shadow-lg shadow-blue-200">Guardar
+                    indicador</button>
             </div>
         </div>
     </div>
@@ -233,33 +893,63 @@
         <div class="modal-card modal-card-lg">
             <div class="flex items-center justify-between px-6 py-4 bg-blue-900 text-white">
                 <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 rounded bg-white/10 flex items-center justify-center"><i class="fa-solid fa-plus"></i></div>
-                    <div><h3 id="cf-modal-title" class="text-sm font-bold uppercase tracking-wider">Crear Nuevo</h3><p id="cf-modal-subtitle" class="text-xs text-blue-200">Nuevo requerimiento</p></div>
+                    <div class="w-8 h-8 rounded bg-white/10 flex items-center justify-center"><i
+                            class="fa-solid fa-plus"></i></div>
+                    <div>
+                        <h3 id="cf-modal-title" class="text-sm font-bold uppercase tracking-wider">Crear Nuevo</h3>
+                        <p id="cf-modal-subtitle" class="text-xs text-blue-200">Nuevo requerimiento</p>
+                    </div>
                 </div>
-                <button id="createFieldClose" class="text-white/70 hover:text-white text-xl transition"><i class="fa-solid fa-times"></i></button>
+                <button id="createFieldClose" class="text-white/70 hover:text-white text-xl transition"><i
+                        class="fa-solid fa-times"></i></button>
             </div>
             <div class="p-6 bg-slate-50 flex-1 overflow-auto">
                 <div class="grid grid-cols-2 gap-6">
-                    <label class="block"><span class="text-xs font-bold text-slate-500 uppercase mb-1 block">Área</span><input id="cf-area" list="cf-areas-list" class="w-full border border-slate-300 rounded p-2 text-sm outline-none" placeholder="Selecciona o escribe una nueva área"><datalist id="cf-areas-list"></datalist></label>
+                    <label class="block"><span
+                            class="text-xs font-bold text-slate-500 uppercase mb-1 block">Área</span><input id="cf-area"
+                            list="cf-areas-list" class="w-full border border-slate-300 rounded p-2 text-sm outline-none"
+                            placeholder="Selecciona o escribe una nueva área"><datalist
+                            id="cf-areas-list"></datalist></label>
                     <div id="div-cf-project-select" style="display:none;">
-                         <label class="block"><span class="text-xs font-bold text-slate-500 uppercase mb-1 block">Proyecto</span><input id="cf-project-readonly" class="w-full border border-slate-300 rounded p-2 text-sm bg-slate-100 text-slate-500 outline-none" readonly></label>
+                        <label class="block"><span
+                                class="text-xs font-bold text-slate-500 uppercase mb-1 block">Proyecto</span><input
+                                id="cf-project-readonly"
+                                class="w-full border border-slate-300 rounded p-2 text-sm bg-slate-100 text-slate-500 outline-none"
+                                readonly></label>
                     </div>
                     <div id="div-cf-project-input">
-                         <label class="block"><span class="text-xs font-bold text-slate-500 uppercase mb-1 block">Nombre del Proyecto</span><input id="cf-project-input" class="w-full border border-slate-300 rounded p-2 text-sm outline-none" placeholder="Nombre del nuevo proyecto"></label>
+                        <label class="block"><span class="text-xs font-bold text-slate-500 uppercase mb-1 block">Nombre
+                                del Proyecto</span><input id="cf-project-input"
+                                class="w-full border border-slate-300 rounded p-2 text-sm outline-none"
+                                placeholder="Nombre del nuevo proyecto"></label>
                     </div>
-                    <label class="block"><span class="text-xs font-bold text-slate-500 uppercase mb-1 block">Tipo</span><select id="cf-tipo" class="w-full border border-slate-300 rounded p-2 text-sm bg-white outline-none"></select></label>
+                    <label class="block"><span
+                            class="text-xs font-bold text-slate-500 uppercase mb-1 block">Tipo</span><select
+                            id="cf-tipo"
+                            class="w-full border border-slate-300 rounded p-2 text-sm bg-white outline-none"></select></label>
                     <div id="div-cf-task" class="block col-span-2" style="display:none;">
-                        <label class="block"><span id="cf-task-label" class="text-xs font-bold text-slate-500 uppercase mb-1 block">Nombre de la Tarea</span><input id="cf-task" class="w-full border border-slate-300 rounded p-2 text-sm outline-none" placeholder="Nombre de la tarea"></label>
+                        <label class="block"><span id="cf-task-label"
+                                class="text-xs font-bold text-slate-500 uppercase mb-1 block">Nombre de la
+                                Tarea</span><input id="cf-task"
+                                class="w-full border border-slate-300 rounded p-2 text-sm outline-none"
+                                placeholder="Nombre de la tarea"></label>
                     </div>
-                    <label class="block"><span class="text-xs font-bold text-slate-500 uppercase mb-1 block">F. Inicio</span><input id="cf-inicio" type="date" class="w-full border border-slate-300 rounded p-2 text-sm outline-none"></label>
+                    <label class="block"><span class="text-xs font-bold text-slate-500 uppercase mb-1 block">F.
+                            Inicio</span><input id="cf-inicio" type="date"
+                            class="w-full border border-slate-300 rounded p-2 text-sm outline-none"></label>
                     <div id="div-cf-ejecutor">
-                        <label class="block"><span class="text-xs font-bold text-slate-500 uppercase mb-1 block">Ejecutor (Tarea)</span><select id="cf-ejecutor" class="w-full border border-slate-300 rounded p-2 text-sm bg-white outline-none"></select></label>
+                        <label class="block"><span
+                                class="text-xs font-bold text-slate-500 uppercase mb-1 block">Ejecutor
+                                (Tarea)</span><select id="cf-ejecutor"
+                                class="w-full border border-slate-300 rounded p-2 text-sm bg-white outline-none"></select></label>
                     </div>
                 </div>
             </div>
             <div class="px-6 py-3 border-t border-slate-200 bg-white flex justify-end">
-                <button id="cf-cancel" class="px-4 py-2 mr-2 bg-slate-100 text-slate-600 font-medium rounded hover:bg-slate-200 transition">Cancelar</button>
-                <button id="cf-save" class="px-4 py-2 bg-emerald-600 text-white font-medium rounded hover:bg-emerald-700 transition shadow-lg shadow-emerald-200">Guardar</button>
+                <button id="cf-cancel"
+                    class="px-4 py-2 mr-2 bg-slate-100 text-slate-600 font-medium rounded hover:bg-slate-200 transition">Cancelar</button>
+                <button id="cf-save"
+                    class="px-4 py-2 bg-emerald-600 text-white font-medium rounded hover:bg-emerald-700 transition shadow-lg shadow-emerald-200">Guardar</button>
             </div>
         </div>
     </div>
@@ -269,23 +959,48 @@
         <div class="modal-card modal-card-lg">
             <div class="flex items-center justify-between px-6 py-4 bg-blue-900 text-white">
                 <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 rounded bg-white/10 flex items-center justify-center"><i class="fa-solid fa-pen-to-square"></i></div>
-                    <div><h3 class="text-sm font-bold uppercase tracking-wider">Editar Tarea</h3></div>
+                    <div class="w-8 h-8 rounded bg-white/10 flex items-center justify-center"><i
+                            class="fa-solid fa-pen-to-square"></i></div>
+                    <div>
+                        <h3 class="text-sm font-bold uppercase tracking-wider">Editar Tarea</h3>
+                    </div>
                 </div>
-                <button onclick="closeEditTaskModal()" class="text-white/70 hover:text-white text-xl transition"><i class="fa-solid fa-times"></i></button>
+                <button onclick="closeEditTaskModal()" class="text-white/70 hover:text-white text-xl transition"><i
+                        class="fa-solid fa-times"></i></button>
             </div>
             <div class="p-6 bg-slate-50 flex-1 overflow-auto">
                 <div class="grid grid-cols-2 gap-6">
-                    <label class="block col-span-2"><span class="text-xs font-bold text-slate-500 uppercase mb-1 block">Nombre</span><input id="edit-task-name" class="w-full border border-slate-300 rounded p-2 text-sm outline-none"></label>
-                    <label class="block"><span class="text-xs font-bold text-slate-500 uppercase mb-1 block">Tipo</span><select id="edit-task-tipo" class="w-full border border-slate-300 rounded p-2 text-sm bg-white outline-none"></select></label>
-                    <label class="block"><span class="text-xs font-bold text-slate-500 uppercase mb-1 block">Estado</span><select id="edit-task-estado" class="w-full border border-slate-300 rounded p-2 text-sm bg-white outline-none"><option value="1">Pendiente</option><option value="2">En Proceso</option><option value="3">Terminado</option></select></label>
-                    <label class="block"><span class="text-xs font-bold text-slate-500 uppercase mb-1 block">F. Inicio</span><input id="edit-task-inicio" type="date" class="w-full border border-slate-300 rounded p-2 text-sm outline-none"></label>
-                    <label class="block"><span class="text-xs font-bold text-slate-500 uppercase mb-1 block">Ejecutor</span><input id="edit-task-ejecutor" class="w-full border border-slate-300 rounded p-2 text-sm outline-none"></label>
+                    <label class="block col-span-2"><span
+                            class="text-xs font-bold text-slate-500 uppercase mb-1 block">Nombre</span><input
+                            id="edit-task-name"
+                            class="w-full border border-slate-300 rounded p-2 text-sm outline-none"></label>
+                    <label class="block"><span
+                            class="text-xs font-bold text-slate-500 uppercase mb-1 block">Tipo</span><select
+                            id="edit-task-tipo"
+                            class="w-full border border-slate-300 rounded p-2 text-sm bg-white outline-none"></select></label>
+                    <label class="block"><span
+                            class="text-xs font-bold text-slate-500 uppercase mb-1 block">Estado</span><select
+                            id="edit-task-estado"
+                            class="w-full border border-slate-300 rounded p-2 text-sm bg-white outline-none">
+                            <option value="1">Pendiente</option>
+                            <option value="2">En Proceso</option>
+                            <option value="3">Terminado</option>
+                        </select></label>
+                    <label class="block"><span class="text-xs font-bold text-slate-500 uppercase mb-1 block">F.
+                            Inicio</span><input id="edit-task-inicio" type="date"
+                            class="w-full border border-slate-300 rounded p-2 text-sm outline-none"></label>
+                    <label class="block"><span
+                            class="text-xs font-bold text-slate-500 uppercase mb-1 block">Ejecutor</span><input
+                            id="edit-task-ejecutor"
+                            class="w-full border border-slate-300 rounded p-2 text-sm outline-none"></label>
                 </div>
             </div>
             <div class="px-6 py-3 border-t border-slate-200 bg-white flex justify-end">
-                <button onclick="closeEditTaskModal()" class="px-4 py-2 mr-2 bg-slate-100 text-slate-600 font-medium rounded hover:bg-slate-200 transition">Cancelar</button>
-                <button onclick="saveEditedTask()" class="px-4 py-2 bg-emerald-600 text-white font-medium rounded hover:bg-emerald-700 transition shadow-lg shadow-emerald-200">Guardar Cambios</button>
+                <button onclick="closeEditTaskModal()"
+                    class="px-4 py-2 mr-2 bg-slate-100 text-slate-600 font-medium rounded hover:bg-slate-200 transition">Cancelar</button>
+                <button onclick="saveEditedTask()"
+                    class="px-4 py-2 bg-emerald-600 text-white font-medium rounded hover:bg-emerald-700 transition shadow-lg shadow-emerald-200">Guardar
+                    Cambios</button>
             </div>
         </div>
     </div>
@@ -295,24 +1010,46 @@
         <div class="modal-card modal-card-lg">
             <div class="flex items-center justify-between px-6 py-4 bg-blue-900 text-white">
                 <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 rounded bg-white/10 flex items-center justify-center"><i class="fa-solid fa-pen-to-square"></i></div>
-                    <div><h3 class="text-sm font-bold uppercase tracking-wider">Editar Proyecto</h3></div>
+                    <div class="w-8 h-8 rounded bg-white/10 flex items-center justify-center"><i
+                            class="fa-solid fa-pen-to-square"></i></div>
+                    <div>
+                        <h3 class="text-sm font-bold uppercase tracking-wider">Editar Proyecto</h3>
+                    </div>
                 </div>
-                <button onclick="closeEditProjectModal()" class="text-white/70 hover:text-white text-xl transition"><i class="fa-solid fa-times"></i></button>
+                <button onclick="closeEditProjectModal()" class="text-white/70 hover:text-white text-xl transition"><i
+                        class="fa-solid fa-times"></i></button>
             </div>
             <div class="p-6 bg-slate-50 flex-1 overflow-auto">
                 <div class="grid grid-cols-2 gap-6">
-                    <label class="block col-span-2"><span class="text-xs font-bold text-slate-500 uppercase mb-1 block">Nombre</span><input id="edit-project-name" class="w-full border border-slate-300 rounded p-2 text-sm outline-none"></label>
-                    <label class="block"><span class="text-xs font-bold text-slate-500 uppercase mb-1 block">Área</span><input id="edit-project-area" list="edit-areas-list" class="w-full border border-slate-300 rounded p-2 text-sm outline-none" placeholder="Selecciona o escribe una nueva área"><datalist id="edit-areas-list"></datalist></label>
-                    <label class="block"><span class="text-xs font-bold text-slate-500 uppercase mb-1 block">Tipo</span><select id="edit-project-tipo" class="w-full border border-slate-300 rounded p-2 text-sm bg-white outline-none"></select></label>
-                    <label class="block"><span class="text-xs font-bold text-slate-500 uppercase mb-1 block">F. Inicio</span><input id="edit-project-inicio" type="date" class="w-full border border-slate-300 rounded p-2 text-sm outline-none"></label>
+                    <label class="block col-span-2"><span
+                            class="text-xs font-bold text-slate-500 uppercase mb-1 block">Nombre</span><input
+                            id="edit-project-name"
+                            class="w-full border border-slate-300 rounded p-2 text-sm outline-none"></label>
+                    <label class="block"><span
+                            class="text-xs font-bold text-slate-500 uppercase mb-1 block">Área</span><input
+                            id="edit-project-area" list="edit-areas-list"
+                            class="w-full border border-slate-300 rounded p-2 text-sm outline-none"
+                            placeholder="Selecciona o escribe una nueva área"><datalist
+                            id="edit-areas-list"></datalist></label>
+                    <label class="block"><span
+                            class="text-xs font-bold text-slate-500 uppercase mb-1 block">Tipo</span><select
+                            id="edit-project-tipo"
+                            class="w-full border border-slate-300 rounded p-2 text-sm bg-white outline-none"></select></label>
+                    <label class="block"><span class="text-xs font-bold text-slate-500 uppercase mb-1 block">F.
+                            Inicio</span><input id="edit-project-inicio" type="date"
+                            class="w-full border border-slate-300 rounded p-2 text-sm outline-none"></label>
                 </div>
             </div>
             <div class="px-6 py-3 border-t border-slate-200 bg-white flex items-center justify-between">
-                <button onclick="deleteProjectFromEditModal()" class="px-4 py-2 bg-red-600 text-white font-medium rounded hover:bg-red-700 transition shadow-lg shadow-red-200">Eliminar Proyecto</button>
+                <button onclick="deleteProjectFromEditModal()"
+                    class="px-4 py-2 bg-red-600 text-white font-medium rounded hover:bg-red-700 transition shadow-lg shadow-red-200">Eliminar
+                    Proyecto</button>
                 <div>
-                    <button onclick="closeEditProjectModal()" class="px-4 py-2 mr-2 bg-slate-100 text-slate-600 font-medium rounded hover:bg-slate-200 transition">Cancelar</button>
-                    <button onclick="saveEditedProject()" class="px-4 py-2 bg-emerald-600 text-white font-medium rounded hover:bg-emerald-700 transition shadow-lg shadow-emerald-200">Guardar Cambios</button>
+                    <button onclick="closeEditProjectModal()"
+                        class="px-4 py-2 mr-2 bg-slate-100 text-slate-600 font-medium rounded hover:bg-slate-200 transition">Cancelar</button>
+                    <button onclick="saveEditedProject()"
+                        class="px-4 py-2 bg-emerald-600 text-white font-medium rounded hover:bg-emerald-700 transition shadow-lg shadow-emerald-200">Guardar
+                        Cambios</button>
                 </div>
             </div>
         </div>
@@ -323,35 +1060,39 @@
         <div class="modal-card modal-card-lg" style="height: 78vh;">
             <div class="flex items-center justify-between px-6 py-4 bg-blue-900 text-white flex-shrink-0">
                 <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 rounded bg-white/10 flex items-center justify-center"><i class="fa-solid fa-chart-line"></i></div>
+                    <div class="w-8 h-8 rounded bg-white/10 flex items-center justify-center"><i
+                            class="fa-solid fa-chart-line"></i></div>
                     <div>
                         <h3 class="text-sm font-bold uppercase tracking-wider">Detalle de tarea e indicador</h3>
                         <p id="taskObjectiveTitle" class="text-xs text-blue-200">Detalle</p>
-                        <p id="taskObjectiveMeta" class="text-[11px] text-blue-200/90 mt-0.5">Proyecto | Agente | Ejecutor</p>
+                        <p id="taskObjectiveMeta" class="text-[11px] text-blue-200/90 mt-0.5">Proyecto | Agente |
+                            Ejecutor</p>
                     </div>
                 </div>
-                <button onclick="closeTaskObjectiveModal()" class="text-white/80 hover:text-white text-xl transition"><i class="fa-solid fa-times"></i></button>
+                <button onclick="closeTaskObjectiveModal()" class="text-white/80 hover:text-white text-xl transition"><i
+                        class="fa-solid fa-times"></i></button>
             </div>
             <div id="taskObjectiveContent" class="flex-1 p-6 bg-white text-sm text-slate-700 overflow-y-auto"></div>
             <div class="px-6 py-3 border-t border-slate-200 bg-white flex justify-end gap-3 flex-shrink-0">
-                <button onclick="closeTaskObjectiveModal()" class="px-4 py-2 text-sm font-bold text-slate-600 bg-slate-100 rounded-lg hover:bg-slate-200 transition">Cerrar</button>
+                <button onclick="closeTaskObjectiveModal()"
+                    class="px-4 py-2 text-sm font-bold text-slate-600 bg-slate-100 rounded-lg hover:bg-slate-200 transition">Cerrar</button>
             </div>
         </div>
     </div>
 
     <script>
         // ========= CONFIG & GLOBALS =========
-        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxqIthmPIyj_iI7zsfKcg_-v7NbrS51lciqgpKdWic6sDLh5EvP2LDIllKxW--p3NPr/exec';
+        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby3hKdwRuNPyMst3ukeTgYlmLt1n00oaN7Afu3S5AxE-0M5achVomYLio0f_O2rG8Bp/exec';
         const PROJECT_TYPES = ['Digital', 'Digital + IA', 'Maquina', 'Proceso'];
         const STATUS_BADGE_CLASSES = { 1: 'sb-pendiente', 2: 'sb-proceso', 3: 'sb-terminado' };
         const STATE_ICONS = { 0: '', 1: '!', 2: '▶', 3: '✓' };
         const STATE_COLORS = { 1: 'bg-red-500', 2: 'bg-amber-500', 3: 'bg-emerald-500' };
-        
+
         let projectData = [];
         let projectMap = new Map(); // Fast lookup by ID
         let currentKpiProject = null;
         let activeKpiIndex = 0;
-        let SHOW_PRIORITY = true;
+        let SHOW_PRIORITY = false;
         let SHOW_COMPLETED = true;
         let SHOW_ALL_TASKS = true; // when true, list every task in the left panel regardless of GANTT view range
         const FILTERS = { month: 'all', area: '', project: '' };
@@ -359,17 +1100,17 @@
         let currentEdit = null;
         let currentEditProject = null;
         let confirmCallback = null;
-        let createMode = 'project'; 
+        let createMode = 'project';
         let targetProjectId = null;
         let targetParentTaskContext = null;
         let renderScheduled = false; // Debounce render
         const ganttMinMaxCache = new Map(); // Cache min/max for gantt arrays
         const taskGroupExpandedState = new Map(); // Persist expand/collapse for task groups
-        
+
         // === TIMESTAMP CONFIGURATION ===
         let lastUpdateTime = null;
         let isLoadingData = false;
-        
+
         // === CACHED COLUMNS DATA (Para optimizar modal) ===
         let cachedColumns = { areas: [], ejecutores: [], tipos: PROJECT_TYPES };
         let columnsCacheLoaded = false;
@@ -445,7 +1186,7 @@
             mHeader.style.minWidth = `${fullWidth}px`; wHeader.style.minWidth = `${fullWidth}px`;
             return fullWidth;
         }
-        
+
         const FULL_WIDTH_PX = initHeaders();
         document.documentElement.style.setProperty('--gantt-width', `${FULL_WIDTH_PX + 2}px`);
 
@@ -524,7 +1265,7 @@
             if (!dateStr) return '';
             const normalized = formatDateDMY(dateStr);
             const parts = normalized.split('/');
-            if(parts.length < 3) return '';
+            if (parts.length < 3) return '';
             const day = parts[0].padStart(2, '0');
             const month = parts[1].padStart(2, '0');
             const year = parts[2];
@@ -625,13 +1366,40 @@
             if (currentLen < MAX_YEAR_WEEKS) return [...arr, ...new Array(MAX_YEAR_WEEKS - currentLen).fill(0)];
             return arr.slice(0, MAX_YEAR_WEEKS);
         }
+        function buildRangeGantt(startDate, endRaw) {
+            const gantt = new Array(MAX_YEAR_WEEKS).fill(0);
+            const normalizedStart = formatDateDMY(startDate);
+            const startW = dateToWeekIndex(normalizedStart);
+            if (!(startW >= 0 && startW < MAX_YEAR_WEEKS)) return gantt;
+
+            let endW = startW;
+            const endText = String(endRaw || '').trim();
+            if (endText) {
+                if (/^-?\d+$/.test(endText)) {
+                    endW = parseInt(endText, 10) - 1;
+                } else {
+                    const endNorm = formatDateDMY(endRaw);
+                    const endFromDate = dateToWeekIndex(endNorm);
+                    if (endFromDate >= 0) endW = endFromDate;
+                }
+            }
+            if (!Number.isFinite(endW)) endW = startW;
+            if (endW < startW) endW = startW;
+            for (let i = startW; i <= Math.min(MAX_YEAR_WEEKS - 1, endW); i++) gantt[i] = 1;
+            return gantt;
+        }
+        function mergeGanttArrays(baseGantt, extraGantt) {
+            const base = padGantt(Array.isArray(baseGantt) ? baseGantt : []);
+            const extra = padGantt(Array.isArray(extraGantt) ? extraGantt : []);
+            return base.map((value, idx) => (value > 0 || extra[idx] > 0 ? 1 : 0));
+        }
         function calculateProjectStatus(tasks) {
-            if (!tasks || tasks.length === 0) return 1; 
+            if (!tasks || tasks.length === 0) return 1;
             const allTerminated = tasks.every(t => t.status === 3);
-            if (allTerminated) return 3; 
+            if (allTerminated) return 3;
             const anyInProgress = tasks.some(t => t.status === 2);
-            if (anyInProgress) return 2; 
-            return 1; 
+            if (anyInProgress) return 2;
+            return 1;
         }
         function calculateProjectType(tasks) {
             if (!tasks || tasks.length === 0) return 'Proceso';
@@ -653,7 +1421,7 @@
         function calculateEndWeekFromGantt(ganttArray) {
             let lastPaintedIndex = -1;
             for (let i = ganttArray.length - 1; i >= 0; i--) { if (ganttArray[i] > 0) { lastPaintedIndex = i; break; } }
-            return lastPaintedIndex === -1 ? "" : lastPaintedIndex + 1; 
+            return lastPaintedIndex === -1 ? "" : lastPaintedIndex + 1;
         }
 
         // ========= UI FUNCTIONS =========
@@ -681,18 +1449,20 @@
         }
 
         function isPriorityProject(p) {
-            // Prioridad por columna de proyecto (PRIORIDAD en hoja Datos)
-            const projectPriority = String(p && p.prioridad || '').toUpperCase().trim();
-            if (projectPriority) return projectPriority === 'ALTA';
-            // Compatibilidad con estructura anterior
-            if (!p || !p.kpis || p.kpis.length === 0) return false;
-            return p.kpis.some(kpi => String(kpi.prioridad || '').toUpperCase().trim() === 'ALTA');
+            if (!p) return false;
+            // Prioridad por columna de proyecto
+            if (String(p.prioridad || '').toUpperCase().trim() === 'ALTA') return true;
+            // Si alguna tarea tiene prioridad Alta, el proyecto es Alta
+            if (p.tasks && p.tasks.some(t => String(t.prioridad || '').toUpperCase().trim() === 'ALTA')) return true;
+            // Compatibilidad con estructura anterior (KPIs)
+            if (p.kpis && p.kpis.some(kpi => String(kpi.prioridad || '').toUpperCase().trim() === 'ALTA')) return true;
+            return false;
         }
-        
+
         function normalizeAreaName(areaValue) {
             return String(areaValue || '').trim();
         }
-        
+
         function compareProjectsByAreaThenName(a, b) {
             const areaA = normalizeAreaName(a.area);
             const areaB = normalizeAreaName(b.area);
@@ -783,12 +1553,12 @@
 
             updateDateHeaderState();
         }
-        
+
         function matchesFilters(p) {
             const status = calculateProjectStatus(p.tasks);
-            if (!SHOW_COMPLETED && status === 3) return false; 
+            if (!SHOW_COMPLETED && status === 3) return false;
             if (SHOW_PRIORITY && !isPriorityProject(p)) return false;
-            
+
             // Month Filter Check (Range Overlap)
             if (FILTERS.month !== 'all') {
                 const mi = parseInt(FILTERS.month, 10);
@@ -797,21 +1567,21 @@
                 const pStartW = dateToWeekIndex(p.inicio);
                 // Calculate Project Duration based on Tasks
                 let pEndW = -1;
-                
+
                 // If project has tasks, check their range
                 if (p.tasks && p.tasks.length > 0) {
-                     let maxTaskEnd = -1;
-                     p.tasks.forEach(t => {
-                         let tEnd = t.gantt.lastIndexOf(1);
-                         if(tEnd > maxTaskEnd) maxTaskEnd = tEnd;
-                     });
-                     if(maxTaskEnd > -1) pEndW = maxTaskEnd;
-                     else pEndW = p.gantt.lastIndexOf(1);
+                    let maxTaskEnd = -1;
+                    p.tasks.forEach(t => {
+                        let tEnd = t.gantt.lastIndexOf(1);
+                        if (tEnd > maxTaskEnd) maxTaskEnd = tEnd;
+                    });
+                    if (maxTaskEnd > -1) pEndW = maxTaskEnd;
+                    else pEndW = p.gantt.lastIndexOf(1);
                 } else {
-                     pEndW = p.gantt.lastIndexOf(1);
+                    pEndW = p.gantt.lastIndexOf(1);
                 }
 
-                if (pEndW < pStartW) pEndW = pStartW; 
+                if (pEndW < pStartW) pEndW = pStartW;
 
                 // Overlap Check: (Start <= FilterEnd) AND (End >= FilterStart)
                 if (!(pStartW <= mEnd && pEndW >= mStart)) return false;
@@ -829,7 +1599,7 @@
         function togglePriority() {
             SHOW_PRIORITY = !SHOW_PRIORITY;
             const btn = document.getElementById('btn-priority');
-            if(SHOW_PRIORITY) {
+            if (SHOW_PRIORITY) {
                 btn.classList.add('btn-priority-active');
                 document.getElementById('filter-area').value = '';
                 document.getElementById('filter-project').value = '';
@@ -887,10 +1657,10 @@
             taskContainer.innerHTML = '';
             ganttContainer.innerHTML = '';
             ganttContainer.style.minWidth = '100%';
-            
+
             const ganttContent = document.createElement('div');
             ganttContent.style.minWidth = `${FULL_WIDTH_PX}px`;
-            
+
             // Use DocumentFragment for batch insertion
             const taskFragment = document.createDocumentFragment();
             const ganttFragment = document.createDocumentFragment();
@@ -903,13 +1673,16 @@
                 const calculatedStatus = calculateProjectStatus(p.tasks);
                 const calculatedType = calculateProjectType(p.tasks);
                 const statusClass = STATUS_BADGE_CLASSES[calculatedStatus];
-                const statusText = {1: 'PENDIENTE', 2: 'EN PROCESO', 3: 'TERMINADO'}[calculatedStatus];
+                const statusText = { 1: 'PENDIENTE', 2: 'EN PROCESO', 3: 'TERMINADO' }[calculatedStatus];
                 const projectAreas = new Set((p.tasks || []).map(t => normalizeAreaName(t.area)).filter(Boolean));
                 if (normalizeAreaName(p.area)) projectAreas.add(normalizeAreaName(p.area));
                 const projectAreaDisplay = projectAreas.size > 1
                     ? 'VARIAS'
                     : (projectAreas.size === 1 ? Array.from(projectAreas)[0] : '');
-                const projectAgents = Array.from(new Set((p.kpis || []).map(k => String(k.a_cambio || '').trim()).filter(Boolean)));
+                const projectAgents = Array.from(new Set([
+                    ...(p.kpis || []).map(k => String(k.a_cambio || '').trim()),
+                    String(p.a_cambio || '').trim()
+                ].filter(Boolean)));
                 const projectAgentDisplay = projectAgents.length > 0 ? projectAgents[0] : '';
                 const projectAgentLabel = projectAgentDisplay || '-';
                 const projectAgentsTitle = projectAgents.length > 0 ? projectAgents.join(', ') : projectAgentLabel;
@@ -917,15 +1690,16 @@
                 const projectPriorityTitle = projectPriorityActive ? 'ALTA' : (String(p.prioridad || 'BAJA').toUpperCase().trim() || 'BAJA');
 
                 const pRowLeft = document.createElement('div');
-                pRowLeft.className = `data-row project-row cursor-pointer group`; 
+                pRowLeft.className = `data-row project-row cursor-pointer group`;
                 pRowLeft.innerHTML = `
                     <div class="cell col-icon group-hover:text-blue-600 transition" onclick="toggleProject('${p.id}')"><i class="fa-solid fa-chevron-${p.expanded ? 'down' : 'right'}"></i></div>
                     <div class="cell col-nombre font-bold text-slate-700 group-hover:text-blue-800 transition">
+                        <span class="inline-flex items-center justify-center w-5 h-5 rounded bg-blue-600 text-white text-[9px] font-bold mr-1.5 flex-shrink-0">P</span>
                         <button onclick="event.stopPropagation(); openEditProjectModal('${p.id}')" class="action-btn text-xs text-slate-500 hover:text-blue-600 mr-1" title="Editar Proyecto"><i class="fa-solid fa-pen-to-square"></i></button>
                         <span onclick="toggleProject('${p.id}')">${p.nombre}</span>
                     </div>
                     <div class="cell col-tipo text-xs font-bold text-slate-700">${calculatedType}</div>
-                    <div class="cell col-estado"><div class="status-badge-select ${statusClass}" style="cursor: default; pointer-events: none;">${statusText}</div></div>
+                    <div class="cell col-estado"><select class="status-badge-select ${statusClass}" onchange="updateProjectStatus('${p.id}', this.value)" onclick="event.stopPropagation()"><option value="1" ${calculatedStatus == 1 ? 'selected' : ''}>Pendiente</option><option value="2" ${calculatedStatus == 2 ? 'selected' : ''}>En Proceso</option><option value="3" ${calculatedStatus == 3 ? 'selected' : ''}>Terminado</option></select></div>
                     <div class="cell col-inicio">
                         <input type="text" inputmode="numeric" placeholder="dd/mm/aaaa" maxlength="10" class="table-input text-center font-bold" value="${formatDateDMY(p.inicio)}" onchange="updateProjectDate('${p.id}', formatDateDMY(this.value))" onclick="event.stopPropagation()">
                     </div>
@@ -943,26 +1717,23 @@
 
                 const pRowRight = document.createElement('div');
                 pRowRight.className = 'data-row project-row relative';
-                
-                let minStart = 9999, maxEnd = -1, totalPoints = 0, earnedPoints = 0;
+
+                let totalPoints = 0;
                 let completedCount = 0;
-                
+
                 p.tasks.forEach(t => {
                     if (t.status === 3) completedCount++;
                     if (t.gantt.some(x => x > 0)) {
                         totalPoints++;
-                        if (t.status === 2) earnedPoints += 0.5;
-                        if (t.status === 3) earnedPoints += 1;
-                    }
-                    const mm = getGanttMinMax(t.gantt);
-                    if (mm.max > -1) {
-                        if (mm.min < minStart) minStart = mm.min;
-                        if (mm.max > maxEnd) maxEnd = mm.max;
                     }
                 });
+                if (!p.gantt) p.gantt = new Array(MAX_YEAR_WEEKS).fill(0);
+                const projectRange = getGanttMinMax(p.gantt);
+                const minStart = projectRange.min;
+                const maxEnd = projectRange.max;
 
-                // Render progress bar for project if there are tasks with gantt data
-                if (totalPoints > 0 && minStart <= maxEnd && maxEnd >= OFFSET_WEEKS_INDEX && minStart <= (OFFSET_WEEKS_INDEX + VISIBLE_TOTAL_WEEKS - 1)) {
+                // Render project bar using the project's own planned range.
+                if (minStart <= maxEnd && maxEnd >= OFFSET_WEEKS_INDEX && minStart <= (OFFSET_WEEKS_INDEX + VISIBLE_TOTAL_WEEKS - 1)) {
                     const viewStartIdx = OFFSET_WEEKS_INDEX;
                     const viewEndIdx = OFFSET_WEEKS_INDEX + VISIBLE_TOTAL_WEEKS - 1;
                     const drawStart = Math.max(minStart, viewStartIdx);
@@ -970,7 +1741,7 @@
                     const leftPx = (drawStart - viewStartIdx) * WEEK_CELL_PX;
                     const widthPx = (drawEnd - drawStart + 1) * WEEK_CELL_PX;
                     const totalCount = p.tasks.length;
-                    const progressPct = Math.round((completedCount / totalCount) * 100);
+                    const progressPct = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
                     const progressLabel = `${completedCount}/${totalCount} • ${progressPct}%`;
                     const showLabelOutside = widthPx < 94;
                     const placeLabelLeft = showLabelOutside && drawEnd >= (viewEndIdx - 1);
@@ -979,12 +1750,12 @@
                             ? 'right-full mr-1.5 text-slate-700 bg-white/95 border border-slate-200 rounded px-1.5 py-0.5 shadow-sm'
                             : 'left-full ml-1.5 text-slate-700 bg-white/95 border border-slate-200 rounded px-1.5 py-0.5 shadow-sm')
                         : 'left-1/2 -translate-x-1/2 text-white';
-                    
+
                     const barContainer = document.createElement('div');
                     barContainer.className = 'absolute top-1/2 -translate-y-1/2 h-5 bg-slate-200 rounded text-xs font-bold text-slate-700 flex items-center justify-center z-20 pointer-events-none overflow-visible whitespace-nowrap shadow-sm border border-slate-300';
                     barContainer.style.left = `${leftPx}px`;
                     barContainer.style.width = `${widthPx}px`;
-                    
+
                     barContainer.innerHTML = `
                         <div class="absolute left-0 top-0 h-full bg-blue-400 rounded-l transition-all duration-700 opacity-80" style="width: ${progressPct}%; border-radius: inherit;"></div>
                         <span class="absolute top-1/2 -translate-y-1/2 z-20 text-[10px] font-semibold whitespace-nowrap drop-shadow-md ${labelPositionClass}">${progressLabel}</span>
@@ -992,14 +1763,12 @@
                     pRowRight.appendChild(barContainer);
                 }
 
-                if (!p.gantt) p.gantt = new Array(MAX_YEAR_WEEKS).fill(0);
-                
                 // Render cells
-                for(let i=0; i<VISIBLE_TOTAL_WEEKS; i++) {
+                for (let i = 0; i < VISIBLE_TOTAL_WEEKS; i++) {
                     const actualWeekIdx = OFFSET_WEEKS_INDEX + i;
                     const cell = document.createElement('div');
                     cell.className = 'gantt-week-col z-10';
-                    cell.onclick = (e) => toggleCell(p.id, -1, i); 
+                    cell.onclick = (e) => toggleCell(p.id, -1, i);
                     pRowRight.appendChild(cell);
                 }
                 taskFragment.appendChild(pRowLeft);
@@ -1031,7 +1800,7 @@
                         const { t, tIndex } = taskEntry;
                         const taskAreaDisplay = normalizeAreaName(t.area) || normalizeAreaName(p.area);
                         const tRowLeft = document.createElement('div');
-                        tRowLeft.className = options.leftRowClass || 'data-row hover:bg-slate-50';
+                        tRowLeft.className = options.leftRowClass || 'data-row task-row hover:bg-slate-50';
                         const tStatus = t.status || 1;
                         const statusSelectTask = `<select class="status-badge-select ${STATUS_BADGE_CLASSES[tStatus]}" onchange="updateTaskStatus('${p.id}', ${tIndex}, this.value)" onclick="event.stopPropagation()"><option value="1" ${tStatus == 1 ? 'selected' : ''}>Pendiente</option><option value="2" ${tStatus == 2 ? 'selected' : ''}>En Proceso</option><option value="3" ${tStatus == 3 ? 'selected' : ''}>Terminado</option></select>`;
                         const taskTipoOptions = PROJECT_TYPES.map(type => `<option value="${type}" ${(t.tipo || PROJECT_TYPES[0]) === type ? 'selected' : ''}>${type}</option>`).join('');
@@ -1039,11 +1808,11 @@
                         const taskTitle = escapeHtml(t.tarea || t.nombre || 'Sin tarea');
                         const subtaskTitle = escapeHtml(t.subtarea || '');
                         const defaultTaskNameHtml = t.subtarea
-                            ? `<div class="leading-tight"><div class="font-semibold text-slate-700">${taskTitle}</div><div class="text-[11px] font-semibold text-emerald-700 mt-0.5">Subtarea: ${subtaskTitle}</div></div>`
+                            ? `<div class="leading-tight"><div class="font-semibold text-slate-700">${subtaskTitle || taskTitle}</div></div>`
                             : `<div class="leading-tight"><div class="font-semibold text-slate-700">${taskTitle}</div></div>`;
                         const taskNameHtml = options.customNameHtml || defaultTaskNameHtml;
                         const iconCellHtml = options.iconCellHtml || '<div class="cell col-icon"></div>';
-                        const namePaddingClass = options.namePaddingClass || 'pl-6';
+                        const namePaddingClass = options.namePaddingClass || 'pl-8';
                         const treeDecorHtml = options.showTreeDecor === false
                             ? ''
                             : '<span class="tree-line-v"></span><span class="tree-line-h"></span><div class="tree-connector"></div>';
@@ -1052,8 +1821,11 @@
                             ? `<button onclick="event.stopPropagation(); openCreateSubtaskModal('${p.id}', ${tIndex})" class="text-blue-600 hover:text-blue-700 p-1.5 transition" title="Agregar subtarea"><i class="fa-solid fa-plus"></i></button>`
                             : '';
 
+                        const levelBadge = options.customNameHtml && options.namePaddingClass === 'pl-16'
+                            ? `<span class="inline-flex items-center justify-center w-5 h-5 rounded bg-slate-400 text-white text-[9px] font-bold mr-1.5 flex-shrink-0">S</span>`
+                            : `<span class="inline-flex items-center justify-center w-5 h-5 rounded bg-amber-500 text-white text-[9px] font-bold mr-1.5 flex-shrink-0">T</span>`;
                         tRowLeft.innerHTML = `
-                            ${iconCellHtml}<div class="cell col-nombre ${namePaddingClass} text-sm">${treeDecorHtml}<div class="flex items-start gap-1 w-full min-w-0"><button onclick="event.stopPropagation(); openEditTaskModal('${p.id}', ${tIndex})" class="action-btn text-xs text-slate-500 hover:text-blue-600 mt-0.5" title="Editar tarea"><i class="fa-solid fa-pen-to-square"></i></button><div class="min-w-0">${taskNameHtml}</div></div></div>
+                            ${iconCellHtml}<div class="cell col-nombre ${namePaddingClass} text-sm">${treeDecorHtml}<div class="flex items-start gap-1 w-full min-w-0">${levelBadge}<button onclick="event.stopPropagation(); openEditTaskModal('${p.id}', ${tIndex})" class="action-btn text-xs text-slate-500 hover:text-blue-600 mt-0.5" title="Editar tarea"><i class="fa-solid fa-pen-to-square"></i></button><div class="min-w-0">${taskNameHtml}</div></div></div>
                             <div class="cell col-tipo">${tipoSelectTask}</div><div class="cell col-estado">${statusSelectTask}</div>
                             <div class="cell col-inicio"><input type="text" inputmode="numeric" placeholder="dd/mm/aaaa" maxlength="10" class="table-input text-center font-bold text-xs" value="${formatDateDMY(t.inicio || p.inicio)}" onchange="updateTaskDate('${p.id}', ${tIndex}, formatDateDMY(this.value))" onclick="event.stopPropagation()"></div>
                             <div class="cell col-area text-slate-500 text-xs">${escapeHtml(taskAreaDisplay)}</div>
@@ -1100,7 +1872,7 @@
                     const groupsInOrder = [];
                     const groupsByName = new Map();
                     tasksForRender.forEach((taskEntry) => {
-                        const groupName = String(taskEntry.t.tarea || taskEntry.t.nombre || '').trim() || `Tarea ${taskEntry.tIndex + 1}`;
+                        const groupName = String(taskEntry.t.sheet_tarea || taskEntry.t.tarea || taskEntry.t.nombre || '').trim() || `Tarea ${taskEntry.tIndex + 1}`;
                         if (!groupsByName.has(groupName)) {
                             const newGroup = { name: groupName, items: [], hasSubtasks: false };
                             groupsByName.set(groupName, newGroup);
@@ -1108,7 +1880,7 @@
                         }
                         const group = groupsByName.get(groupName);
                         group.items.push(taskEntry);
-                        if (String(taskEntry.t.subtarea || '').trim()) group.hasSubtasks = true;
+                        if ((taskEntry.t.hierarchy_level || 0) >= 3 || String(taskEntry.t.subtarea || '').trim()) group.hasSubtasks = true;
                     });
 
                     groupsInOrder.forEach((group) => {
@@ -1170,17 +1942,18 @@
                         `;
 
                         const groupRowLeft = document.createElement('div');
-                        groupRowLeft.className = 'data-row bg-slate-50';
+                        groupRowLeft.className = 'data-row task-parent-row';
                         groupRowLeft.innerHTML = `
                             <div class="cell col-icon text-slate-500 hover:text-blue-600 cursor-pointer task-group-toggle"><i class="fa-solid fa-chevron-${groupExpanded ? 'down' : 'right'}"></i></div>
-                            <div class="cell col-nombre text-sm">
-                                <div class="leading-tight">
-                                    <div class="flex items-center gap-1">${groupEditButton}<div class="font-bold text-slate-700 cursor-pointer task-group-name">${escapeHtml(group.name)}</div></div>
+                            <div class="cell col-nombre pl-8 text-sm">
+                                <span class="inline-flex items-center justify-center w-5 h-5 rounded bg-amber-500 text-white text-[9px] font-bold mr-1.5 flex-shrink-0">T</span>
+                                <div class="leading-tight min-w-0">
+                                    <div class="flex items-center gap-1 min-w-0">${groupEditButton}<div class="font-bold text-slate-700 cursor-pointer task-group-name">${escapeHtml(group.name)}</div></div>
                                     <div class="text-[11px] text-slate-500">${visibleSubtasks.length} subtarea(s)</div>
                                 </div>
                             </div>
                             <div class="cell col-tipo text-xs font-bold text-slate-700">${escapeHtml(groupType)}</div>
-                            <div class="cell col-estado"><div class="status-badge-select ${STATUS_BADGE_CLASSES[groupStatus]}" style="cursor: default; pointer-events: none;">${groupStatusText}</div></div>
+                            <div class="cell col-estado"><select class="status-badge-select ${STATUS_BADGE_CLASSES[groupStatus]}" onchange="updateTaskGroupStatus('${p.id}', '${encodeURIComponent(group.name)}', this.value)" onclick="event.stopPropagation()"><option value="1" ${groupStatus == 1 ? 'selected' : ''}>Pendiente</option><option value="2" ${groupStatus == 2 ? 'selected' : ''}>En Proceso</option><option value="3" ${groupStatus == 3 ? 'selected' : ''}>Terminado</option></select></div>
                             <div class="cell col-inicio text-xs font-bold text-slate-700 justify-center">${formatDateDMY(groupStart)}</div>
                             <div class="cell col-area text-slate-500 text-xs">${escapeHtml(groupAreaDisplay)}</div>
                             <div class="cell col-ejecutor text-xs text-slate-500">${escapeHtml(groupExecutorDisplay)}</div>
@@ -1214,7 +1987,7 @@
                         taskFragment.appendChild(groupRowLeft);
 
                         const groupRowRight = document.createElement('div');
-                        groupRowRight.className = 'data-row bg-slate-50 relative';
+                        groupRowRight.className = 'data-row task-parent-row relative';
                         const groupGantt = new Array(MAX_YEAR_WEEKS).fill(0);
                         aggregateItems.forEach((item) => {
                             const rowGantt = Array.isArray(item.t.gantt) ? item.t.gantt : [];
@@ -1246,13 +2019,13 @@
                         if (!groupExpanded) return;
                         visibleSubtasks.forEach((taskEntry) => {
                             const subtaskName = escapeHtml(taskEntry.t.subtarea || taskEntry.t.nombre || 'Subtarea');
-                            const customNameHtml = `<div class="leading-tight"><div class="text-[11px] text-slate-400">Subtarea</div><div class="font-semibold text-slate-700">${subtaskName}</div></div>`;
+                            const customNameHtml = `<div class="leading-tight"><div class="font-semibold text-slate-600">${subtaskName}</div></div>`;
                             renderTaskLeafRow(taskEntry, {
                                 iconCellHtml: '<div class="cell col-icon"></div>',
-                                namePaddingClass: 'pl-10',
-                                showTreeDecor: false,
-                                leftRowClass: 'data-row hover:bg-slate-50',
-                                rightRowClass: 'data-row hover:bg-slate-50 relative',
+                                namePaddingClass: 'pl-16',
+                                showTreeDecor: true,
+                                leftRowClass: 'data-row subtask-row hover:bg-slate-50',
+                                rightRowClass: 'data-row subtask-row hover:bg-slate-50 relative',
                                 customNameHtml
                             });
                         });
@@ -1263,18 +2036,32 @@
             ganttContent.appendChild(ganttFragment);
             ganttContainer.appendChild(ganttContent);
             taskContainer.appendChild(taskFragment);
-            setTimeout(syncRowHeights, 0); 
+            setTimeout(syncRowHeights, 0);
         }
 
         // ========= INTERACTION FUNCTIONS (Saving/Updating) =========
-        function updateTaskStatus(pid, tidx, val) { const p = projectMap.get(pid); if(p && p.tasks[tidx]) { p.tasks[tidx].status = parseInt(val); saveToSheetAsync(pid, tidx); scheduleRender(); } }
-        function updateTaskType(pid, tidx, val) { const p = projectMap.get(pid); if(p && p.tasks[tidx]) { p.tasks[tidx].tipo = val; saveToSheetAsync(pid, tidx); } }
+        function updateProjectStatus(pid, val) { const p = projectMap.get(pid); if (p) { p.status = parseInt(val); saveToSheetAsync(pid, -1); scheduleRender(); } }
+        function updateTaskStatus(pid, tidx, val) { const p = projectMap.get(pid); if (p && p.tasks[tidx]) { p.tasks[tidx].status = parseInt(val); saveToSheetAsync(pid, tidx); scheduleRender(); } }
+        function updateTaskType(pid, tidx, val) { const p = projectMap.get(pid); if (p && p.tasks[tidx]) { p.tasks[tidx].tipo = val; saveToSheetAsync(pid, tidx); } }
+        function updateTaskGroupStatus(pid, groupName, val) {
+            const p = projectMap.get(pid);
+            if (p && p.tasks) {
+                const decodedName = decodeURIComponent(groupName);
+                p.tasks.forEach(task => {
+                    if ((task.sheet_tarea || task.tarea || task.nombre || '').toString().trim() === decodedName) {
+                        task.status = parseInt(val);
+                    }
+                });
+                saveToSheetAsync(pid, -1);
+                scheduleRender();
+            }
+        }
         function updateTaskDate(pid, tidx, val) {
             const p = projectMap.get(pid);
             if (p && p.tasks[tidx]) {
                 const t = p.tasks[tidx];
                 t.inicio = val;
-            const startWeek = dateToWeekIndex(val);
+                const startWeek = dateToWeekIndex(val);
                 if (!(startWeek >= 0 && startWeek < MAX_YEAR_WEEKS)) { saveToSheetAsync(pid, tidx); scheduleRender(); return; }
 
                 // Determine current painted length (continuous block) to preserve duration
@@ -1300,10 +2087,9 @@
         function updateProjectDate(pid, val) {
             const p = projectMap.get(pid);
             if (p) {
-                const oldInicio = p.inicio;
                 p.inicio = val;
                 const startWeek = dateToWeekIndex(val);
-                if (!(startWeek >= 0 && startWeek < MAX_YEAR_WEEKS)) { scheduleRender(); return; }
+                if (!(startWeek >= 0 && startWeek < MAX_YEAR_WEEKS)) { saveProjectSheetAsync(pid); scheduleRender(); return; }
 
                 // Preserve existing painted span length for project gantt
                 if (!p.gantt) p.gantt = new Array(MAX_YEAR_WEEKS).fill(0);
@@ -1322,13 +2108,14 @@
                 for (let i = startWeek; i <= endIdx; i++) newGantt[i] = 1;
                 p.gantt = newGantt;
 
+                saveProjectSheetAsync(pid);
                 scheduleRender();
             }
         }
-        
+
         function toggleCell(pid, tidx, wIndex) {
             const p = projectMap.get(pid); if (!p) return;
-            
+
             const target = (tidx === -1) ? p : p.tasks[tidx];
             let startDate = target.inicio;
             if (tidx >= 0 && !startDate) startDate = p.inicio;
@@ -1359,6 +2146,8 @@
 
             if (tidx !== -1) {
                 saveToSheetAsync(pid, tidx);
+            } else {
+                saveProjectSheetAsync(pid);
             }
             scheduleRender();
         }
@@ -1378,14 +2167,14 @@
         }
         function toggleProject(pid) { const p = projectMap.get(pid); if (p) { p.expanded = !p.expanded; scheduleRender(); } }
         function toggleAll(expand) { projectData.forEach(p => p.expanded = expand); scheduleRender(); }
-        
+
         // Debounced render to avoid multiple renders in quick succession
         function scheduleRender() {
             if (renderScheduled) return;
             renderScheduled = true;
             requestAnimationFrame(() => { renderScheduled = false; render(); });
         }
-        
+
         // Fast gantt min/max calculator with caching
         function getGanttMinMax(gantt) {
             const key = gantt.join(',');
@@ -1409,15 +2198,17 @@
         }
 
         async function fetchColumnFromSheet(columnName) {
-            try { const response = await fetch(APPS_SCRIPT_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'fetchColumnValues', columnName: columnName }) });
-            if (!response.ok) return []; const result = await response.json(); return result || []; } catch(e) { console.warn(e); return []; }
+            try {
+                const response = await fetch(APPS_SCRIPT_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'fetchColumnValues', columnName: columnName }) });
+                if (!response.ok) return []; const result = await response.json(); return result || [];
+            } catch (e) { console.warn(e); return []; }
         }
-        
+
         // Extraer columnas directamente de los datos ya cargados (sin fetch adicional)
         function refreshCachedColumns() {
             const areasSet = new Set();
             const ejecutoresSet = new Set();
-            
+
             projectData.forEach(p => {
                 if (p.area && String(p.area).trim()) areasSet.add(String(p.area).trim());
                 if (p.tasks) {
@@ -1427,7 +2218,7 @@
                     });
                 }
             });
-            
+
             cachedColumns.areas = Array.from(areasSet);
             cachedColumns.ejecutores = ejecutoresSet.size > 0 ? Array.from(ejecutoresSet) : ['EO', 'Equipo', 'Externo'];
             columnsCacheLoaded = true;
@@ -1437,23 +2228,23 @@
         async function saveToSheetAsync(pid, tidx, oldIdentity = null) {
             const p = projectMap.get(pid); if (!p) return;
             const task = tidx >= 0 ? p.tasks[tidx] : null;
-            const statusText = task ? {1: 'Pendiente', 2: 'En proceso', 3: 'Terminado'}[task.status] : {1: 'Pendiente', 2: 'En proceso', 3: 'Terminado'}[p.status];
+            const statusText = task ? { 1: 'Pendiente', 2: 'En proceso', 3: 'Terminado' }[task.status] : { 1: 'Pendiente', 2: 'En proceso', 3: 'Terminado' }[p.status];
             const currentGantt = task ? task.gantt : p.gantt;
             const currentStart = task ? dateToISO(task.inicio) : dateToISO(p.inicio);
             const calculatedEndWeek = calculateEndWeekFromGantt(currentGantt);
-            const calculatedStartSheet = dateFromISO(currentStart); 
+            const calculatedStartSheet = dateFromISO(currentStart);
             const taskTareaKey = task ? String(task.sheet_tarea !== undefined ? task.sheet_tarea : (task.tarea || task.nombre || '')).trim() : '';
             const taskSubtareaKey = task ? String(task.sheet_subtarea !== undefined ? task.sheet_subtarea : (task.subtarea || '')).trim() : '';
-            const taskObj = { 
-              area: task ? (normalizeAreaName(task.area) || p.area) : p.area, 
-              proyecto: p.nombre, 
-              tarea: task ? taskTareaKey : '', 
-              subtarea: task ? taskSubtareaKey : '',
-              tipo: task ? task.tipo : p.tipo, 
-              estado: statusText, 
-              ejecutor: task ? task.ejecutor : p.ejecutor, 
-              f_inicio: calculatedStartSheet, 
-              f_fin: calculatedEndWeek 
+            const taskObj = {
+                area: task ? (normalizeAreaName(task.area) || p.area) : p.area,
+                proyecto: p.nombre,
+                tarea: task ? taskTareaKey : '',
+                subtarea: task ? taskSubtareaKey : '',
+                tipo: task ? task.tipo : p.tipo,
+                estado: statusText,
+                ejecutor: task ? task.ejecutor : p.ejecutor,
+                f_inicio: calculatedStartSheet,
+                f_fin: calculatedEndWeek
             };
             if (oldIdentity) {
                 if (oldIdentity.area !== undefined) taskObj.old_area = oldIdentity.area;
@@ -1461,11 +2252,34 @@
                 if (oldIdentity.tarea !== undefined) taskObj.old_tarea = oldIdentity.tarea;
                 if (oldIdentity.subtarea !== undefined) taskObj.old_subtarea = oldIdentity.subtarea;
             }
-            try { await fetch(APPS_SCRIPT_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'saveTaskData', payload: taskObj }) }); } catch(e) { console.error('Error guardando en Sheet:', e); }
+            try { await fetch(APPS_SCRIPT_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'saveTaskData', payload: taskObj }) }); } catch (e) { console.error('Error guardando en Sheet:', e); }
+        }
+        async function saveProjectSheetAsync(pid, oldIdentity = null) {
+            const p = projectMap.get(pid); if (!p) return;
+            const projectObj = {
+                area: normalizeAreaName(p.area) || '',
+                proyecto: p.nombre,
+                tipo: p.tipo,
+                f_inicio: dateFromISO(dateToISO(p.inicio)),
+                f_fin: calculateEndWeekFromGantt(Array.isArray(p.gantt) ? p.gantt : [])
+            };
+            if (oldIdentity) {
+                if (oldIdentity.area !== undefined) projectObj.old_area = oldIdentity.area;
+                if (oldIdentity.proyecto !== undefined) projectObj.old_proyecto = oldIdentity.proyecto;
+            }
+            try {
+                await fetch(APPS_SCRIPT_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify({ action: 'saveProjectData', payload: projectObj })
+                });
+            } catch (e) {
+                console.error('Error guardando proyecto en Sheet:', e);
+            }
         }
 
         async function deleteTaskAsync(area, proyecto, tarea, subtarea = '') {
-            try { await fetch(APPS_SCRIPT_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'deleteTaskData', payload: { area, proyecto, tarea, subtarea } }) }); } catch(e) { console.error(e); }
+            try { await fetch(APPS_SCRIPT_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'deleteTaskData', payload: { area, proyecto, tarea, subtarea } }) }); } catch (e) { console.error(e); }
         }
 
         async function deleteProjectAsync(proyecto, area = '') {
@@ -1490,38 +2304,45 @@
 
             const tareaLabel = String(t.tarea || t.nombre || '').trim();
             const subtareaLabel = String(t.subtarea || '').trim();
+            const isSubtaskView = subtareaLabel !== '';
             const title = subtareaLabel
                 ? `${tareaLabel} > ${subtareaLabel}`
                 : (tareaLabel || 'Tarea');
 
-            const projectIndicator = ((p.kpis || [])[0] || {});
-            const projectSolution = String(projectIndicator.que_soluciono || '').trim();
-            const projectMetric = String(projectIndicator.indicador || '').trim();
-            const projectLBase = String(projectIndicator.l_base || '').trim();
-            const projectMeta = String(projectIndicator.meta || '').trim();
-            const projectNumerador = String(projectIndicator.numerador || '').trim();
-            const projectDenominador = String(projectIndicator.denominador || '').trim();
-            const projectMonthly = projectIndicator.monthly || {};
+            const monthKeys = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+            const monthLabels = { ene: 'ENE', feb: 'FEB', mar: 'MAR', abr: 'ABR', may: 'MAY', jun: 'JUN', jul: 'JUL', ago: 'AGO', sep: 'SEP', oct: 'OCT', nov: 'NOV', dic: 'DIC' };
+            const projectFallback = p.project_kpi_fallback || {};
+            const firstProjectIndicator = ((p.kpis || [])[0] || {});
+            const projectMonthly = {};
+            monthKeys.forEach(month => {
+                projectMonthly[month] = String((((firstProjectIndicator.monthly || {})[month]) || ((projectFallback.monthly || {})[month]) || '')).trim();
+            });
+            const projectAgent = String(firstProjectIndicator.a_cambio || projectFallback.a_cambio || p.a_cambio || '').trim();
+            const projectSolution = String(firstProjectIndicator.que_soluciono || projectFallback.que_soluciono || '').trim();
+            const projectMetric = String(firstProjectIndicator.indicador || projectFallback.indicador || '').trim();
+            const projectLBase = String(firstProjectIndicator.l_base || projectFallback.l_base || '').trim();
+            const projectMeta = String(firstProjectIndicator.meta || projectFallback.meta || '').trim();
+            const projectNumerador = String(firstProjectIndicator.numerador || projectFallback.numerador || '').trim();
+            const projectDenominador = String(firstProjectIndicator.denominador || projectFallback.denominador || '').trim();
 
             const taskSolution = String(t.que_soluciono_tarea || '').trim();
-            const taskMetric = String(t.indicador_tarea || '').trim();
-            const taskLBase = String(t.l_base_tarea || '').trim();
-            const taskMeta = String(t.meta_tarea || '').trim();
-            const taskNumerador = String(t.numerador_tarea || '').trim();
-            const taskDenominador = String(t.denominador_tarea || '').trim();
-            const taskMonthly = t.monthly_tarea || {};
-
             const ejecutor = String(t.ejecutor || '').trim();
             const proyecto = String(p.nombre || '').trim();
             const meta = `Proyecto: ${proyecto || '-'} | Ejecutor: ${ejecutor || '-'}`;
-            const monthKeys = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
-            const monthLabels = { ene: 'ENE', feb: 'FEB', mar: 'MAR', abr: 'ABR', may: 'MAY', jun: 'JUN', jul: 'JUL', ago: 'AGO', sep: 'SEP', oct: 'OCT', nov: 'NOV', dic: 'DIC' };
-            const renderMonthTable = (monthly) => `
+            const taskFieldClass = isSubtaskView ? '' : 'md:col-span-2';
+            const taskSolutionLabel = isSubtaskView ? 'Subtarea: ¿Qué solucionó?' : 'Tarea: ¿Qué solucionó?';
+            const subtaskFieldHtml = isSubtaskView ? `
+                    <div>
+                        <span class="block text-xs font-bold uppercase text-slate-500 mb-1">Subtarea</span>
+                        <input id="to-subtarea" value="${escapeHtml(subtareaLabel)}" class="w-full border border-slate-300 rounded p-2.5 text-sm text-slate-700 bg-white min-h-[44px] focus:outline-none focus:border-blue-500">
+                    </div>
+            ` : '';
+            const renderMonthTable = (monthly, prefix) => `
                 <div class="grid grid-cols-3 md:grid-cols-6 lg:grid-cols-12 gap-2 mt-3">
                     ${monthKeys.map(m => `
                         <div class="border border-slate-200 rounded bg-white p-2">
                             <div class="text-[10px] font-bold text-slate-500">${monthLabels[m]}</div>
-                            <div class="text-xs text-slate-700 mt-1 break-words">${escapeHtml(String((monthly && monthly[m]) || '').trim() || '-')}</div>
+                            <input id="${prefix}-${m}" value="${escapeHtml(String((monthly && monthly[m]) || '').trim())}" class="w-full text-xs text-slate-700 mt-1 pb-1 border-b border-transparent focus:border-blue-500 focus:outline-none bg-transparent">
                         </div>
                     `).join('')}
                 </div>
@@ -1529,47 +2350,40 @@
 
             const content = `
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                    <div>
+                    <div class="${taskFieldClass}">
                         <span class="block text-xs font-bold uppercase text-slate-500 mb-1">Tarea</span>
-                        <div class="w-full border border-slate-300 rounded p-2.5 text-sm text-slate-700 bg-white min-h-[44px]">${escapeHtml(tareaLabel || '-')}</div>
+                        <input id="to-tarea" value="${escapeHtml(tareaLabel)}" class="w-full border border-slate-300 rounded p-2.5 text-sm text-slate-700 bg-white min-h-[44px] focus:outline-none focus:border-blue-500">
                     </div>
-                    <div>
-                        <span class="block text-xs font-bold uppercase text-slate-500 mb-1">Subtarea</span>
-                        <div class="w-full border border-slate-300 rounded p-2.5 text-sm text-slate-700 bg-white min-h-[44px]">${escapeHtml(subtareaLabel || '-')}</div>
-                    </div>
+                    ${subtaskFieldHtml}
                     <div class="md:col-span-2">
                         <span class="block text-xs font-bold uppercase text-slate-500 mb-1">Proyecto: ¿Qué solucionó?</span>
-                        <div class="w-full border border-slate-300 rounded p-3 text-sm text-slate-700 bg-white min-h-[64px] whitespace-pre-wrap">${escapeHtml(projectSolution || 'Sin detalle registrado.')}</div>
+                        <textarea id="to-project-solution" class="w-full border border-slate-300 rounded p-3 text-sm text-slate-700 bg-white min-h-[80px] focus:outline-none focus:border-blue-500">${escapeHtml(projectSolution)}</textarea>
                     </div>
                     <div class="md:col-span-2">
                         <span class="block text-xs font-bold uppercase text-slate-500 mb-1">Proyecto: Indicador</span>
                         <div class="w-full border border-slate-300 rounded p-3 bg-white">
-                            <div class="text-sm text-slate-700 font-semibold">${escapeHtml(projectMetric || '-')}</div>
-                            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mt-3">
-                                <div><div class="text-[10px] uppercase font-bold text-slate-500">Línea base</div><div class="text-sm text-slate-700">${escapeHtml(projectLBase || '-')}</div></div>
-                                <div><div class="text-[10px] uppercase font-bold text-slate-500">Meta</div><div class="text-sm text-slate-700">${escapeHtml(projectMeta || '-')}</div></div>
-                                <div><div class="text-[10px] uppercase font-bold text-slate-500">Numerador</div><div class="text-sm text-slate-700">${escapeHtml(projectNumerador || '-')}</div></div>
-                                <div><div class="text-[10px] uppercase font-bold text-slate-500">Denominador</div><div class="text-sm text-slate-700">${escapeHtml(projectDenominador || '-')}</div></div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                <div>
+                                    <div class="text-[10px] uppercase font-bold text-slate-500 mb-1">Agente de cambio</div>
+                                    <input id="to-project-agent" value="${escapeHtml(projectAgent)}" class="w-full border border-slate-300 rounded p-1.5 text-sm text-slate-700 focus:outline-none focus:border-blue-500" placeholder="Ej: TI">
+                                </div>
+                                <div>
+                                    <div class="text-[10px] uppercase font-bold text-slate-500 mb-1">Indicador</div>
+                                    <input id="to-project-metric" value="${escapeHtml(projectMetric)}" class="w-full border border-slate-300 rounded p-1.5 text-sm text-slate-700 focus:outline-none focus:border-blue-500" placeholder="Nombre del indicador">
+                                </div>
                             </div>
-                            ${renderMonthTable(projectMonthly)}
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mt-3">
+                                <div><div class="text-[10px] uppercase font-bold text-slate-500 mb-1">Línea base</div><input id="to-project-lbase" value="${escapeHtml(projectLBase)}" class="w-full border border-slate-300 rounded p-1.5 text-sm text-slate-700 focus:outline-none focus:border-blue-500"></div>
+                                <div><div class="text-[10px] uppercase font-bold text-slate-500 mb-1">Meta</div><input id="to-project-meta" value="${escapeHtml(projectMeta)}" class="w-full border border-slate-300 rounded p-1.5 text-sm text-slate-700 focus:outline-none focus:border-blue-500"></div>
+                                <div><div class="text-[10px] uppercase font-bold text-slate-500 mb-1">Numerador</div><input id="to-project-numerador" value="${escapeHtml(projectNumerador)}" class="w-full border border-slate-300 rounded p-1.5 text-sm text-slate-700 focus:outline-none focus:border-blue-500"></div>
+                                <div><div class="text-[10px] uppercase font-bold text-slate-500 mb-1">Denominador</div><input id="to-project-denominador" value="${escapeHtml(projectDenominador)}" class="w-full border border-slate-300 rounded p-1.5 text-sm text-slate-700 focus:outline-none focus:border-blue-500"></div>
+                            </div>
+                            ${renderMonthTable(projectMonthly, 'to-project')}
                         </div>
                     </div>
                     <div class="md:col-span-2">
-                        <span class="block text-xs font-bold uppercase text-slate-500 mb-1">Tarea/Subtarea: ¿Qué solucionó?</span>
-                        <div class="w-full border border-slate-300 rounded p-3 text-sm text-slate-700 bg-white min-h-[64px] whitespace-pre-wrap">${escapeHtml(taskSolution || 'Sin detalle registrado.')}</div>
-                    </div>
-                    <div class="md:col-span-2">
-                        <span class="block text-xs font-bold uppercase text-slate-500 mb-1">Tarea/Subtarea: Indicador</span>
-                        <div class="w-full border border-slate-300 rounded p-3 bg-white">
-                            <div class="text-sm text-slate-700 font-semibold">${escapeHtml(taskMetric || '-')}</div>
-                            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mt-3">
-                                <div><div class="text-[10px] uppercase font-bold text-slate-500">Línea base</div><div class="text-sm text-slate-700">${escapeHtml(taskLBase || '-')}</div></div>
-                                <div><div class="text-[10px] uppercase font-bold text-slate-500">Meta</div><div class="text-sm text-slate-700">${escapeHtml(taskMeta || '-')}</div></div>
-                                <div><div class="text-[10px] uppercase font-bold text-slate-500">Numerador</div><div class="text-sm text-slate-700">${escapeHtml(taskNumerador || '-')}</div></div>
-                                <div><div class="text-[10px] uppercase font-bold text-slate-500">Denominador</div><div class="text-sm text-slate-700">${escapeHtml(taskDenominador || '-')}</div></div>
-                            </div>
-                            ${renderMonthTable(taskMonthly)}
-                        </div>
+                        <span class="block text-xs font-bold uppercase text-slate-500 mb-1">${taskSolutionLabel}</span>
+                        <textarea id="to-task-solution" class="w-full border border-slate-300 rounded p-3 text-sm text-slate-700 bg-white min-h-[64px] focus:outline-none focus:border-blue-500">${escapeHtml(taskSolution)}</textarea>
                     </div>
                 </div>
             `;
@@ -1580,7 +2394,18 @@
             if (titleEl) titleEl.textContent = title;
             if (metaEl) metaEl.textContent = meta;
             if (contentEl) contentEl.innerHTML = content;
-            document.getElementById('taskObjectiveModal').style.display = 'flex';
+            
+            // Reemplazar el botón "Cerrar" original y añadir "Guardar Cambios"
+            const modal = document.getElementById('taskObjectiveModal');
+            const footerDiv = modal.querySelector('.border-t.border-slate-200.bg-white.flex');
+            if(footerDiv) {
+                footerDiv.innerHTML = `
+                    <button onclick="closeTaskObjectiveModal()" class="px-4 py-2 text-sm font-bold text-slate-600 bg-slate-100 rounded-lg hover:bg-slate-200 transition">Cancelar</button>
+                    <button onclick="saveTaskObjective('${pid}', ${tidx})" class="px-5 py-2 text-sm font-bold text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition shadow-lg shadow-blue-200">Guardar Cambios</button>
+                `;
+            }
+
+            modal.style.display = 'flex';
         }
 
         function closeTaskObjectiveModal() {
@@ -1588,32 +2413,109 @@
             if (modal) modal.style.display = 'none';
         }
 
+        async function saveTaskObjective(pid, tidx) {
+            const p = projectMap.get(pid);
+            if (!p || !p.tasks || !p.tasks[tidx]) return;
+            const t = p.tasks[tidx];
+
+            const btn = document.querySelector('#taskObjectiveModal button.bg-blue-600');
+            if (btn) btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Guardando...';
+
+            const readMonthlyInputs = (prefix) => ({
+                ene: (document.getElementById(`${prefix}-ene`)?.value || '').trim(),
+                feb: (document.getElementById(`${prefix}-feb`)?.value || '').trim(),
+                mar: (document.getElementById(`${prefix}-mar`)?.value || '').trim(),
+                abr: (document.getElementById(`${prefix}-abr`)?.value || '').trim(),
+                may: (document.getElementById(`${prefix}-may`)?.value || '').trim(),
+                jun: (document.getElementById(`${prefix}-jun`)?.value || '').trim(),
+                jul: (document.getElementById(`${prefix}-jul`)?.value || '').trim(),
+                ago: (document.getElementById(`${prefix}-ago`)?.value || '').trim(),
+                sep: (document.getElementById(`${prefix}-sep`)?.value || '').trim(),
+                oct: (document.getElementById(`${prefix}-oct`)?.value || '').trim(),
+                nov: (document.getElementById(`${prefix}-nov`)?.value || '').trim(),
+                dic: (document.getElementById(`${prefix}-dic`)?.value || '').trim()
+            });
+            const projectPayload = {
+                area: normalizeAreaName(p.area) || normalizeAreaName(t.area) || '',
+                proyecto: p.nombre,
+                f_inicio: p.inicio,
+                a_cambio: (document.getElementById('to-project-agent')?.value || '').trim(),
+                que_soluciono: (document.getElementById('to-project-solution')?.value || '').trim(),
+                objetivo: '',
+                l_base: (document.getElementById('to-project-lbase')?.value || '').trim(),
+                meta: (document.getElementById('to-project-meta')?.value || '').trim(),
+                indicador: (document.getElementById('to-project-metric')?.value || '').trim(),
+                numerador: (document.getElementById('to-project-numerador')?.value || '').trim(),
+                denominador: (document.getElementById('to-project-denominador')?.value || '').trim(),
+                datos_mensuales: readMonthlyInputs('to-project')
+            };
+            const oldTaskKey = String(t.sheet_tarea !== undefined ? t.sheet_tarea : (t.tarea || t.nombre || '')).trim();
+            const oldSubtaskKey = String(t.sheet_subtarea !== undefined ? t.sheet_subtarea : (t.subtarea || '')).trim();
+            const taskPayload = {
+                area: normalizeAreaName(t.area) || p.area,
+                proyecto: p.nombre,
+                tarea: document.getElementById('to-tarea').value.trim(),
+                subtarea: (document.getElementById('to-subtarea')?.value || '').trim(),
+                old_tarea: oldTaskKey,
+                old_subtarea: oldSubtaskKey,
+                que_soluciono_tarea: document.getElementById('to-task-solution').value.trim()
+            };
+            const postAction = async (action, payload) => {
+                const response = await fetch(APPS_SCRIPT_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify({ action, payload })
+                });
+                return await response.json();
+            };
+
+            try {
+                const projectRes = await postAction('saveKpiData', projectPayload);
+                const taskRes = await postAction('saveTaskData', taskPayload);
+                if (projectRes.success && taskRes.success) {
+                    showToast('Datos guardados', 'success');
+                    closeTaskObjectiveModal();
+                    await loadDataFromSheet();
+                } else {
+                    const errorMessage = (projectRes && !projectRes.success && projectRes.message)
+                        || (taskRes && !taskRes.success && taskRes.message)
+                        || 'No se pudieron guardar los cambios';
+                    showToast('Error: ' + errorMessage, 'error');
+                }
+            } catch (err) {
+                console.error('Error guardando datos de proyecto/tarea:', err);
+                showToast('Error al guardar datos', 'error');
+            } finally {
+                if (btn) btn.innerHTML = 'Guardar Cambios';
+            }
+        }
+
         // ========= MODALS LOGIC =========
-        
+
         // --- Open Modal Wrapper ---
         function openModal(mode, projectObj = null, options = {}) {
             createMode = mode; // 'project', 'task' or 'subtask'
             targetProjectId = projectObj ? projectObj.id : null;
             targetParentTaskContext = null;
-            
+
             const modal = document.getElementById('createFieldModal');
             const titleEl = document.getElementById('cf-modal-title');
             const subtitleEl = document.getElementById('cf-modal-subtitle');
             const taskLabelEl = document.getElementById('cf-task-label');
             const taskInputEl = document.getElementById('cf-task');
-            
+
             // Refrescar columnas desde datos ya cargados (instantáneo, sin fetch)
             refreshCachedColumns();
-            
+
             // Poblar datalist de AREA desde datos del Excel (columna AREA de hoja Datos)
             const $area = document.getElementById('cf-area');
             const $areaList = document.getElementById('cf-areas-list');
             $areaList.innerHTML = cachedColumns.areas.map(a => `<option value="${a}">`).join('');
             $area.value = '';
-            
+
             // Poblar dropdown de EJECUTOR desde datos del Excel (columna EJECUTOR de hoja Datos)
             const $exec = document.getElementById('cf-ejecutor');
-            $exec.innerHTML = '<option value="">-- Seleccione --</option>' + 
+            $exec.innerHTML = '<option value="">-- Seleccione --</option>' +
                 cachedColumns.ejecutores.map(e => `<option value="${e}">${e}</option>`).join('');
 
             // Poblar dropdown de TIPO
@@ -1625,33 +2527,33 @@
             const divProjReadonly = document.getElementById('div-cf-project-select');
             const divTask = document.getElementById('div-cf-task');
             const divExec = document.getElementById('div-cf-ejecutor');
-            
+
             if (mode === 'project') {
                 titleEl.textContent = "CREAR NUEVO PROYECTO";
                 subtitleEl.textContent = "Definir nuevo proyecto maestro";
                 if (taskLabelEl) taskLabelEl.textContent = "Nombre de la Tarea";
-                
+
                 divProjInput.style.display = 'block';
                 divProjReadonly.style.display = 'none';
                 divTask.style.display = 'none';    // Hide Task name
                 divExec.style.display = 'none';    // Hide Executor
-                
+
                 // Clear fields
                 document.getElementById('cf-project-input').value = "";
                 $area.value = "";
                 $area.placeholder = "Selecciona o escribe una nueva área";
                 $area.disabled = false;
-                
+
             } else if (mode === 'task') {
                 titleEl.textContent = "AGREGAR TAREA";
                 subtitleEl.textContent = `Al proyecto: ${projectObj.nombre}`;
                 if (taskLabelEl) taskLabelEl.textContent = "Nombre de la Tarea";
-                
+
                 divProjInput.style.display = 'none';
                 divProjReadonly.style.display = 'block';
                 divTask.style.display = 'block';   // Show Task name
                 divExec.style.display = 'block';   // Show Executor
-                
+
                 // Pre-fill fields
                 document.getElementById('cf-project-readonly').value = projectObj.nombre;
                 if (taskInputEl) {
@@ -1700,9 +2602,9 @@
 
         // --- Trigger for New Project ---
         document.getElementById('create-project-button')?.addEventListener('click', () => {
-             openModal('project');
+            openModal('project');
         });
-        
+
         // --- Trigger for New Task (called from render loop) ---
         function openCreateTaskModal(projectId) {
             const p = projectMap.get(projectId);
@@ -1731,27 +2633,27 @@
             openModal('subtask', p, { parentTaskName: name, parentArea: normalizeAreaName(parentArea) || normalizeAreaName(p.area) || '' });
         }
 
-        document.getElementById('createFieldClose')?.addEventListener('click', () => document.getElementById('createFieldModal').style.display='none');
-        document.getElementById('cf-cancel')?.addEventListener('click', () => document.getElementById('createFieldModal').style.display='none');
-        
+        document.getElementById('createFieldClose')?.addEventListener('click', () => document.getElementById('createFieldModal').style.display = 'none');
+        document.getElementById('cf-cancel')?.addEventListener('click', () => document.getElementById('createFieldModal').style.display = 'none');
+
         // --- SAVE LOGIC ---
         document.getElementById('cf-save')?.addEventListener('click', async () => {
             const areaInput = normalizeAreaName(document.getElementById('cf-area').value);
-            const area = areaInput || 'GENERAL'; 
+            const area = areaInput || 'GENERAL';
             const tipo = document.getElementById('cf-tipo').value || 'Proceso';
             let inicioInput = document.getElementById('cf-inicio').value;
-            if (!inicioInput) { 
-                inicioInput = getTodayFormatted(); 
+            if (!inicioInput) {
+                inicioInput = getTodayFormatted();
             } else {
                 // Convertir de formato YYYY-MM-DD a DD/MM/YYYY
                 const [year, month, day] = inicioInput.split('-');
                 inicioInput = `${day}/${month}/${year}`;
             }
             let inicio = inicioInput;
-            
+
             // Calcular semana inicio
             const semanaInicioIdx = dateToWeekIndex(inicio);
-            
+
             // Logic split
             let proyecto = "";
             let tarea = "";
@@ -1760,8 +2662,8 @@
 
             if (createMode === 'project') {
                 proyecto = (document.getElementById('cf-project-input').value || 'Nuevo Proyecto').trim();
-                tarea = ""; 
-                ejecutor = ""; 
+                tarea = "";
+                ejecutor = "";
             } else if (createMode === 'task') {
                 if (!areaInput) {
                     showToast('Selecciona un área para la tarea', 'error');
@@ -1792,13 +2694,13 @@
             }
 
             // Local Update
-            const ganttArr = padGantt([1]); 
-            const fFinCalculada = semanaInicioIdx + 1; 
+            const ganttArr = padGantt([1]);
+            const fFinCalculada = semanaInicioIdx + 1;
 
             if (createMode === 'project') {
                 const newId = 'u' + Date.now();
                 const newProject = {
-                    id: newId, area, tipo, inicio, nombre: proyecto, ejecutor: "", expanded: false, 
+                    id: newId, area, tipo, inicio, nombre: proyecto, ejecutor: "", expanded: false,
                     tasks: [], gantt: ganttArr, kpis: []
                 };
                 projectData.push(newProject);
@@ -1852,7 +2754,7 @@
                     : (createMode === 'task' ? 'Tarea agregada' : 'Subtarea agregada'),
                 'success'
             );
-            
+
             // Guardar en servidor
             if (createMode === 'project') {
                 const projectObj = {
@@ -1861,9 +2763,9 @@
                     tipo: tipo,
                     f_inicio: inicio
                 };
-                
+
                 console.log('Guardando proyecto:', projectObj);
-                
+
                 // Guardar proyecto en background con mejor manejo de errores
                 fetch(APPS_SCRIPT_URL, {
                     method: 'POST',
@@ -1896,9 +2798,9 @@
                     estado: 'Pendiente',
                     f_fin: fFinCalculada
                 };
-                 
+
                 console.log(createMode === 'task' ? 'Guardando tarea:' : 'Guardando subtarea:', taskObj);
-                
+
                 // Guardar en background con mejor manejo de errores
                 fetch(APPS_SCRIPT_URL, {
                     method: 'POST',
@@ -1988,30 +2890,30 @@
             const p = projectMap.get(pid); if (!p) return;
             currentEditProject = pid;
             document.getElementById('edit-project-name').value = p.nombre;
-            
+
             // Llenar el datalist de áreas con opciones disponibles
             const $areaInput = document.getElementById('edit-project-area');
             const $areaList = document.getElementById('edit-areas-list');
             const areas = Array.from(new Set(projectData.map(proj => proj.area).filter(a => a)));
             $areaList.innerHTML = areas.map(area => `<option value="${area}">`).join('');
             $areaInput.value = p.area || '';
-            
+
             // Llenar el selector de tipo
             const $tipoSelect = document.getElementById('edit-project-tipo');
             $tipoSelect.innerHTML = PROJECT_TYPES.map(type => `<option value="${type}">${type}</option>`).join('');
             $tipoSelect.value = calculateProjectType(p.tasks) || PROJECT_TYPES[0];
-            
+
             // Convertir de formato DD/MM/YYYY a YYYY-MM-DD
             const fechaStr = p.inicio;
             const [d, m, y] = fechaStr.split('/');
             document.getElementById('edit-project-inicio').value = `${y}-${m}-${d}`;
-            
+
             document.getElementById('editProjectModal').style.display = 'flex';
         }
-        
-        function closeEditProjectModal() { 
-            document.getElementById('editProjectModal').style.display = 'none'; 
-            currentEditProject = null; 
+
+        function closeEditProjectModal() {
+            document.getElementById('editProjectModal').style.display = 'none';
+            currentEditProject = null;
         }
 
         function deleteProjectFromEditModal() {
@@ -2037,7 +2939,7 @@
                 }
             });
         }
-        
+
         function saveEditedProject() {
             if (!currentEditProject) return;
             const p = projectMap.get(currentEditProject); if (!p) return;
@@ -2046,7 +2948,7 @@
             const newProjectName = document.getElementById('edit-project-name').value.trim() || p.nombre;
             const newArea = normalizeAreaName(document.getElementById('edit-project-area').value) || p.area;
             const newType = document.getElementById('edit-project-tipo').value || calculateProjectType(p.tasks) || p.tipo;
-            
+
             p.nombre = newProjectName;
             p.area = newArea;
             p.tipo = newType;
@@ -2055,16 +2957,16 @@
                     if (!normalizeAreaName(t.area)) t.area = newArea;
                 });
             }
-            
+
             // Convertir de formato YYYY-MM-DD a DD/MM/YYYY
             const inicioValue = document.getElementById('edit-project-inicio').value;
             if (inicioValue) {
                 const [year, month, day] = inicioValue.split('-');
                 p.inicio = `${day}/${month}/${year}`;
             }
-            
-            closeEditProjectModal(); 
-            scheduleRender(); 
+
+            closeEditProjectModal();
+            scheduleRender();
             showToast('Proyecto actualizado', 'success');
 
             const projectObj = {
@@ -2072,6 +2974,7 @@
                 proyecto: p.nombre,
                 tipo: p.tipo,
                 f_inicio: p.inicio,
+                f_fin: calculateEndWeekFromGantt(Array.isArray(p.gantt) ? p.gantt : []),
                 old_area: oldArea,
                 old_proyecto: oldProjectName
             };
@@ -2105,6 +3008,7 @@
             const firstKpi = (project.kpis && project.kpis.length > 0) ? project.kpis[0] : {};
             project.kpis = [{
                 id: firstKpi.id || ('new_' + Date.now()),
+                a_cambio: firstKpi.a_cambio || '',
                 que_soluciono: firstKpi.que_soluciono || '',
                 l_base: firstKpi.l_base || '',
                 meta: firstKpi.meta || '',
@@ -2113,7 +3017,7 @@
                 denominador: firstKpi.denominador || '',
                 monthly: firstKpi.monthly || {}
             }];
-            activeKpiIndex = 0; 
+            activeKpiIndex = 0;
             renderKpiModalContent();
             document.getElementById('kpiModal').style.display = 'flex';
         }
@@ -2127,12 +3031,12 @@
         function renderKpiList() {
             const container = document.getElementById('kpiListContainer'); container.innerHTML = '';
             currentKpiProject.kpis.forEach((kpi, idx) => {
-                const div = document.createElement('div'); 
+                const div = document.createElement('div');
                 div.className = `kpi-sidebar-item ${idx === activeKpiIndex ? 'active' : ''}`;
-                
+
                 // Title span
                 const span = document.createElement('span');
-                const title = kpi.indicador || kpi.que_soluciono || `Indicador ${idx + 1}`; 
+                const title = kpi.indicador || kpi.que_soluciono || `Indicador ${idx + 1}`;
                 span.textContent = title.length > 18 ? title.substring(0, 18) + '...' : title;
                 span.className = "flex-1";
                 span.onclick = () => { activeKpiIndex = idx; renderKpiModalContent(); };
@@ -2140,12 +3044,12 @@
                 // Actions div
                 const actions = document.createElement('div');
                 actions.className = "flex gap-2 opacity-60 hover:opacity-100";
-                
+
                 // Edit btn
                 const btnEdit = document.createElement('i');
                 btnEdit.className = "fa-solid fa-pencil hover:text-blue-600 p-1";
                 btnEdit.onclick = (e) => { e.stopPropagation(); activeKpiIndex = idx; renderKpiModalContent(); };
-                
+
                 // Delete btn
                 const btnDel = document.createElement('i');
                 btnDel.className = "fa-solid fa-trash hover:text-red-600 p-1";
@@ -2159,28 +3063,28 @@
                 container.appendChild(div);
             });
         }
-        
+
         function deleteKpi(index) {
-            if(confirm('¿Eliminar este indicador?')) {
+            if (confirm('¿Eliminar este indicador?')) {
                 const kpi = currentKpiProject.kpis[index];
                 // Optimistic UI update
                 currentKpiProject.kpis.splice(index, 1);
                 // Adjust active index
-                if(index <= activeKpiIndex) activeKpiIndex = Math.max(0, activeKpiIndex - 1);
-                if(currentKpiProject.kpis.length === 0) createNewKpi(); // Ensure at least one
+                if (index <= activeKpiIndex) activeKpiIndex = Math.max(0, activeKpiIndex - 1);
+                if (currentKpiProject.kpis.length === 0) createNewKpi(); // Ensure at least one
                 else renderKpiModalContent();
-                
+
                 // Call backend
                 deleteKpiAsync(kpi);
             }
         }
-        
+
         async function deleteKpiAsync(kpi) {
-             try { await fetch(APPS_SCRIPT_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'deleteKpiData', payload: { id: kpi.id, proyecto: currentKpiProject.nombre } }) }); showToast('Indicador eliminado', 'success'); } catch(e) { console.error(e); }
+            try { await fetch(APPS_SCRIPT_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'deleteKpiData', payload: { id: kpi.id, proyecto: currentKpiProject.nombre } }) }); showToast('Indicador eliminado', 'success'); } catch (e) { console.error(e); }
         }
-        
+
         function createNewKpi() {
-            currentKpiProject.kpis.push({ id: 'new_' + Date.now() + Math.random().toString(36).substr(2, 5), que_soluciono: '', l_base: '', meta: '', indicador: '', numerador: '', denominador: '', monthly: {} });
+            currentKpiProject.kpis.push({ id: 'new_' + Date.now() + Math.random().toString(36).substr(2, 5), a_cambio: '', que_soluciono: '', l_base: '', meta: '', indicador: '', numerador: '', denominador: '', monthly: {} });
             activeKpiIndex = currentKpiProject.kpis.length - 1; renderKpiModalContent();
         }
 
@@ -2195,7 +3099,7 @@
         function updateKpiMonth(month, value) {
             if (!currentKpiProject || !currentKpiProject.kpis[activeKpiIndex]) return;
             const kpi = currentKpiProject.kpis[activeKpiIndex];
-            if(!kpi.monthly) kpi.monthly = {};
+            if (!kpi.monthly) kpi.monthly = {};
             kpi.monthly[month] = value;
         }
 
@@ -2204,12 +3108,16 @@
             const monthly = kpi.monthly || {};
             const container = document.getElementById('kpiFormContainer');
             const months = ['ENE', 'FEB', 'MAR', 'ABR', 'MAY', 'JUN', 'JUL', 'AGO', 'SEP', 'OCT', 'NOV', 'DIC'];
-            
+
             let fieldsHTML = `
                 <div class="mb-6 grid grid-cols-2 gap-4">
                     <div class="col-span-2">
                         <label class="block text-xs font-bold text-slate-500 uppercase mb-1">¿Qué soluciono?</label>
                         <input class="w-full border border-slate-300 rounded p-2 text-sm" value="${kpi.que_soluciono || ''}" placeholder="Descripción de la solución" oninput="updateKpiField('que_soluciono', this.value)">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Agente de Cambio</label>
+                        <input class="w-full border border-slate-300 rounded p-2 text-sm" value="${kpi.a_cambio || ''}" placeholder="Ej: Juan Perez" oninput="updateKpiField('a_cambio', this.value)">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Indicador</label>
@@ -2233,7 +3141,7 @@
                     </div>
                 </div>
             `;
-            
+
             let tableHTML = `
                 <div class="bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden overflow-x-auto">
                     <table class="kpi-table w-full">
@@ -2249,7 +3157,7 @@
                     </table>
                 </div>
             `;
-            
+
             container.innerHTML = fieldsHTML + tableHTML;
         }
 
@@ -2264,7 +3172,7 @@
                 proyecto: currentKpiProject.nombre,
                 id: kpi.id,
                 f_inicio: currentKpiProject.inicio,
-                a_cambio: '',
+                a_cambio: kpi.a_cambio || '',
                 que_soluciono: kpi.que_soluciono,
                 objetivo: '',
                 l_base: kpi.l_base,
@@ -2290,14 +3198,14 @@
                     showToast(result.message || 'Error al guardar indicador', 'error');
                     console.error('Backend error:', result);
                 }
-            } catch(e) {
+            } catch (e) {
                 console.error('Error guardando indicador:', e);
                 showToast('Error: ' + e.message, 'error');
             }
         }
 
         // ========= LOAD DATA =========
-        
+
         // Actualizar el timestamp visible en el UI
         function updateLastUpdateTime() {
             const now = new Date();
@@ -2308,7 +3216,7 @@
             lastUpdateTime = timeStr;
             document.getElementById('lastUpdateTime').textContent = `Última actualización: ${timeStr}`;
         }
-        
+
         // ========= LOAD DATA =========
         async function loadDataFromSheet() {
             isLoadingData = true;
@@ -2319,7 +3227,7 @@
                 const text = await response.text();
                 if (text.trim().startsWith('<')) throw new Error('Recibí HTML (Login Page). Revisa permisos "Cualquier persona".');
                 const result = JSON.parse(text);
-                
+
                 if (result.datosData) {
                     projectData = transformSheetDataToGantt(result.datosData, result.kpiData);
                     // Ensure all projects start collapsed by default
@@ -2327,13 +3235,13 @@
                     updateProjectMap();
                     updateLastUpdateTime();
                     showToast('Datos cargados', 'success');
-                } else { projectData = []; } 
+                } else { projectData = []; }
                 populateFilterOptions(); render();
             } catch (e) {
                 console.error('Error cargando:', e);
                 // Demo fallback
                 const DEMO = [{ id: 'p1', area: 'HILANDERIA', tipo: 'Digital', prioridad: 'Alta', inicio: '14/01/2026', nombre: 'Digitalización y sistematización', ejecutor: 'EO', expanded: false, status: 2, gantt: padGantt([]), kpis: [], tasks: [] }];
-                projectData = DEMO; 
+                projectData = DEMO;
                 updateProjectMap();
                 render();
                 showToast(`Error: ${e.message}`, 'error');
@@ -2374,7 +3282,7 @@
                     const key = canonicalKey(rawKey);
                     if (!key) return;
                     setCanonValue(canonical, key, value);
-                    const baseKey = key.replace(/\d+$/, '');
+                    const baseKey = key.replace(/_?\d+$/, '');
                     if (baseKey && baseKey !== key) setCanonValue(canonical, baseKey, value);
                 });
                 return canonical;
@@ -2403,6 +3311,34 @@
                 oct: ['OCT'],
                 nov: ['NOV'],
                 dic: ['DIC']
+            };
+            const buildProjectKpiFallback = (row) => {
+                const monthly = {};
+                Object.entries(monthMap).forEach(([month, candidates]) => {
+                    monthly[month] = normalizeValue(pick(row, candidates));
+                });
+                return {
+                    a_cambio: normalizeValue(pick(row, ['A_CAMBIO', 'AGENTE_CAMBIO', 'AGENTE DE CAMBIO', 'AGENTE', 'A CAMBIO'])),
+                    que_soluciono: normalizeValue(pick(row, ['QUE_SOLUCIONO', 'QUE SOLUCIONO', '¿QUE SOLUCIONO?', 'Â¿QUE SOLUCIONO?'])),
+                    l_base: normalizeValue(pick(row, ['L_BASE', 'LINEA BASE', 'L BASE'])),
+                    meta: normalizeValue(pick(row, ['META'])),
+                    indicador: normalizeValue(pick(row, ['INDICADOR'])),
+                    numerador: normalizeValue(pick(row, ['NUMERADOR'])),
+                    denominador: normalizeValue(pick(row, ['DENOMINADOR'])),
+                    monthly
+                };
+            };
+            const mergeProjectKpiFallback = (target, source) => {
+                if (!target || !source) return target;
+                ['a_cambio', 'que_soluciono', 'l_base', 'meta', 'indicador', 'numerador', 'denominador'].forEach((field) => {
+                    if (!normalizeValue(target[field]) && normalizeValue(source[field])) target[field] = source[field];
+                });
+                Object.keys(monthMap).forEach((month) => {
+                    if (!normalizeValue((target.monthly || {})[month]) && normalizeValue((source.monthly || {})[month])) {
+                        target.monthly[month] = source.monthly[month];
+                    }
+                });
+                return target;
             };
 
             const normalizedRows = rows.map(raw => ({
@@ -2460,7 +3396,8 @@
                 const kpiItem = {
                     id: 'k_' + Math.random().toString(36).substr(2, 5),
                     f_inicio: pick(rowObj, ['F_INCIO_PROYECTO', 'F_INICIO_PROYECTO', 'F.INICIO', 'F INICIO']),
-                    que_soluciono: pick(rowObj, ['¿QUE SOLUCIONO?', 'QUE SOLUCIONO', 'Â¿QUE SOLUCIONO?']),
+                    a_cambio: pick(rowObj, ['A_CAMBIO', 'AGENTE_CAMBIO', 'AGENTE DE CAMBIO', 'AGENTE', 'A CAMBIO']),
+                    que_soluciono: pick(rowObj, ['QUE_SOLUCIONO', 'QUE SOLUCIONO', '¿QUE SOLUCIONO?', 'Â¿QUE SOLUCIONO?']),
                     l_base: pick(rowObj, ['L_BASE', 'LINEA BASE', 'L BASE']),
                     meta: pick(rowObj, ['META']),
                     indicador: pick(rowObj, ['INDICADOR']),
@@ -2472,6 +3409,7 @@
                 const hasMonthly = Object.values(monthly).some(v => normalizeValue(v) !== '');
                 const hasKpiData =
                     normalizeValue(kpiItem.que_soluciono) !== '' ||
+                    normalizeValue(kpiItem.a_cambio) !== '' ||
                     normalizeValue(kpiItem.l_base) !== '' ||
                     normalizeValue(kpiItem.meta) !== '' ||
                     normalizeValue(kpiItem.indicador) !== '' ||
@@ -2482,6 +3420,7 @@
 
                 const fingerprint = JSON.stringify({
                     f_inicio: normalizeValue(kpiItem.f_inicio),
+                    a_cambio: normalizeValue(kpiItem.a_cambio),
                     que_soluciono: normalizeValue(kpiItem.que_soluciono),
                     l_base: normalizeValue(kpiItem.l_base),
                     meta: normalizeValue(kpiItem.meta),
@@ -2508,8 +3447,10 @@
 
                 const sheetTareaName = normalizeValue(pick(row, ['TAREA']));
                 const sheetSubtareaName = normalizeValue(pick(row, ['SUBTAREA']));
+                const hasTaskName = sheetTareaName.length > 0;
+                const hasSubtaskName = sheetSubtareaName.length > 0;
                 let parentTaskName = sheetTareaName;
-                if (!parentTaskName && sheetSubtareaName) {
+                if (!parentTaskName && hasSubtaskName) {
                     const knownTasks = knownTasksByProject.get(projectName);
                     if (knownTasks && knownTasks.size === 1) {
                         parentTaskName = Array.from(knownTasks)[0];
@@ -2519,23 +3460,33 @@
                         parentTaskName = 'Tarea general';
                     }
                 }
-                const taskName = sheetSubtareaName || parentTaskName;
-                const isTaskRow = taskName.length > 0;
+                const taskName = hasSubtaskName ? sheetSubtareaName : parentTaskName;
+                const isTaskRow = hasTaskName || hasSubtaskName;
+                const hierarchyLevel = hasSubtaskName ? 3 : (hasTaskName ? 2 : 1);
+                const persistedTaskName = parentTaskName || sheetTareaName || taskName;
                 const areaName = resolveAreaForRow(projectName, pick(row, ['AREA']));
 
                 const projectStartRaw = pick(row, ['F_INCIO_PROYECTO', 'F_INICIO_PROYECTO', 'F.INICIO']);
-                const taskStartRaw = pick(row, ['F_INCIO_TAREA', 'F_INICIO_TAREA', 'F_INCIO_SUBTAREA', 'F_INICIO_SUBTAREA', 'F.INICIO']);
+                const projectEndRaw = pick(row, ['F_FIN_PROYECTO', 'F.FIN', 'F_FIN']);
+                const taskStartRaw = hasSubtaskName
+                    ? (pick(row, ['F_INCIO_SUBTAREA', 'F_INICIO_SUBTAREA', 'F.INICIO']) || pick(row, ['F_INCIO_TAREA', 'F_INICIO_TAREA']))
+                    : (pick(row, ['F_INCIO_TAREA', 'F_INICIO_TAREA', 'F.INICIO']) || pick(row, ['F_INCIO_SUBTAREA', 'F_INICIO_SUBTAREA']));
                 const projectStartNorm = normalizeValue(projectStartRaw) ? formatDateDMY(projectStartRaw) : '';
                 const taskStartNorm = normalizeValue(taskStartRaw) ? formatDateDMY(taskStartRaw) : '';
                 const projectStartFinal = projectStartNorm || taskStartNorm || getTodayFormatted();
                 const taskStartFinal = taskStartNorm || projectStartNorm || getTodayFormatted();
+                const projectGantt = buildRangeGantt(projectStartFinal, projectEndRaw);
 
                 const projectType = pick(row, ['TIPO_PROYECTO', 'TIPO']);
-                const taskType = pick(row, ['TIPO_TAREA', 'TIPO_SUBTAREA', 'TIPO']);
+                const taskType = hasSubtaskName
+                    ? (pick(row, ['TIPO_SUBTAREA', 'TIPO_TAREA', 'TIPO']) || pick(row, ['TIPO_TAREA', 'TIPO']))
+                    : pick(row, ['TIPO_TAREA', 'TIPO_SUBTAREA', 'TIPO']);
                 const projectStatusRaw = pick(row, ['ESTADO_PROYECTO', 'ESTADO']);
-                const taskStatusRaw = pick(row, ['ESTADO_TAREA', 'ESTADO_SUBTAREA', 'ESTADO']);
+                const taskStatusRaw = hasSubtaskName
+                    ? (pick(row, ['ESTADO_SUBTAREA_2', 'ESTADO_SUBTAREA', 'ESTADO']) || pick(row, ['ESTADO_TAREA', 'ESTADO']))
+                    : pick(row, ['ESTADO_TAREA', 'ESTADO_SUBTAREA', 'ESTADO']);
                 const priorityRaw = pick(row, ['PRIORIDAD']);
-                const taskSolution = normalizeValue(pick(row, ['QUE_SOLUCIONO_TAREA', 'QUE_SOLUCIONO', '¿QUE SOLUCIONO_TAREA?', '¿QUE SOLUCIONO?']));
+                const taskSolution = normalizeValue(pick(row, ['QUE_SOLUCIONO_TAREA', 'QUE_SOLUCIONO', '¿QUE SOLUCIONO_TAREA?', '¿QUE SOLUCIONO?', 'Â¿QUE SOLUCIONO_TAREA?', 'Â¿QUE SOLUCIONO?']));
                 const taskIndicator = normalizeValue(pick(row, ['INDICADOR']));
                 const taskLBase = normalizeValue(pick(row, ['L_BASE', 'LINEA BASE', 'L BASE']));
                 const taskMeta = normalizeValue(pick(row, ['META']));
@@ -2553,12 +3504,14 @@
                         area: areaName,
                         tipo: normalizeValue(projectType || taskType) || 'Proceso',
                         prioridad: normalizeValue(priorityRaw),
+                        a_cambio: normalizeValue(pick(row, ['A_CAMBIO', 'AGENTE_CAMBIO', 'AGENTE DE CAMBIO', 'AGENTE', 'A CAMBIO'])),
+                        project_kpi_fallback: buildProjectKpiFallback(row),
                         inicio: projectStartFinal,
                         nombre: projectName,
                         ejecutor: '',
                         expanded: false,
                         status: getStatusFromText(projectStatusRaw || taskStatusRaw || ''),
-                        gantt: padGantt([]),
+                        gantt: projectGantt,
                         kpis: kpiMap.get(projectKey) || [],
                         tasks: []
                     });
@@ -2568,6 +3521,11 @@
                 if ((!normalizeAreaName(proyecto.area) || proyecto.area === 'GENERAL') && areaName !== 'GENERAL') {
                     proyecto.area = areaName;
                 }
+                if (!normalizeValue(proyecto.a_cambio)) {
+                    proyecto.a_cambio = normalizeValue(pick(row, ['A_CAMBIO', 'AGENTE_CAMBIO', 'AGENTE DE CAMBIO', 'AGENTE', 'A CAMBIO']));
+                }
+                mergeProjectKpiFallback(proyecto.project_kpi_fallback, buildProjectKpiFallback(row));
+                proyecto.gantt = mergeGanttArrays(proyecto.gantt, projectGantt);
 
                 if (!isTaskRow) {
                     if (normalizeValue(projectType)) proyecto.tipo = projectType;
@@ -2582,7 +3540,9 @@
                     const startW = dateToWeekIndex(taskStartFinal);
                     if (startW >= 0) {
                         let endW = startW;
-                        const endRaw = pick(row, ['F_FIN_TAREA', 'F_FIN_SUBTAREA', 'F.FIN', 'F_FIN']);
+                        const endRaw = hasSubtaskName
+                            ? (pick(row, ['F_FIN_SUBTAREA', 'F.FIN', 'F_FIN']) || pick(row, ['F_FIN_TAREA']))
+                            : (pick(row, ['F_FIN_TAREA', 'F.FIN', 'F_FIN']) || pick(row, ['F_FIN_SUBTAREA']));
                         const endText = normalizeValue(endRaw);
                         if (endText) {
                             if (/^-?\d+$/.test(endText)) {
@@ -2604,10 +3564,11 @@
                 proyecto.tasks.push({
                     id: 't_' + slugify(projectName) + '_' + slugify(taskName) + '_' + Math.random().toString(36).substr(2, 5),
                     nombre: taskName,
-                    tarea: parentTaskName || taskName,
-                    subtarea: sheetSubtareaName,
-                    sheet_tarea: sheetTareaName,
-                    sheet_subtarea: sheetSubtareaName,
+                    tarea: persistedTaskName,
+                    subtarea: hasSubtaskName ? sheetSubtareaName : '',
+                    sheet_tarea: persistedTaskName,
+                    sheet_subtarea: hasSubtaskName ? sheetSubtareaName : '',
+                    hierarchy_level: hierarchyLevel,
                     area: areaName,
                     tipo: normalizeValue(taskType || projectType) || 'Proceso',
                     prioridad: normalizeValue(priorityRaw),
@@ -2627,13 +3588,13 @@
 
             const projs = Array.from(proyectosMap.values());
             projs.forEach(p => {
-                const pGantt = new Array(MAX_YEAR_WEEKS).fill(0);
+                const taskUnionGantt = new Array(MAX_YEAR_WEEKS).fill(0);
                 p.tasks.forEach(t => {
                     t.gantt.forEach((v, i) => {
-                        if (v > 0) pGantt[i] = 1;
+                        if (v > 0) taskUnionGantt[i] = 1;
                     });
                 });
-                p.gantt = pGantt;
+                p.gantt = mergeGanttArrays(p.gantt, taskUnionGantt);
 
                 if (p.tasks.length > 0) {
                     p.status = calculateProjectStatus(p.tasks);
@@ -2654,5 +3615,5 @@
         })();
     </script>
 </body>
-</html>
 
+</html>
