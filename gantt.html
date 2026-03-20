@@ -775,6 +775,12 @@
                         style="width:220px; font-size:0.8rem;">
                         <option value="">Buscar proyecto (todos)</option>
                     </select>
+                    <select id="filter-estado" class="table-input filter-select" style="width:140px; font-size:0.8rem;">
+                        <option value="">Todos los estados</option>
+                        <option value="1">Pendiente</option>
+                        <option value="2">En Proceso</option>
+                        <option value="3">Terminado</option>
+                    </select>
                 </div>
                 <div class="h-6 w-px bg-slate-200"></div>
                 <!-- Timestamp de última actualización -->
@@ -940,8 +946,9 @@
                     <div id="div-cf-ejecutor">
                         <label class="block"><span
                                 class="text-xs font-bold text-slate-500 uppercase mb-1 block">Ejecutor
-                                (Tarea)</span><select id="cf-ejecutor"
-                                class="w-full border border-slate-300 rounded p-2 text-sm bg-white outline-none"></select></label>
+                                (Tarea)</span><input id="cf-ejecutor" list="cf-ejecutores-list"
+                                class="w-full border border-slate-300 rounded p-2 text-sm outline-none"
+                                placeholder="Escribe el nombre del ejecutor"><datalist id="cf-ejecutores-list"></datalist></label>
                     </div>
                 </div>
             </div>
@@ -1095,7 +1102,7 @@
         let SHOW_PRIORITY = false;
         let SHOW_COMPLETED = true;
         let SHOW_ALL_TASKS = true; // when true, list every task in the left panel regardless of GANTT view range
-        const FILTERS = { month: 'all', area: '', project: '' };
+        const FILTERS = { month: 'all', area: '', project: '', estado: '' };
         const DATE_VIEW = { sort: 'none' };
         let currentEdit = null;
         let currentEditProject = null;
@@ -1593,6 +1600,11 @@
                 if (!projectMatches && !taskMatches) return false;
             }
             if (FILTERS.project && p.nombre !== FILTERS.project) return false;
+            if (FILTERS.estado) {
+                const filterStatus = parseInt(FILTERS.estado, 10);
+                const projStatus = calculateProjectStatus(p.tasks);
+                if (projStatus !== filterStatus) return false;
+            }
             return true;
         }
 
@@ -1603,7 +1615,8 @@
                 btn.classList.add('btn-priority-active');
                 document.getElementById('filter-area').value = '';
                 document.getElementById('filter-project').value = '';
-                FILTERS.area = ''; FILTERS.project = '';
+                document.getElementById('filter-estado').value = '';
+                FILTERS.area = ''; FILTERS.project = ''; FILTERS.estado = '';
             } else { btn.classList.remove('btn-priority-active'); }
             render();
         }
@@ -1648,6 +1661,8 @@
             projectSel.innerHTML = '<option value="">Buscar proyecto (todos)</option>' + projects.map(n => `<option value="${n}">${n}</option>`).join('');
             areaSel.addEventListener('change', (e) => { FILTERS.area = e.target.value; render(); });
             projectSel.addEventListener('change', (e) => { FILTERS.project = e.target.value; render(); });
+            const estadoSel = document.getElementById('filter-estado');
+            if (estadoSel) estadoSel.addEventListener('change', (e) => { FILTERS.estado = e.target.value; render(); });
         }
 
         // ========= MAIN RENDER =========
@@ -2513,10 +2528,11 @@
             $areaList.innerHTML = cachedColumns.areas.map(a => `<option value="${a}">`).join('');
             $area.value = '';
 
-            // Poblar dropdown de EJECUTOR desde datos del Excel (columna EJECUTOR de hoja Datos)
+            // Poblar datalist de EJECUTOR desde datos del Excel (columna EJECUTOR de hoja Datos)
             const $exec = document.getElementById('cf-ejecutor');
-            $exec.innerHTML = '<option value="">-- Seleccione --</option>' +
-                cachedColumns.ejecutores.map(e => `<option value="${e}">${e}</option>`).join('');
+            const $execList = document.getElementById('cf-ejecutores-list');
+            $execList.innerHTML = cachedColumns.ejecutores.map(e => `<option value="${e}">`).join('');
+            $exec.value = '';
 
             // Poblar dropdown de TIPO
             const $tipo = document.getElementById('cf-tipo');
