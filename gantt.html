@@ -51,7 +51,7 @@
 
         .task-panel {
             flex: 1 1 auto;
-            min-width: 660px;
+            min-width: 600px;
             width: auto;
             background: white;
             border-right: 1px solid #e2e8f0;
@@ -62,9 +62,9 @@
         }
 
         .gantt-panel {
-            flex: 0 0 var(--gantt-width, 560px);
-            width: var(--gantt-width, 560px);
-            max-width: var(--gantt-width, 560px);
+            flex: 0 0 var(--gantt-width, 520px);
+            width: var(--gantt-width, 520px);
+            max-width: var(--gantt-width, 520px);
             overflow: hidden;
             background: #fff;
             display: flex;
@@ -73,25 +73,25 @@
         }
 
         .header-row {
-            height: 50px;
+            height: 46px;
             background: #f1f5f9;
             border-bottom: 2px solid #cbd5e1;
             display: flex;
             align-items: center;
-            font-size: 0.75rem;
+            font-size: 0.72rem;
             font-weight: 700;
             color: #334155;
             text-transform: uppercase;
-            letter-spacing: 0.08em;
+            letter-spacing: 0.05em;
         }
 
         .data-row {
-            min-height: 48px;
+            min-height: 44px;
             height: auto;
             border-bottom: 1px solid #f1f5f9;
             display: flex;
             align-items: center;
-            font-size: 0.85rem;
+            font-size: 0.82rem;
             transition: background 0.1s;
         }
 
@@ -139,14 +139,14 @@
         }
 
         .cell {
-            padding: 4px 8px;
+            padding: 3px 6px;
             display: flex;
             align-items: center;
             overflow: hidden;
             white-space: normal;
             word-wrap: break-word;
             border-right: 1px solid transparent;
-            line-height: 1.3;
+            line-height: 1.25;
         }
 
         .cell:hover {
@@ -162,26 +162,63 @@
             align-self: stretch;
         }
 
+        .col-prioridad {
+            width: 35px;
+            text-align: center;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .col-prioridad input[type="number"] {
+            width: 35px;
+            height: 24px;
+            padding: 2px 4px;
+            border: 1px solid #cbd5e1;
+            border-radius: 4px;
+            text-align: center;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: text;
+        }
+
+        .col-prioridad input[type="number"]::-webkit-outer-spin-button,
+        .col-prioridad input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        .col-prioridad input[type="number"] {
+            appearance: textfield;
+        }
+
+        .col-prioridad input[type="number"]:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+        }
+
         .col-area {
-            width: 130px;
+            width: 120px;
             color: #1e293b;
-            font-size: 0.75rem;
+            font-size: 0.73rem;
             flex-shrink: 0;
             font-weight: 700;
-            padding: 0 8px;
+            padding: 0 6px;
         }
 
         .col-estado {
-            width: 150px;
+            width: 124px;
             flex-shrink: 0;
             color: #1e293b;
             font-weight: 600;
-            padding: 0 8px;
+            padding: 0 6px;
         }
 
         .col-inicio {
-            width: 140px;
-            font-size: 0.75rem;
+            width: 130px;
+            font-size: 0.73rem;
             text-align: center;
             justify-content: center;
             flex-shrink: 0;
@@ -193,28 +230,29 @@
             flex: 1;
             color: #1e293b;
             position: relative;
-            min-width: 180px;
-            padding-left: 10px;
+            min-width: 160px;
+            padding-left: 8px;
             font-weight: 600;
+            font-size: 0.85rem;
         }
 
         .col-ejecutor {
-            width: 140px;
+            width: 130px;
             justify-content: flex-start;
-            padding: 0 8px;
+            padding: 0 6px;
             color: #1e293b;
-            font-size: 0.75rem;
+            font-size: 0.72rem;
             flex-shrink: 0;
             font-weight: 600;
             display: flex;
             align-items: center;
-            gap: 4px;
+            gap: 3px;
         }
 
         .col-acciones {
-            width: 110px;
+            width: 100px;
             justify-content: center;
-            gap: 4px;
+            gap: 3px;
             flex-shrink: 0;
             position: relative;
             z-index: 2;
@@ -305,7 +343,7 @@
             font-weight: 700;
             font-size: 0.7rem;
             border-radius: 20px;
-            padding: 4px 12px;
+            padding: 4px 8px;
             cursor: pointer;
             border: 1px solid transparent;
             transition: all 0.2s ease;
@@ -683,7 +721,7 @@
             }
 
             .col-estado {
-                width: 130px;
+                width: 116px;
             }
 
             .col-inicio {
@@ -704,7 +742,7 @@
 
             .status-badge-select {
                 font-size: 0.65rem;
-                padding: 3px 8px;
+                padding: 3px 6px;
             }
 
             .header-row {
@@ -723,7 +761,7 @@
             }
 
             .col-estado {
-                width: 120px;
+                width: 106px;
             }
 
             .col-inicio {
@@ -744,6 +782,7 @@
 
             .status-badge-select {
                 font-size: 0.62rem;
+                padding: 3px 5px;
             }
         }
     </style>
@@ -821,6 +860,7 @@
             <div class="task-panel">
                 <div id="taskHeaderRow" class="header-row px-2">
                     <div class="col-icon"></div>
+                    <div class="col-prioridad font-bold">P</div>
                     <div class="col-nombre relative flex items-center pr-2 transition" style="padding-left: 2px;">
                         <button class="header-filter-btn text-slate-400 hover:text-slate-600 transition p-1" data-filter-col="project" title="Filtrar proyecto"><i class="fa-solid fa-filter"></i></button>
                         <span class="ml-1 font-bold">PROYECTO</span>
@@ -947,6 +987,11 @@
                             list="cf-areas-list" class="w-full border border-slate-300 rounded p-2 text-sm outline-none"
                             placeholder="Selecciona o escribe una nueva área"><datalist
                             id="cf-areas-list"></datalist></label>
+                    <label class="block"><span
+                            class="text-xs font-bold text-slate-500 uppercase mb-1 block">Origen</span><input id="cf-origen"
+                            list="cf-origenes-list" class="w-full border border-slate-300 rounded p-2 text-sm outline-none"
+                            placeholder="Selecciona o escribe un nuevo origen"><datalist
+                            id="cf-origenes-list"></datalist></label>
                     <div id="div-cf-project-select" style="display:none;">
                         <label class="block"><span
                                 class="text-xs font-bold text-slate-500 uppercase mb-1 block">Proyecto</span><input
@@ -1157,7 +1202,7 @@
 
     <script>
         // ========= CONFIG & GLOBALS =========
-        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyiRcRjBBKrYsYRZyi0Yhbj_Njw8fFaMz_-B1rPC17qMbzghknqy1Tdw9ci7N2pYRNz/exec';
+        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxBQwZNT_EOL1nPZEH7ei-nL56vZIlBkEPRkHwmy33q-1YuEKzc0QOBDsPBLDjF63dX/exec';
         const PROJECT_TYPES = ['Digital', 'Digital + IA', 'Maquina', 'Proceso'];
         const STATUS_BADGE_CLASSES = { 1: 'sb-pendiente', 2: 'sb-proceso', 3: 'sb-terminado' };
         const STATE_ICONS = { 0: '', 1: '!', 2: '▶', 3: '✓' };
@@ -1169,7 +1214,7 @@
         let activeKpiIndex = 0;
         let currentTaskModalPid = null; // Para almacenar pid de la tarea abierta
         let currentTaskModalTidx = null; // Para almacenar tidx de la tarea abierta
-        let SHOW_PRIORITY = false;
+        let SHOW_PRIORITY = true;
         let SHOW_COMPLETED = true;
         let SHOW_ALL_TASKS = true; // when true, list every task in the left panel regardless of GANTT view range
         let FILTERS = { exactYear: 'all', exactMonth: 'all', month: 'all', area: [], project: [], estado: [], tipo: [], ejecutor: [] };
@@ -1189,7 +1234,7 @@
         let isLoadingData = false;
 
         // === CACHED COLUMNS DATA (Para optimizar modal) ===
-        let cachedColumns = { areas: [], ejecutores: [], agentes: [], tipos: PROJECT_TYPES };
+        let cachedColumns = { areas: [], ejecutores: [], agentes: [], origenes: [], tipos: PROJECT_TYPES };
         let columnsCacheLoaded = false;
 
         // Reflect default priority button state in UI (script runs after DOM)
@@ -1207,11 +1252,12 @@
             { name: 'Oct', weeks: 4, color: 'bg-slate-600' }, { name: 'Nov', weeks: 4, color: 'bg-slate-700' }, { name: 'Dic', weeks: 5, color: 'bg-slate-800' }
         ];
 
-        // --- SHIFTABLE 6-MONTH VIEW STATE ---
+        // --- SHIFTABLE 5-MONTH VIEW STATE ---
         const today = new Date();
         const MAX_YEAR_WEEKS = 52; // Total weeks in full year for data array
-        let WEEK_CELL_PX = 20; 
-        const VISIBLE_MONTH_COUNT = 6;
+        const BASE_WEEK_CELL_PX = 20;
+        let WEEK_CELL_PX = BASE_WEEK_CELL_PX;
+        const VISIBLE_MONTH_COUNT = 5;
         let currentStartMonthIndex = Math.max(0, today.getMonth() - 1);
         
         let VISIBLE_MONTHS = [];
@@ -1222,7 +1268,6 @@
         // Get global references
         const taskContainer = document.getElementById('taskListContainer');
         const ganttContainer = document.getElementById('ganttGridContainer');
-        const ganttPanelWrapper = document.getElementById('ganttPanelContainer');
         let _scrollSyncInitialized = false;
 
         function updateTimeframeState() {
@@ -1236,12 +1281,8 @@
 
             VISIBLE_TOTAL_WEEKS = VISIBLE_MONTHS.reduce((acc, m) => acc + m.weeks, 0);
             
-            // Calculate dynamic WEEK_CELL_PX so that exactly 6 months fits in the current screen viewport
-            if (ganttPanelWrapper) {
-                const containerWidth = ganttPanelWrapper.clientWidth > 0 ? ganttPanelWrapper.clientWidth : 800;
-                const availableWidth = containerWidth - 10; 
-                WEEK_CELL_PX = Math.max(20, Math.floor(availableWidth / VISIBLE_TOTAL_WEEKS));
-            }
+            // Keep a fixed week width so reducing visible months actually frees space for the task panel.
+            WEEK_CELL_PX = BASE_WEEK_CELL_PX;
 
             // Update Header Label
             const lbl = document.getElementById('timeframe-label');
@@ -1593,6 +1634,8 @@
 
         function isPriorityProject(p) {
             if (!p) return false;
+            // Si el usuario asignó un número de prioridad, es prioritario
+            if (p.user_priority !== null && p.user_priority !== undefined && p.user_priority !== '') return true;
             // Prioridad por columna de proyecto
             if (String(p.prioridad || '').toUpperCase().trim() === 'ALTA') return true;
             // Si alguna tarea tiene prioridad Alta, el proyecto es Alta
@@ -1625,6 +1668,23 @@
         }
 
         function compareProjectsForRender(a, b) {
+            // 1. Ordenar por prioridad del usuario (números más bajos primero)
+            const aPrio = a.user_priority !== null && a.user_priority !== undefined && a.user_priority !== '' ? parseInt(a.user_priority) : Infinity;
+            const bPrio = b.user_priority !== null && b.user_priority !== undefined && b.user_priority !== '' ? parseInt(b.user_priority) : Infinity;
+            
+            if (aPrio !== Infinity || bPrio !== Infinity) {
+                if (aPrio !== bPrio) return aPrio - bPrio;
+            }
+
+            // 2. Si ninguno tiene número, los con prioridad ALTA van primero
+            const aPriorityHigh = !isNaN(aPrio) ? false : (String(a.prioridad || '').toUpperCase().trim() === 'ALTA' || 
+                                   (a.tasks && a.tasks.some(t => String(t.prioridad || '').toUpperCase().trim() === 'ALTA')));
+            const bPriorityHigh = !isNaN(bPrio) ? false : (String(b.prioridad || '').toUpperCase().trim() === 'ALTA' || 
+                                   (b.tasks && b.tasks.some(t => String(t.prioridad || '').toUpperCase().trim() === 'ALTA')));
+            
+            if (aPriorityHigh && !bPriorityHigh) return -1;
+            if (!aPriorityHigh && bPriorityHigh) return 1;
+
             if (DATE_VIEW.sort === 'asc' || DATE_VIEW.sort === 'desc') {
                 const ta = sortDateValue(a.inicio);
                 const tb = sortDateValue(b.inicio);
@@ -2060,6 +2120,9 @@
                 pRowLeft.className = `data-row project-row cursor-pointer group`;
                 pRowLeft.innerHTML = `
                     <div class="cell col-icon group-hover:text-blue-600 transition" onclick="toggleProject('${p.id}')"><i class="fa-solid fa-chevron-${p.expanded ? 'down' : 'right'}"></i></div>
+                    <div class="cell col-prioridad" onclick="event.stopPropagation()">
+                        <input type="number" min="0" value="${p.user_priority || ''}" onchange="updateProjectUserPriority('${p.id}', this.value)" placeholder="-" title="Número de prioridad">
+                    </div>
                     <div class="cell col-nombre font-bold text-slate-700 group-hover:text-blue-800 transition">
                         <span class="inline-flex items-center justify-center w-5 h-5 rounded bg-blue-600 text-white text-[9px] font-bold mr-1.5 flex-shrink-0" title="${escapeHtml(calculatedType)}">${escapeHtml(calculatedType.charAt(0).toUpperCase())}</span>
                         <button onclick="event.stopPropagation(); openEditProjectModal('${p.id}')" class="action-btn text-xs text-slate-500 hover:text-blue-600 mr-1" title="Editar Proyecto"><i class="fa-solid fa-pen-to-square"></i></button>
@@ -2567,6 +2630,13 @@
             scheduleRender();
         }
         function toggleProject(pid) { const p = projectMap.get(pid); if (p) { p.expanded = !p.expanded; scheduleRender(); } }
+        function updateProjectUserPriority(pid, value) { 
+            const p = projectMap.get(pid); 
+            if (p) { 
+                p.user_priority = value ? parseInt(value) : null; 
+                scheduleRender(); 
+            } 
+        }
         function toggleAll(expand) { projectData.forEach(p => p.expanded = expand); scheduleRender(); }
 
         // Debounced render to avoid multiple renders in quick succession
@@ -2610,13 +2680,16 @@
             const areasSet = new Set();
             const ejecutoresSet = new Set();
             const agentesSet = new Set();
+            const origenesSet = new Set();
 
             projectData.forEach(p => {
                 if (p.area && String(p.area).trim()) areasSet.add(String(p.area).trim());
+                if (p.origen && String(p.origen).trim()) origenesSet.add(String(p.origen).trim());
                 if (p.a_cambio && String(p.a_cambio).trim()) agentesSet.add(String(p.a_cambio).trim());
                 if (p.tasks) {
                     p.tasks.forEach(t => {
                         if (t.area && String(t.area).trim()) areasSet.add(String(t.area).trim());
+                        if (t.origen && String(t.origen).trim()) origenesSet.add(String(t.origen).trim());
                         if (t.ejecutor && String(t.ejecutor).trim()) ejecutoresSet.add(String(t.ejecutor).trim());
                     });
                 }
@@ -2630,6 +2703,7 @@
             cachedColumns.areas = Array.from(areasSet);
             cachedColumns.ejecutores = ejecutoresSet.size > 0 ? Array.from(ejecutoresSet) : ['EO', 'Equipo', 'Externo'];
             cachedColumns.agentes = Array.from(agentesSet);
+            cachedColumns.origenes = origenesSet.size > 0 ? Array.from(origenesSet) : ['Interno', 'Externo', 'Cliente'];
             columnsCacheLoaded = true;
             console.log('Columnas extraídas de datos:', cachedColumns);
         }
@@ -2989,6 +3063,12 @@ ${escapeHtml(taskSolution)}</textarea>
             $areaList.innerHTML = cachedColumns.areas.map(a => `<option value="${a}">`).join('');
             $area.value = '';
 
+            // Poblar datalist de ORIGEN desde datos del Excel (columna ORIGEN de hoja Datos)
+            const $origen = document.getElementById('cf-origen');
+            const $origenList = document.getElementById('cf-origenes-list');
+            $origenList.innerHTML = cachedColumns.origenes.map(o => `<option value="${o}">`).join('');
+            $origen.value = '';
+
             // Poblar datalist de EJECUTOR desde datos del Excel (columna EJECUTOR de hoja Datos)
             const $exec = document.getElementById('cf-ejecutor');
             const $execList = document.getElementById('cf-ejecutores-list');
@@ -3136,6 +3216,7 @@ ${escapeHtml(taskSolution)}</textarea>
         document.getElementById('cf-save')?.addEventListener('click', async () => {
             const areaInput = normalizeAreaName(document.getElementById('cf-area').value);
             const area = areaInput || 'GENERAL';
+            const origen = (document.getElementById('cf-origen').value || '').trim();
             const tipo = document.getElementById('cf-tipo').value || 'Proceso';
             let inicioInput = document.getElementById('cf-inicio').value;
             if (!inicioInput) {
@@ -3198,7 +3279,8 @@ ${escapeHtml(taskSolution)}</textarea>
                 const newId = 'u' + Date.now();
                 const newProject = {
                     id: newId, area, tipo, inicio, nombre: proyecto, ejecutor: "", expanded: false,
-                    tasks: [], gantt: ganttArr, kpis: [], a_cambio: (document.getElementById('cf-agente-cambio').value || '').trim()
+                    tasks: [], gantt: ganttArr, kpis: [], a_cambio: (document.getElementById('cf-agente-cambio').value || '').trim(),
+                    origen: origen
                 };
                 projectData.push(newProject);
                 projectMap.set(newId, newProject);
@@ -3261,6 +3343,7 @@ ${escapeHtml(taskSolution)}</textarea>
                     f_inicio: inicio,
                     fecha_objetivo: fFinCalculada,
                     f_fin: '',
+                    origen: origen,
                     a_cambio: (document.getElementById('cf-agente-cambio').value || '').trim()
                 };
 
@@ -4058,6 +4141,7 @@ ${escapeHtml(taskSolution)}</textarea>
                         area: areaName,
                         tipo: normalizeValue(projectType || taskType) || 'Proceso',
                         prioridad: normalizeValue(priorityRaw),
+                        origen: normalizeValue(pick(row, ['ORIGEN'])),
                         a_cambio: normalizeValue(pick(row, ['A_CAMBIO', 'AGENTE_CAMBIO', 'AGENTE DE CAMBIO', 'AGENTE', 'A CAMBIO'])),
                         project_kpi_fallback: buildProjectKpiFallback(row),
                         inicio: projectStartFinal,
@@ -4130,6 +4214,7 @@ ${escapeHtml(taskSolution)}</textarea>
                     area: areaName,
                     tipo: normalizeValue(taskType || projectType) || 'Proceso',
                     prioridad: normalizeValue(priorityRaw),
+                    origen: normalizeValue(pick(row, ['ORIGEN'])),
                     que_soluciono_tarea: taskSolution,
                     indicador_tarea: taskIndicator,
                     l_base_tarea: taskLBase,
