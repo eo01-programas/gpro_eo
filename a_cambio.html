@@ -336,6 +336,7 @@
     .form-actions { display:flex; justify-content:flex-end; gap:8px; }
     #loading { position:fixed; inset:0; background:rgba(255,255,255,.9); display:flex; align-items:center; justify-content:center; z-index:20; }
   </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.min.js"></script>
 </head>
 <body>
   <div id="loading">Cargando...</div>
@@ -359,6 +360,7 @@
   <div id="detail-modal" class="overlay"><div class="modal"><span class="close" data-close="detail-modal">&times;</span><h3 id="detail-title">Detalle</h3>
     <div id="detail-filter" style="margin-bottom:8px;display:none;">
       <label>Filtro: <select id="faltas-filter"><option value="">Todos</option><option value="1">1 falta</option><option value="2">2 faltas</option><option value="3">3 faltas</option><option value="4">4+ faltas</option></select></label>
+      <button id="export-asistencia-btn" class="btn" style="margin-left:8px;display:none;" title="Descargar asistencia en Excel">Descargar Excel</button>
     </div>
     <div id="detail-table-wrap" class="table-wrap"><table><thead><tr><th id="detail-h1">Concepto</th><th id="detail-h2">Registros</th><th id="detail-h3">Ahorro</th><th id="detail-h4" style="display:none"></th></tr></thead><tbody id="detail-body"></tbody></table></div>
     <div id="detail-custom"></div></div></div>
@@ -366,7 +368,7 @@
 
 <script>
 const SHEET_ID='1lRBoAr2JN2elTtB9QgmvIYNIq1zsxvBENpuwzjIuZt4';
-const APPS_SCRIPT_URL='https://script.google.com/macros/s/AKfycbzMGOmPGWwj6ccGlVjEZXfqREE42yKD_7xOAGuT0mVSds3S58RnHMOeuVpJthVTSSj3/exec';
+const APPS_SCRIPT_URL='https://script.google.com/macros/s/AKfycbxQZZR5_ujuIBPKcuBS3GZFgSQVONf7oaoAhFEIX2XNxvzQerSBKHCn7TO2rJ48Lxcs/exec';
 const S_AC='A_cambio', S_U='U_cofaco', S_M='Metodologia';
 const S_SUMILLA_CANDIDATES=['Sumilla','SUMILLA','sumilla'];
 let acRows=[], uRows=[], summary=null, charts={}, sumillaRowsCache=null, sumillaSheetName='', metodologiaRowsCache=null;
@@ -398,7 +400,7 @@ function aggAgentsWithArea(rows,limit){
     return {...item, areaLabel:area, displayLabel:`${agent} - ${area} (${fmt(item.count)})`};
   }).slice(0,limit);
 }
-function normAC(rows){ return (rows||[]).map(r=>({mes:r.MES||'', area:r.AREA||'', tipo:r.TIPO||r.TIPO_1||'', agenteCambio:r['A.CAMBIO']||r['A CAMBIO']||r['A_CAMBIO']||'', proyecto:r.PROYECTO||'', frecuencia:r.FRECUENCIA||r.FRECUENCIA_1||r.FRECUENCIA_2||r.FRECUENCIA2||'', antes:r.ANTES||'', ahora:r.AHORA||'', ahorroMin:num(r.AHORRO), linkUrl:(()=>{let u=String(r.LINK||r.LINK_1||'').trim(); if(/^www\./i.test(u)||/^drive\.google\.com\//i.test(u))u='https://'+u; return /^https?:\/\//i.test(u)?u:'';})()})).filter(r=>r.area||r.tipo||r.agenteCambio||r.proyecto||r.ahorroMin||r.linkUrl); }
+function normAC(rows){ return (rows||[]).map(r=>({mes:r.MES||'', area:r.AREA||'', tipo:r.TIPO||r.TIPO_1||'', agenteCambio:r['A.CAMBIO']||r['A CAMBIO']||r['A_CAMBIO']||'', proyecto:r.PROYECTO||'', operacion:r.OPERACION||r.OPERACION_1||'', frecuencia:r.FRECUENCIA||r.FRECUENCIA_1||r.FRECUENCIA_2||r.FRECUENCIA2||'', antes:r.ANTES||'', ahora:r.AHORA||'', ahorroMin:num(r.AHORRO), linkUrl:(()=>{let u=String(r.LINK||r.LINK_1||'').trim(); if(/^www\./i.test(u)||/^drive\.google\.com\//i.test(u))u='https://'+u; return /^https?:\/\//i.test(u)?u:'';})()})).filter(r=>r.area||r.tipo||r.agenteCambio||r.proyecto||r.ahorroMin||r.linkUrl); }
 function countProjectsByArea(rows){ const m=new Map(); (rows||[]).forEach(r=>{ const area=String(r.area||'').trim(); const proyecto=String(r.proyecto||'').trim(); if(!area||!proyecto) return; if(!m.has(area)) m.set(area,new Set()); m.get(area).add(proyecto); }); const out={}; m.forEach((set,area)=>{ out[area]=set.size; }); return out; }
 function bar(items,key,showDetail=true,showCountInLabel=false){ if(!items.length) return '<div class="kpi-sub">Sin datos</div>'; const m=Math.max(...items.map(i=>num(i.ahorroMin)),0); const detail=(showDetail&&key)?`<div style="text-align:right;margin-top:8px;"><button class="btn" data-chart="${key}">Ver detalle</button></div>`:''; return `<ul class="chart-list">${items.map(i=>`<li class="chart-item"><div><div class="label">${esc(i.label)}${showCountInLabel?` (${fmt(i.count)})`:''}</div><div class="track"><div class="fill" style="width:${m>0?((num(i.ahorroMin)/m)*100).toFixed(1):0}%"></div></div></div><span class="val">${fmt(i.ahorroMin)} min</span></li>`).join('')}</ul>${detail}`; }
 function combinedBar(items,key){ if(!items.length) return '<div class="kpi-sub">Sin datos</div>'; const maxA=Math.max(...items.map(i=>num(i.ahorroMin)),0); const maxC=Math.max(...items.map(i=>num(i.count)),0); return `<ul class="chart-list">${items.map(i=>{ const aPct = maxA?((num(i.ahorroMin)/maxA)*100).toFixed(1):0; const cPct = maxC?((num(i.count)/maxC)*100).toFixed(1):0; return `<li class="chart-item"><div style="flex:1 1 0"><div class="label">${esc(i.label)}</div><div class="track" style="margin-top:6px;height:10px"><div class="fill" style="width:${aPct}%;background:linear-gradient(90deg,#0ea5e9,#14b8a6);"></div></div><div class="kpi-sub" style="margin-top:6px">${fmt(i.ahorroMin)} min · ${fmt(i.count)} proyectos</div></div><span class="val">${fmt1((num(i.ahorroMin)||0))} min</span></li>` }).join('')}</ul><div style="text-align:right;margin-top:8px;"><button class="btn" data-chart="${key}">Ver detalle</button></div>`; }
@@ -711,7 +713,7 @@ function agentesPorArea(rows,key){
     ${items.map(i=>{ const p=(i.count/max)*100; return `<li class="chart-item"><div><div class="label">${esc(i.label)}</div><div class="track"><div class="fill" style="width:${p.toFixed(1)}%;"></div></div><div class="kpi-sub">${fmt(i.proyectos)} proyectos</div></div><span class="val">${fmt(i.count)} ag.</span></li>`; }).join('')}
   </ul><div style="text-align:right;margin-top:8px;"><button class="btn" data-chart="${key}">Ver detalle</button></div>`;
 }
-function render(){ const rows=normAC(acRows); const areaProjectCounts=countProjectsByArea(rows); const tot=rows.length, sum=rows.reduce((x,r)=>x+num(r.ahorroMin),0), h=sum/60,d=h/9; const ag=new Set(rows.map(r=>String(r.agenteCambio||'').trim()).filter(Boolean)).size; const pr=new Set(rows.map(r=>String(r.proyecto||'').trim()).filter(Boolean)).size; const pa=pr? h/pr:0; const rr=tot? sum/tot:0; const tA=agg(rows,'area').slice(0,7), tT=agg(rows,'tipo').slice(0,5), agentesAll=aggAgentsWithArea(rows,9999), tG=agentesAll.slice(0,10); charts={areas:tA,tipos:tT,agentes:tG,agentes_all:agentesAll}; summary=uSummary(uRows);
+function render(){ const rows=normAC(acRows); const areaProjectCounts=countProjectsByArea(rows); const tot=rows.length, sum=rows.reduce((x,r)=>x+num(r.ahorroMin),0), h=sum/60,d=h/9; const ag=new Set(rows.map(r=>String(r.agenteCambio||'').trim()).filter(Boolean)).size; const pr=new Set(rows.map(r=>String(r.proyecto||'').trim()).filter(Boolean)).size; const pa=pr? h/pr:0; const rr=tot? sum/tot:0; const tA=agg(rows,'area').slice(0,7), tT=agg(rows,'tipo').slice(0,5), tOp=agg(rows,'operacion').slice(0,5), agentesAll=aggAgentsWithArea(rows,9999), tG=agentesAll.slice(0,10); charts={areas:tA,tipos:tT,operaciones:tOp,agentes:tG,agentes_all:agentesAll}; summary=uSummary(uRows);
   const areasConAhorro=unique(rows.map(r=>r.area));
   const totalAreasRef=((summary&&summary.areas)||[]).map(a=>a.area);
   const totalAreas = unique(totalAreasRef).length || areasConAhorro.length;
@@ -731,11 +733,13 @@ function render(){ const rows=normAC(acRows); const areaProjectCounts=countProje
       <div>${areaStackedBars(summary.areas)}</div>
     </div>
   </section>
-  <div class="grid2"><div class="card"><div class="kpi-title">Top Areas por Ahorro</div><div class="areas-kpi-inline"><div class="areas-kpi-box"><div class="kpi-mini-title">Ahorro total por mes</div><div class="kpi-mini-value">${fmt(sum)} min</div><div class="kpi-mini-sub">${fmt1(h)} h | ${fmt1(d)} dias</div></div><div class="areas-kpi-box"><div class="kpi-mini-title">Promedio por proyecto por mes</div><div class="kpi-mini-value">${fmt1(pa)} h</div><div class="kpi-mini-sub">${fmt1(rr)} min por registro</div></div></div>${areaAhorroDonut(tA,sum,areaProjectCounts,areaCoverage)}<div style="text-align:right;margin-top:8px;"><button class="btn area-table-detail-btn">Ver detalle</button></div></div><div class="card"><div class="kpi-title">Top Tipos por Ahorro</div>${bar(tT,'tipos',false,true)}${tiposShareDonut(tT,sum)}<div style="text-align:right;margin-top:8px;"><button class="btn" data-chart="tipos_full">Ver detalle</button></div></div><div class="card"><div class="kpi-title">Top Agentes de Cambio</div>${agentsVerticalCombined(tG,'agentes')}</div></div>`;
+  <div class="grid2"><div class="card"><div class="kpi-title">Top Areas por Ahorro</div><div class="areas-kpi-inline"><div class="areas-kpi-box"><div class="kpi-mini-title">Ahorro total por mes</div><div class="kpi-mini-value">${fmt(sum)} min</div><div class="kpi-mini-sub">${fmt1(h)} h | ${fmt1(d)} dias</div></div><div class="areas-kpi-box"><div class="kpi-mini-title">Promedio por proyecto por mes</div><div class="kpi-mini-value">${fmt1(pa)} h</div><div class="kpi-mini-sub">${fmt1(rr)} min por registro</div></div></div>${areaAhorroDonut(tA,sum,areaProjectCounts,areaCoverage)}<div style="text-align:right;margin-top:8px;"><button class="btn area-table-detail-btn">Ver detalle</button></div></div><div class="card"><div class="kpi-title">Top Tipos por Ahorro</div>${bar(tT,'tipos',false,true)}${tiposShareDonut(tT,sum)}<div style="text-align:right;margin-top:8px;"><button class="btn" data-chart="tipos_full">Ver detalle</button></div></div><div class="card"><div class="kpi-title">Top Operaciones por Ahorro</div>${bar(tOp,'operaciones',false,true)}${tiposShareDonut(tOp,sum)}<div style="text-align:right;margin-top:8px;"><button class="btn" data-chart="operaciones_full">Ver detalle</button></div></div><div class="card"><div class="kpi-title">Top Agentes de Cambio</div>${agentsVerticalCombined(tG,'agentes')}</div></div>`;
   // attach click handlers to area attendance list
   setTimeout(()=>{ document.querySelectorAll('.vbar-col[data-area], .area-att-row[data-area], .area-bar-row[data-area], .area-vbar-col[data-area]').forEach(el=>{ el.addEventListener('click',()=>{ const area=el.dataset.area||''; if(area) showAreaAbsentees(area); }); }); },50);
   // attach inasistencias button
-  const ina = $('inasistencias-btn'); if(ina) ina.addEventListener('click',()=>{ const sel=$('faltas-filter'); if(sel) sel.value=''; $('detail-filter').style.display='block'; $('detail-title').textContent='Inasistencias'; $('detail-h1').textContent='Colaborador'; $('detail-h1').style.display='table-cell'; $('detail-h2').textContent='Area'; $('detail-h2').style.display='table-cell'; $('detail-h3').textContent='Faltas'; $('detail-h3').style.display='table-cell'; renderFaltasInModal(''); openModal('detail-modal'); });
+  const ina = $('inasistencias-btn'); if(ina) ina.addEventListener('click',()=>{ const sel=$('faltas-filter'); if(sel) sel.value=''; $('detail-filter').style.display='block'; $('detail-title').textContent='Inasistencias'; $('detail-h1').textContent='Colaborador'; $('detail-h1').style.display='table-cell'; $('detail-h2').textContent='Area'; $('detail-h2').style.display='table-cell'; $('detail-h3').textContent='Faltas'; $('detail-h3').style.display='table-cell'; const expBtn=$('export-asistencia-btn'); if(expBtn) expBtn.style.display='inline-block'; renderFaltasInModal(''); openModal('detail-modal'); });
+  // attach export asistencia button
+  const exportBtn = $('export-asistencia-btn'); if(exportBtn) exportBtn.addEventListener('click',()=>{ exportAsistenciaExcel(); });
 }
 function resolvePostUrl(){
   const href=String(window.location.href||'');
@@ -817,6 +821,7 @@ function resetDetailModalMode(){
   if(modal) modal.classList.remove('modal-wide');
   const wrap=$('detail-table-wrap'); if(wrap) wrap.style.display='block';
   const custom=$('detail-custom'); if(custom){ custom.style.display='none'; custom.innerHTML=''; }
+  const expBtn=$('export-asistencia-btn'); if(expBtn) expBtn.style.display='none';
 }
 function openModal(id){ $(id).style.display='block'; }
 function closeModal(id){
@@ -999,7 +1004,7 @@ async function submitMetodologiaForm(form){
 }
 function openAhorroGeneralDetail(){
   const rows = normAC(acRows).slice().sort((a,b)=>num(b.ahorroMin)-num(a.ahorroMin));
-  const tableHtml = `<div class="table-wrap"><table><thead><tr><th>Mes</th><th>Area</th><th>A.Cambio</th><th>Proyecto</th><th>Tipo</th><th>Frecuencia</th><th>Antes</th><th>Ahora</th><th>Ahorro</th><th>Link</th></tr></thead><tbody>${rows.map(r=>`<tr><td>${esc(r.mes)}</td><td>${esc(r.area)}</td><td>${esc(r.agenteCambio)}</td><td>${esc(r.proyecto)}</td><td>${esc(r.tipo)}</td><td>${esc(r.frecuencia)}</td><td>${esc(withMin(r.antes))}</td><td>${esc(withMin(r.ahora))}</td><td>${fmt(r.ahorroMin)} min</td><td style="text-align:center;">${r.linkUrl?`<a class="link-btn" href="${esc(r.linkUrl)}" target="_blank" rel="noopener">Ver detalle</a>`:'-'}</td></tr>`).join('')}</tbody></table></div>`;
+  const tableHtml = `<div class="table-wrap"><table><thead><tr><th>Mes</th><th>Area</th><th>A.Cambio</th><th>Proyecto</th><th>Operacion</th><th>Tipo</th><th>Frecuencia</th><th>Antes</th><th>Ahora</th><th>Ahorro</th><th>Link</th></tr></thead><tbody>${rows.map(r=>`<tr><td>${esc(r.mes)}</td><td>${esc(r.area)}</td><td>${esc(r.agenteCambio)}</td><td>${esc(r.proyecto)}</td><td>${esc(r.operacion)}</td><td>${esc(r.tipo)}</td><td>${esc(r.frecuencia)}</td><td>${esc(withMin(r.antes))}</td><td>${esc(withMin(r.ahora))}</td><td>${fmt(r.ahorroMin)} min</td><td style="text-align:center;">${r.linkUrl?`<a class="link-btn" href="${esc(r.linkUrl)}" target="_blank" rel="noopener">Ver detalle</a>`:'-'}</td></tr>`).join('')}</tbody></table></div>`;
   $('detail-filter').style.display='none';
   $('detail-title').textContent='Detalle: Top Areas por Ahorro';
   const modal=document.querySelector('#detail-modal .modal');
@@ -1014,9 +1019,24 @@ function openTiposFullDetail(){
     .filter(r=>tiposTop.size?tiposTop.has(String(r.tipo||'').trim()):true)
     .slice()
     .sort((a,b)=>num(b.ahorroMin)-num(a.ahorroMin));
-  const tableHtml = `<div class="table-wrap"><table><thead><tr><th>Mes</th><th>Area</th><th>Tipo</th><th>A.Cambio</th><th>Proyecto</th><th>Frecuencia</th><th>Antes</th><th>Ahora</th><th>Ahorro</th><th>Link</th></tr></thead><tbody>${rows.map(r=>`<tr><td>${esc(r.mes)}</td><td>${esc(r.area)}</td><td>${esc(r.tipo)}</td><td>${esc(r.agenteCambio)}</td><td>${esc(r.proyecto)}</td><td>${esc(r.frecuencia)}</td><td>${esc(withMin(r.antes))}</td><td>${esc(withMin(r.ahora))}</td><td>${fmt(r.ahorroMin)} min</td><td style="text-align:center;">${r.linkUrl?`<a class="link-btn" href="${esc(r.linkUrl)}" target="_blank" rel="noopener">Ver detalle</a>`:'-'}</td></tr>`).join('')}</tbody></table></div>`;
+  const tableHtml = `<div class="table-wrap"><table><thead><tr><th>Mes</th><th>Area</th><th>Tipo</th><th>A.Cambio</th><th>Proyecto</th><th>Operacion</th><th>Frecuencia</th><th>Antes</th><th>Ahora</th><th>Ahorro</th><th>Link</th></tr></thead><tbody>${rows.map(r=>`<tr><td>${esc(r.mes)}</td><td>${esc(r.area)}</td><td>${esc(r.tipo)}</td><td>${esc(r.agenteCambio)}</td><td>${esc(r.proyecto)}</td><td>${esc(r.operacion)}</td><td>${esc(r.frecuencia)}</td><td>${esc(withMin(r.antes))}</td><td>${esc(withMin(r.ahora))}</td><td>${fmt(r.ahorroMin)} min</td><td style="text-align:center;">${r.linkUrl?`<a class="link-btn" href="${esc(r.linkUrl)}" target="_blank" rel="noopener">Ver detalle</a>`:'-'}</td></tr>`).join('')}</tbody></table></div>`;
   $('detail-filter').style.display='none';
   $('detail-title').textContent='Detalle: Top Tipos por Ahorro (todos los datos)';
+  const modal=document.querySelector('#detail-modal .modal');
+  if(modal) modal.classList.add('modal-wide');
+  const wrap=$('detail-table-wrap'); if(wrap) wrap.style.display='none';
+  const custom=$('detail-custom'); if(custom){ custom.style.display='block'; custom.innerHTML=tableHtml; }
+  openModal('detail-modal');
+}
+function openOperacionesFullDetail(){
+  const operacionesTop = new Set((charts.operaciones||[]).map(o=>String(o.label||'').trim()).filter(Boolean));
+  const rows = normAC(acRows)
+    .filter(r=>operacionesTop.size?operacionesTop.has(String(r.operacion||'').trim()):true)
+    .slice()
+    .sort((a,b)=>num(b.ahorroMin)-num(a.ahorroMin));
+  const tableHtml = `<div class="table-wrap"><table><thead><tr><th>Mes</th><th>Area</th><th>A.Cambio</th><th>Proyecto</th><th>Operacion</th><th>Tipo</th><th>Frecuencia</th><th>Antes</th><th>Ahora</th><th>Ahorro</th><th>Link</th></tr></thead><tbody>${rows.map(r=>`<tr><td>${esc(r.mes)}</td><td>${esc(r.area)}</td><td>${esc(r.agenteCambio)}</td><td>${esc(r.proyecto)}</td><td>${esc(r.operacion)}</td><td>${esc(r.tipo)}</td><td>${esc(r.frecuencia)}</td><td>${esc(withMin(r.antes))}</td><td>${esc(withMin(r.ahora))}</td><td>${fmt(r.ahorroMin)} min</td><td style="text-align:center;">${r.linkUrl?`<a class="link-btn" href="${esc(r.linkUrl)}" target="_blank" rel="noopener">Ver detalle</a>`:'-'}</td></tr>`).join('')}</tbody></table></div>`;
+  $('detail-filter').style.display='none';
+  $('detail-title').textContent='Detalle: Top Operaciones por Ahorro (todos los datos)';
   const modal=document.querySelector('#detail-modal .modal');
   if(modal) modal.classList.add('modal-wide');
   const wrap=$('detail-table-wrap'); if(wrap) wrap.style.display='none';
@@ -1030,6 +1050,29 @@ function renderFaltasInModal(g){
   $('detail-body').innerHTML = sorted.length
     ? sorted.map(p=>`<tr><td>${esc(p.colaborador)}</td><td>${esc(p.area)}</td><td>${fmt(p.faltas)}</td></tr>`).join('')
     : '<tr><td colspan="3">Sin registros para este filtro.</td></tr>';
+}
+function exportAsistenciaExcel(){
+  try{
+    if(!uRows||!uRows.length||!summary) { alert('No hay datos de asistencia para exportar'); return; }
+    const all=dateCols(uRows);
+    const d=getWeekDateColumns(all);
+    const useColsRaw=d.length?d:all;
+    const useCols=useColsRaw.filter(dc=>uRows.some(r=>present(r[dc])));
+    if(!useCols.length) { alert('No hay fechas de clase registradas'); return; }
+    let faltasData=(summary.faltas||[]).slice();
+    faltasData.sort((a,b)=>{const fA=parseInt(a.faltas,10)||0;const fB=parseInt(b.faltas,10)||0;if(fA===fB)return String(a.colaborador||'').localeCompare(String(b.colaborador||''));return fA-fB;});
+    const excelData=[];
+    const headerRow=['Area','Colaborador',...useCols.map(dc=>dc)];
+    excelData.push(headerRow);
+    faltasData.forEach(persona=>{const row=uRows.find(r=>String(r.AREA||'').trim().toUpperCase()===String(persona.area||'').trim().toUpperCase()&&String(r.COLABORADOR||'').trim().toUpperCase()===String(persona.colaborador||'').trim().toUpperCase());if(!row)return;const fila=[String(persona.area||''),String(persona.colaborador||'')];useCols.forEach(dc=>{fila.push(present(row[dc])?'Presente':'Ausente');});excelData.push(fila);});
+    const ws=XLSX.utils.aoa_to_sheet(excelData);ws['!cols']=[{wch:18},{wch:20},...useCols.map(_=>({wch:14}))];
+    const headerStyle={fill:{fgColor:{rgb:'14B8A6'}},font:{bold:true,color:{rgb:'FFFFFF'}},alignment:{horizontal:'center',vertical:'center'}};
+    for(let i=0;i<headerRow.length;i++){const cellRef=XLSX.utils.encode_cell({r:0,c:i});if(ws[cellRef])ws[cellRef].s=headerStyle;}
+    const presenteStyle={fill:{fgColor:{rgb:'D4EDDA'}},font:{color:{rgb:'155724'}}};
+    const ausenteStyle={fill:{fgColor:{rgb:'F8D7DA'}},font:{color:{rgb:'721C24'}}};
+    for(let r=1;r<excelData.length;r++){for(let c=2;c<headerRow.length;c++){const cellRef=XLSX.utils.encode_cell({r:r,c:c});if(ws[cellRef]){ws[cellRef].s=excelData[r][c]==='Presente'?presenteStyle:ausenteStyle;ws[cellRef].alignment={horizontal:'center',vertical:'center'};}}}
+    const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Asistencia');const fecha=new Date().toISOString().split('T')[0];XLSX.writeFile(wb,`Asistencia_${fecha}.xlsx`);
+  }catch(err){alert('Error al exportar: '+(err.message||err));}
 }
 function fillSel(sel,vals,ph){ sel.innerHTML=['<option value="">'+ph+'</option>',...vals.map(v=>`<option value="${esc(v)}">${esc(v)}</option>`)].join(''); }
 function unique(v){ return [...new Set(v.map(x=>String(x||'').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'es',{sensitivity:'base'})); }
@@ -1263,7 +1306,11 @@ $('content').addEventListener('click',(e)=>{
       openTiposFullDetail();
       return;
     }
-    const k=b.dataset.chart, t={areas:'Top Areas por ahorro',tipos:'Top Tipos por ahorro',agentes:'Top Agentes de cambio',agentes_all:'Todos los agentes de cambio',agentes_area:'Agentes de cambio por area'};
+    if(b.dataset.chart==='operaciones_full'){
+      openOperacionesFullDetail();
+      return;
+    }
+    const k=b.dataset.chart, t={areas:'Top Areas por ahorro',tipos:'Top Tipos por ahorro',operaciones:'Top Operaciones por ahorro',agentes:'Top Agentes de cambio',agentes_all:'Todos los agentes de cambio',agentes_area:'Agentes de cambio por area'};
     const hdr4 = $('detail-h4'); if(hdr4) hdr4.style.display='none';
     $('detail-filter').style.display='none';
     $('detail-title').textContent='Detalle: '+(t[k]||'Detalle');
