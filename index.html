@@ -2287,6 +2287,15 @@ document.addEventListener('DOMContentLoaded', () => {
         return acc;
     }, {});
 
+    function normalizeMapStatus(value) {
+        const raw = String(value || '').trim().toLowerCase();
+        if (!raw) return '';
+        if (raw.includes('termin')) return 'terminado';
+        if (raw.includes('proceso')) return 'en proceso';
+        if (raw.includes('pend') || raw.includes('estacion')) return 'estacionamiento';
+        return raw;
+    }
+
     function updateMapWithData(rows) {
         processedStats = {};
         const globalStats = { total: 0, Terminado: 0, "En proceso": 0, "Estacionamiento": 0 };
@@ -2300,7 +2309,7 @@ document.addEventListener('DOMContentLoaded', () => {
         rows.forEach(row => {
             const rawAreaName = row.AREA ? String(row.AREA).trim().toUpperCase() : undefined;
             const id = areaNameToIdMap[rawAreaName];
-            const estadoRaw = row.ESTADO ? String(row.ESTADO).trim().toLowerCase() : undefined;
+            const estadoRaw = normalizeMapStatus(row.ESTADO);
 
             let hrsRaw = row[HORAS_COLUMN_NAME] ? String(row[HORAS_COLUMN_NAME]) : '0';
             hrsRaw = hrsRaw.replace(/[$,\s]/g, '');
@@ -2590,7 +2599,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    const statusOrder = { 'terminado': 1, 'en proceso': 2, 'estacionamiento': 3 };
+    const statusOrder = { 'terminado': 1, 'en proceso': 2, 'estacionamiento': 3, 'pendiente': 3 };
 
     function openDetailsModal(areaId) {
         const areaName = idToAreaNameMap[areaId];
@@ -2612,8 +2621,8 @@ document.addEventListener('DOMContentLoaded', () => {
         );
 
         filteredRows.sort((a, b) => {
-            const statusA = (a.ESTADO || '').toLowerCase();
-            const statusB = (b.ESTADO || '').toLowerCase();
+            const statusA = normalizeMapStatus(a.ESTADO);
+            const statusB = normalizeMapStatus(b.ESTADO);
             const orderA = statusOrder[statusA] || 99;
             const orderB = statusOrder[statusB] || 99;
             return orderA - orderB;
@@ -2626,7 +2635,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             filteredRows.forEach(row => {
                 let statusClass = '';
-                const estadoLower = (row.ESTADO || '').toLowerCase();
+                const estadoLower = normalizeMapStatus(row.ESTADO);
                 if (estadoLower === 'terminado') statusClass = 'status-terminado';
                 else if (estadoLower === 'en proceso') statusClass = 'status-en-proceso';
                 else if (estadoLower === 'estacionamiento') statusClass = 'status-estacionamiento';
@@ -2764,7 +2773,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             rows.forEach(r => {
                 const estado = (r.ESTADO || '').toString();
-                const estadoLower = estado.toLowerCase();
+                const estadoLower = normalizeMapStatus(estado);
                 // Filtrado según el estado del toggle
                 try {
                     const ffinDate = parseDateValue(r['F.FIN']);
