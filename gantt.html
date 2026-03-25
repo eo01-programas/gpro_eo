@@ -1254,6 +1254,121 @@
         </div>
     </div>
 
+    <!-- Modal: Mover Tarea -->
+    <div id="moveTaskModal" class="modal-overlay" style="display:none;">
+        <div class="modal-card">
+            <div class="flex items-center justify-between px-6 py-4 bg-blue-900 text-white">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded bg-white/10 flex items-center justify-center"><i
+                            class="fa-solid fa-arrow-right"></i></div>
+                    <div>
+                        <h3 class="text-sm font-bold uppercase tracking-wider">Mover Tarea</h3>
+                        <p class="text-xs text-blue-200">Selecciona el proyecto destino</p>
+                    </div>
+                </div>
+                <button onclick="document.getElementById('moveTaskModal').style.display='none'" class="text-white/70 hover:text-white text-xl transition"><i class="fa-solid fa-times"></i></button>
+            </div>
+            <div class="p-6 bg-slate-50 flex-1 overflow-auto">
+                <div class="grid gap-4">
+                    <label class="block">
+                        <span class="text-xs font-bold text-slate-500 uppercase mb-1 block">Proyecto Destino</span>
+                        <select id="move-task-project" class="w-full border border-slate-300 rounded p-2 text-sm bg-white outline-none">
+                            <option value="">-- Selecciona un proyecto --</option>
+                        </select>
+                    </label>
+                </div>
+            </div>
+            <div class="px-6 py-3 border-t border-slate-200 bg-white flex justify-end gap-3">
+                <button onclick="document.getElementById('moveTaskModal').style.display='none'" class="px-4 py-2 bg-slate-100 text-slate-600 font-medium rounded hover:bg-slate-200 transition">Cancelar</button>
+                <button onclick="executeMoveTask()" class="px-4 py-2 bg-blue-600 text-white font-medium rounded hover:bg-blue-700 transition shadow-lg shadow-blue-200">Mover</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Mover Subtarea -->
+    <div id="moveSubtaskModal" class="modal-overlay" style="display:none;">
+        <div class="modal-card">
+            <div class="flex items-center justify-between px-6 py-4 bg-blue-900 text-white">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded bg-white/10 flex items-center justify-center"><i
+                            class="fa-solid fa-arrow-right"></i></div>
+                    <div>
+                        <h3 class="text-sm font-bold uppercase tracking-wider">Mover Subtarea</h3>
+                        <p class="text-xs text-blue-200">Selecciona tarea y proyecto destino</p>
+                    </div>
+                </div>
+                <button onclick="document.getElementById('moveSubtaskModal').style.display='none'" class="text-white/70 hover:text-white text-xl transition"><i class="fa-solid fa-times"></i></button>
+            </div>
+            <div class="p-6 bg-slate-50 flex-1 overflow-auto">
+                <div class="grid gap-4">
+                    <label class="block">
+                        <span class="text-xs font-bold text-slate-500 uppercase mb-1 block">Proyecto</span>
+                        <select id="move-subtask-project" class="w-full border border-slate-300 rounded p-2 text-sm bg-white outline-none" onchange="loadMoveSubtaskParentTasks()">
+                            <option value="">-- Selecciona un proyecto --</option>
+                        </select>
+                    </label>
+                    <label class="block">
+                        <span class="text-xs font-bold text-slate-500 uppercase mb-1 block">Tarea Destino</span>
+                        <select id="move-subtask-task" class="w-full border border-slate-300 rounded p-2 text-sm bg-white outline-none">
+                            <option value="">-- Selecciona una tarea --</option>
+                        </select>
+                    </label>
+                </div>
+            </div>
+            <div class="px-6 py-3 border-t border-slate-200 bg-white flex justify-end gap-3">
+                <button onclick="document.getElementById('moveSubtaskModal').style.display='none'" class="px-4 py-2 bg-slate-100 text-slate-600 font-medium rounded hover:bg-slate-200 transition">Cancelar</button>
+                <button onclick="executeMoveSubtask()" class="px-4 py-2 bg-blue-600 text-white font-medium rounded hover:bg-blue-700 transition shadow-lg shadow-blue-200">Mover</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Mover Masivo -->
+    <div id="bulkMoveModal" class="modal-overlay" style="display:none;">
+        <div class="modal-card">
+            <div class="flex items-center justify-between px-6 py-4 bg-blue-900 text-white">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded bg-white/10 flex items-center justify-center"><i class="fa-solid fa-arrows-alt"></i></div>
+                    <div>
+                        <h3 class="text-sm font-bold uppercase tracking-wider">Mover múltiples elementos</h3>
+                        <p class="text-xs text-blue-200" id="bulkMoveCount">0 elementos seleccionados</p>
+                    </div>
+                </div>
+                <button onclick="document.getElementById('bulkMoveModal').style.display='none'" class="text-white/70 hover:text-white text-xl transition"><i class="fa-solid fa-times"></i></button>
+            </div>
+            <div class="p-6 bg-slate-50 flex-1 overflow-auto">
+                <div class="grid gap-4">
+                    <label class="block">
+                        <span class="text-xs font-bold text-slate-500 uppercase mb-1 block">Proyecto Destino</span>
+                        <select id="bulk-move-project" class="w-full border border-slate-300 rounded p-2 text-sm bg-white outline-none" onchange="loadBulkMoveParentTasks()">
+                            <option value="">-- Selecciona un proyecto --</option>
+                        </select>
+                    </label>
+                    <div id="bulkMoveTaskParentDiv" style="display:none;">
+                        <label class="block">
+                            <span class="text-xs font-bold text-slate-500 uppercase mb-1 block">Tarea Destino (para subtareas)</span>
+                            <select id="bulk-move-parent-task" class="w-full border border-slate-300 rounded p-2 text-sm bg-white outline-none">
+                                <option value="">-- Selecciona una tarea (opcional) --</option>
+                            </select>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="px-6 py-3 border-t border-slate-200 bg-white flex justify-end gap-3">
+                <button onclick="document.getElementById('bulkMoveModal').style.display='none'" class="px-4 py-2 bg-slate-100 text-slate-600 font-medium rounded hover:bg-slate-200 transition">Cancelar</button>
+                <button onclick="executeBulkMove()" class="px-4 py-2 bg-blue-600 text-white font-medium rounded hover:bg-blue-700 transition shadow-lg shadow-blue-200">Mover Todos</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Barra de herramientas de selección masiva -->
+    <div id="bulkActionToolbar" class="fixed bottom-6 left-1/2 -translate-x-1/2 bg-white border border-slate-300 rounded-lg shadow-2xl z-40 p-4 flex items-center gap-4" style="display:none;">
+        <span class="text-sm font-bold text-slate-600"><span id="bulkSelectionCount">0</span> seleccionados</span>
+        <div class="h-6 w-px bg-slate-200"></div>
+        <button onclick="clearAllSelections()" class="px-3 py-1.5 bg-slate-100 text-slate-600 text-xs font-bold rounded hover:bg-slate-200 transition">Desmarcar todos</button>
+        <button onclick="openBulkMoveModal()" class="px-3 py-1.5 bg-blue-600 text-white text-xs font-bold rounded hover:bg-blue-700 transition shadow-sm"><i class="fa-solid fa-arrows-alt mr-1"></i>Mover</button>
+        <button onclick="bulkDeleteConfirm()" class="px-3 py-1.5 bg-red-600 text-white text-xs font-bold rounded hover:bg-red-700 transition shadow-sm"><i class="fa-solid fa-trash mr-1"></i>Eliminar</button>
+    </div>
+
     <!-- Modal Objetivo de Tarea/Subtarea -->
     <div id="taskObjectiveModal" class="modal-overlay" style="display:none;">
         <div class="modal-card modal-card-lg" style="height: 80vh;">
@@ -1283,7 +1398,9 @@
     <!-- Menú Contextual Flotante -->
     <div id="taskContextMenu" class="fixed hidden bg-white border border-slate-300 rounded shadow-lg z-50" style="display:none; min-width:180px;">
         <button onclick="openConvertToSubtaskFlow()" class="w-full text-left px-4 py-2 hover:bg-slate-100 transition text-sm text-slate-700 border-b border-slate-200"><i class="fa-solid fa-arrow-right mr-2"></i>Convertir a Subtarea</button>
-        <button onclick="openConvertToTaskFlow()" class="w-full text-left px-4 py-2 hover:bg-slate-100 transition text-sm text-slate-700"><i class="fa-solid fa-arrow-right mr-2"></i>Convertir a Tarea</button>
+        <button onclick="openConvertToTaskFlow()" class="w-full text-left px-4 py-2 hover:bg-slate-100 transition text-sm text-slate-700 border-b border-slate-200"><i class="fa-solid fa-arrow-right mr-2"></i>Convertir a Tarea</button>
+        <button onclick="openMoveTaskFlow()" id="moveTaskBtn" class="w-full text-left px-4 py-2 hover:bg-slate-100 transition text-sm text-slate-700 border-b border-slate-200"><i class="fa-solid fa-arrows-alt mr-2"></i>Mover Tarea</button>
+        <button onclick="openMoveSubtaskFlow()" id="moveSubtaskBtn" class="w-full text-left px-4 py-2 hover:bg-slate-100 transition text-sm text-slate-700"><i class="fa-solid fa-arrows-alt mr-2"></i>Mover Subtarea</button>
     </div>
 
     <div id="lastScrollPos" style="display:none;"></div>
@@ -2369,7 +2486,8 @@
                             ? `<div class="leading-tight"><div class="font-semibold text-slate-700">${subtaskTitle || taskTitle}</div></div>`
                             : `<div class="leading-tight"><div class="font-semibold text-slate-700">${taskTitle}</div></div>`;
                         const taskNameHtml = options.customNameHtml || defaultTaskNameHtml;
-                        const iconCellHtml = options.iconCellHtml || '<div class="cell col-icon"></div>';
+                        const isSelected = isTaskSelected(p.id, tIndex);
+                        const iconCellHtml = options.iconCellHtml || `<div class="cell col-icon flex items-center justify-center"><input type="checkbox" ${isSelected ? 'checked' : ''} onchange="event.stopPropagation(); toggleTaskSelection('${p.id}', ${tIndex})" style="width: 18px; height: 18px; cursor: pointer; accent-color: #2563eb;"></div>`;
                         const namePaddingClass = options.namePaddingClass || 'pl-8';
                         const treeDecorHtml = options.showTreeDecor === false
                             ? ''
@@ -2597,7 +2715,6 @@
                             const subtaskName = escapeHtml(taskEntry.t.subtarea || taskEntry.t.nombre || 'Subtarea');
                             const customNameHtml = `<div class="leading-tight"><div class="font-semibold text-slate-600">${subtaskName}</div></div>`;
                             renderTaskLeafRow(taskEntry, {
-                                iconCellHtml: '<div class="cell col-icon"></div>',
                                 namePaddingClass: 'pl-16',
                                 showTreeDecor: true,
                                 leftRowClass: 'data-row subtask-row hover:bg-slate-50',
@@ -3036,7 +3153,7 @@ ${escapeHtml(taskSolution)}</textarea>
                     <div class="grid grid-cols-2 gap-4 pt-2">
                         <div>
                             <label class="block text-xs font-bold uppercase text-slate-700 mb-2 tracking-widest">Proceso</label>
-                            <input id="to-task-proceso" value="" 
+                            <input id="to-task-proceso" value="${escapeHtml(String(t.proceso_tarea || projectFallback.proceso || '').trim())}" 
                                 class="w-full border border-slate-300 rounded-lg p-3 text-sm text-slate-700 bg-white focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200 placeholder-slate-400"
                                 placeholder="Ej: RRHH, Ventas">
                         </div>
@@ -3084,13 +3201,13 @@ ${escapeHtml(taskSolution)}</textarea>
                     <div class="grid grid-cols-2 gap-4">
                         <div>
                             <label class="block text-xs font-bold uppercase text-slate-700 mb-2 tracking-widest">HRS/DÍA Actual</label>
-                            <input id="to-task-hrs-actual" value="" 
+                            <input id="to-task-hrs-actual" value="${escapeHtml(String(t.hrs_dia_actual_tarea || projectFallback.hrs_dia_actual || '').trim())}" 
                                 class="w-full border border-slate-300 rounded-lg p-3 text-sm text-slate-700 bg-white focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200 placeholder-slate-400"
                                 placeholder="0.0">
                         </div>
                         <div>
                             <label class="block text-xs font-bold uppercase text-slate-700 mb-2 tracking-widest">HRS/DÍA Mejora</label>
-                            <input id="to-task-hrs-mejora" value="" 
+                            <input id="to-task-hrs-mejora" value="${escapeHtml(String(t.hrs_dia_mejora_tarea || projectFallback.hrs_dia_mejora || '').trim())}" 
                                 class="w-full border border-slate-300 rounded-lg p-3 text-sm text-slate-700 bg-white focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200 placeholder-slate-400"
                                 placeholder="0.0">
                         </div>
@@ -3130,6 +3247,8 @@ ${escapeHtml(taskSolution)}</textarea>
             const p = projectMap.get(pid);
             if (!p || !p.tasks || !p.tasks[tidx]) return;
             const t = p.tasks[tidx];
+            const tareaLabel = String(t.tarea || t.nombre || '').trim();
+            const subtareaLabel = String(t.subtarea || '').trim();
 
             const btn = document.querySelector('#taskObjectiveModal button.bg-blue-600');
             if (btn) btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Guardando...';
@@ -3158,9 +3277,12 @@ ${escapeHtml(taskSolution)}</textarea>
                 old_tarea: oldTaskKey,
                 old_subtarea: oldSubtaskKey,
                 que_soluciono_tarea: document.getElementById('to-task-solution').value.trim(),
+                proceso: document.getElementById('to-task-proceso').value.trim(),
                 indicador: document.getElementById('to-task-metric').value.trim(),
                 l_base: document.getElementById('to-task-lbase').value.trim(),
                 meta: document.getElementById('to-task-meta').value.trim(),
+                hrs_dia_actual: document.getElementById('to-task-hrs-actual').value.trim(),
+                hrs_dia_mejora: document.getElementById('to-task-hrs-mejora').value.trim(),
                 numerador: document.getElementById('to-task-numerador').value.trim(),
                 denominador: document.getElementById('to-task-denominador').value.trim(),
                 datos_mensuales: readMonthlyInputs('to-task')
@@ -3663,6 +3785,266 @@ ${escapeHtml(taskSolution)}</textarea>
         // === Conversión de Tareas/Subtareas ===
         let conversionContext = null;
         
+        // === Selección masiva de tareas ===
+        let selectedTasks = new Set(); // Formato: "projectId-taskIndex"
+        let bulkMoveMode = null;
+
+        function getTaskSheetIdentity(projectObj, taskObj) {
+            if (!projectObj || !taskObj) return null;
+            return {
+                area: normalizeAreaName(taskObj.area) || normalizeAreaName(projectObj.area) || '',
+                proyecto: String(projectObj.nombre || '').trim(),
+                tarea: String(taskObj.sheet_tarea !== undefined ? taskObj.sheet_tarea : (taskObj.tarea || taskObj.nombre || '')).trim(),
+                subtarea: String(taskObj.sheet_subtarea !== undefined ? taskObj.sheet_subtarea : (taskObj.subtarea || '')).trim()
+            };
+        }
+
+        function getTaskParentKey(taskObj) {
+            return String(taskObj && (taskObj.sheet_tarea !== undefined ? taskObj.sheet_tarea : (taskObj.tarea || taskObj.nombre || '')) || '').trim();
+        }
+
+        function getTaskDisplayName(taskObj) {
+            return String(taskObj && (taskObj.subtarea || taskObj.nombre || taskObj.tarea || taskObj.sheet_tarea || '') || '').trim();
+        }
+
+        function getTaskGroupEntries(projectObj, taskIndex) {
+            if (!projectObj || !Array.isArray(projectObj.tasks) || !projectObj.tasks[taskIndex]) return [];
+            const selectedTask = projectObj.tasks[taskIndex];
+            const isSubtask = String(selectedTask.subtarea || '').trim() !== '';
+            if (isSubtask) return [{ task: selectedTask, tIndex: taskIndex }];
+
+            const parentKey = getTaskParentKey(selectedTask);
+            return projectObj.tasks
+                .map((task, tIndex) => ({ task, tIndex }))
+                .filter(({ task }) => getTaskParentKey(task) === parentKey);
+        }
+        
+        function toggleTaskSelection(pid, tidx) {
+            const key = `${pid}-${tidx}`;
+            if (selectedTasks.has(key)) {
+                selectedTasks.delete(key);
+            } else {
+                selectedTasks.add(key);
+            }
+            updateBulkActionToolbar();
+            render();
+        }
+        
+        function isTaskSelected(pid, tidx) {
+            return selectedTasks.has(`${pid}-${tidx}`);
+        }
+        
+        function updateBulkActionToolbar() {
+            const toolbar = document.getElementById('bulkActionToolbar');
+            const count = document.getElementById('bulkSelectionCount');
+            count.textContent = selectedTasks.size;
+            toolbar.style.display = selectedTasks.size > 0 ? 'flex' : 'none';
+        }
+        
+        function clearAllSelections() {
+            selectedTasks.clear();
+            updateBulkActionToolbar();
+            render();
+        }
+        
+        function openBulkMoveModal() {
+            if (selectedTasks.size === 0) {
+                showToast('Selecciona al menos un elemento', 'error');
+                return;
+            }
+            
+            // Determine if all selected are subtasks
+            let allAreSubtasks = true;
+            let allAreTasks = true;
+            
+            selectedTasks.forEach(key => {
+                const [pid, tidx] = key.split('-');
+                const p = projectMap.get(pid);
+                const t = p.tasks[parseInt(tidx)];
+                const isSubtask = String(t.subtarea || '').trim() !== '';
+                
+                if (isSubtask) allAreTasks = false;
+                if (!isSubtask) allAreSubtasks = false;
+            });
+
+            if (!allAreSubtasks && !allAreTasks) {
+                showToast('La selección masiva no puede mezclar tareas y subtareas', 'error');
+                return;
+            }
+            bulkMoveMode = allAreSubtasks ? 'subtasks' : 'tasks';
+            
+            // Load projects
+            const projSelect = document.getElementById('bulk-move-project');
+            projSelect.innerHTML = '<option value="">-- Selecciona un proyecto --</option>';
+            projectData.forEach(proj => {
+                projSelect.innerHTML += `<option value="${proj.id}">${proj.nombre}</option>`;
+            });
+            
+            // Show parent task selector only if moving subtasks
+            const taskParentDiv = document.getElementById('bulkMoveTaskParentDiv');
+            taskParentDiv.style.display = bulkMoveMode === 'subtasks' ? 'block' : 'none';
+            
+            // Update count label
+            document.getElementById('bulkMoveCount').textContent = `${selectedTasks.size} elementos seleccionados`;
+            
+            document.getElementById('bulkMoveModal').style.display = 'flex';
+        }
+        
+        function loadBulkMoveParentTasks() {
+            const projSelect = document.getElementById('bulk-move-project');
+            const taskSelect = document.getElementById('bulk-move-parent-task');
+            const projId = projSelect.value;
+            
+            if (!projId) {
+                taskSelect.innerHTML = '<option value="">-- Selecciona una tarea --</option>';
+                return;
+            }
+            
+            const p = projectMap.get(projId);
+            if (!p) return;
+            
+            taskSelect.innerHTML = '<option value="">-- Selecciona una tarea --</option>';
+            (p.tasks || []).forEach((t, idx) => {
+                const isSubtask = String(t.subtarea || '').trim() !== '';
+                if (!isSubtask) {
+                    const taskName = String(t.nombre || t.tarea || t.sheet_tarea || '').trim() || `Tarea ${idx + 1}`;
+                    taskSelect.innerHTML += `<option value="${idx}">${taskName}</option>`;
+                }
+            });
+        }
+        
+        async function executeBulkMove() {
+            if (selectedTasks.size === 0) return;
+            
+            const newProjId = document.getElementById('bulk-move-project').value;
+            if (!newProjId) {
+                showToast('Selecciona un proyecto destino', 'error');
+                return;
+            }
+            
+            const newProject = projectMap.get(newProjId);
+            if (!newProject) return;
+
+            const isSubtaskMove = bulkMoveMode === 'subtasks';
+            let destinationParentName = '';
+            let destinationParentArea = '';
+            if (isSubtaskMove) {
+                const parentTaskRaw = document.getElementById('bulk-move-parent-task').value;
+                if (parentTaskRaw === '') {
+                    showToast('Selecciona la tarea destino para las subtareas', 'error');
+                    return;
+                }
+                const parentTaskIndex = parseInt(parentTaskRaw, 10);
+                const parentTask = newProject.tasks[parentTaskIndex];
+                if (!parentTask || String(parentTask.subtarea || '').trim() !== '') {
+                    showToast('La tarea destino no es válida', 'error');
+                    return;
+                }
+                destinationParentName = getTaskParentKey(parentTask);
+                destinationParentArea = normalizeAreaName(parentTask.area) || normalizeAreaName(newProject.area) || '';
+                if (!destinationParentName) {
+                    showToast('No se pudo identificar la tarea destino', 'error');
+                    return;
+                }
+            }
+            
+            // Collect all selections with their project context
+            const toMove = [];
+            selectedTasks.forEach(key => {
+                const [pid, tidx] = key.split('-');
+                toMove.push({ pid, tidx: parseInt(tidx) });
+            });
+            
+            // Sort by project ID and then reverse index to avoid index shifting issues
+            toMove.sort((a, b) => {
+                if (a.pid !== b.pid) return b.pid.localeCompare(a.pid);
+                return b.tidx - a.tidx;
+            });
+            
+            let movedCount = 0;
+            for (const { pid, tidx } of toMove) {
+                const oldProject = projectMap.get(pid);
+                if (!oldProject) continue;
+                
+                const task = oldProject.tasks[tidx];
+                if (!task) continue;
+                const oldIdentity = getTaskSheetIdentity(oldProject, task);
+                const currentParentName = getTaskParentKey(task);
+
+                if (!isSubtaskMove && pid === newProjId) continue;
+                if (isSubtaskMove && pid === newProjId && currentParentName === destinationParentName) continue;
+
+                if (isSubtaskMove) {
+                    task.tarea = destinationParentName;
+                    task.sheet_tarea = destinationParentName;
+                    task.origen = '';
+                    if (destinationParentArea) task.area = destinationParentArea;
+                }
+
+                if (pid !== newProjId) {
+                    oldProject.tasks.splice(tidx, 1);
+                    newProject.tasks.push(task);
+                    const newTidx = newProject.tasks.length - 1;
+                    await saveToSheetAsync(newProjId, newTidx, oldIdentity);
+                } else {
+                    await saveToSheetAsync(pid, tidx, oldIdentity);
+                }
+                
+                movedCount++;
+            }
+
+            if (movedCount === 0) {
+                showToast('No hubo cambios para aplicar', 'error');
+                return;
+            }
+            
+            // Show success
+            document.getElementById('bulkMoveModal').style.display = 'none';
+            selectedTasks.clear();
+            updateBulkActionToolbar();
+            await loadDataFromSheet();
+            showToast(`${movedCount} elemento(s) movido(s) correctamente`, 'success');
+        }
+        
+        function bulkDeleteConfirm() {
+            if (selectedTasks.size === 0) return;
+            showConfirm(`¿Eliminar ${selectedTasks.size} elemento(s)?`, bulkDeleteTasks);
+        }
+        
+        async function bulkDeleteTasks() {
+            if (selectedTasks.size === 0) return;
+            
+            // Collect all selections
+            const toDelete = [];
+            selectedTasks.forEach(key => {
+                const [pid, tidx] = key.split('-');
+                toDelete.push({ pid, tidx: parseInt(tidx) });
+            });
+            
+            // Sort by project ID and then reverse index
+            toDelete.sort((a, b) => {
+                if (a.pid !== b.pid) return b.pid.localeCompare(a.pid);
+                return b.tidx - a.tidx;
+            });
+            
+            let deletedCount = 0;
+            for (const { pid, tidx } of toDelete) {
+                const project = projectMap.get(pid);
+                if (project && project.tasks[tidx]) {
+                    const task = project.tasks[tidx];
+                    const identity = getTaskSheetIdentity(project, task);
+                    await deleteTaskAsync(identity.area, identity.proyecto, identity.tarea, identity.subtarea);
+                    project.tasks.splice(tidx, 1);
+                    deletedCount++;
+                }
+            }
+            
+            selectedTasks.clear();
+            updateBulkActionToolbar();
+            await loadDataFromSheet();
+            showToast(`${deletedCount} elemento(s) eliminado(s)`, 'success');
+        }
+        
         function showTaskContextMenu(e, pid, tidx) {
             e.preventDefault();
             const menu = document.getElementById('taskContextMenu');
@@ -3670,16 +4052,22 @@ ${escapeHtml(taskSolution)}</textarea>
             const t = p.tasks[tidx];
             const isSubtask = String(t.subtarea || '').trim() !== '';
             
-            // Mostrar solo la opción relevante
+            // Mostrar opciones relevantes
             const convertToSubtaskBtn = menu.querySelector('button:nth-child(1)');
             const convertToTaskBtn = menu.querySelector('button:nth-child(2)');
+            const moveTaskBtn = document.getElementById('moveTaskBtn');
+            const moveSubtaskBtn = document.getElementById('moveSubtaskBtn');
             
             if (isSubtask) {
                 convertToSubtaskBtn.style.display = 'none';
                 convertToTaskBtn.style.display = 'block';
+                moveTaskBtn.style.display = 'none';
+                moveSubtaskBtn.style.display = 'block';
             } else {
                 convertToSubtaskBtn.style.display = 'block';
                 convertToTaskBtn.style.display = 'none';
+                moveTaskBtn.style.display = 'block';
+                moveSubtaskBtn.style.display = 'none';
             }
             
             menu.style.left = e.pageX + 'px';
@@ -3734,11 +4122,16 @@ ${escapeHtml(taskSolution)}</textarea>
             });
         }
         
-        function executeConvertToSubtask() {
+        async function executeConvertToSubtask() {
             if (!conversionContext) return;
             const { pid: oldPid, tidx: oldTidx } = conversionContext;
             const oldProject = projectMap.get(oldPid);
             const oldTask = oldProject.tasks[oldTidx];
+            const taskGroup = getTaskGroupEntries(oldProject, oldTidx);
+            if (taskGroup.length > 1) {
+                showToast('No puedes convertir una tarea que ya tiene subtareas', 'error');
+                return;
+            }
             
             const newProjId = document.getElementById('c2s-project').value;
             const newParentTidx = parseInt(document.getElementById('c2s-task').value);
@@ -3750,13 +4143,28 @@ ${escapeHtml(taskSolution)}</textarea>
             
             const newProject = projectMap.get(newProjId);
             if (!newProject) return;
+            if (oldPid === newProjId && oldTidx === newParentTidx) {
+                showToast('Selecciona una tarea padre distinta', 'error');
+                return;
+            }
+            const parentTask = newProject.tasks[newParentTidx];
+            if (!parentTask || String(parentTask.subtarea || '').trim() !== '') {
+                showToast('La tarea padre seleccionada no es válida', 'error');
+                return;
+            }
+            const parentTaskName = getTaskParentKey(parentTask);
+            const parentArea = normalizeAreaName(parentTask.area) || normalizeAreaName(newProject.area) || normalizeAreaName(oldTask.area) || '';
+            const oldIdentity = getTaskSheetIdentity(oldProject, oldTask);
+            const subtaskName = getTaskDisplayName(oldTask) || 'Nueva subtarea';
             
             // Convertir a subtarea
-            oldTask.subtarea = oldTask.nombre;
-            oldTask.sheet_subtarea = oldTask.nombre;
-            oldTask.tarea = '';
-            oldTask.sheet_tarea = '';
+            oldTask.nombre = subtaskName;
+            oldTask.subtarea = subtaskName;
+            oldTask.sheet_subtarea = subtaskName;
+            oldTask.tarea = parentTaskName;
+            oldTask.sheet_tarea = parentTaskName;
             oldTask.origen = ''; // Limpiar origen
+            if (parentArea) oldTask.area = parentArea;
             
             let newTidx = oldTidx;
             
@@ -3767,16 +4175,10 @@ ${escapeHtml(taskSolution)}</textarea>
                 newTidx = newProject.tasks.length - 1;
             }
             
-            // Guardar
-            saveToSheetAsync(newProjId, newTidx, {
-                area: normalizeAreaName(oldTask.area),
-                proyecto: newProject.nombre,
-                tarea: '',
-                subtarea: oldTask.subtarea
-            });
+            await saveToSheetAsync(newProjId, newTidx, oldIdentity);
             
             document.getElementById('convertToSubtaskModal').style.display = 'none';
-            scheduleRender();
+            await loadDataFromSheet();
             showToast('Convertida a subtarea', 'success');
             conversionContext = null;
         }
@@ -3799,11 +4201,12 @@ ${escapeHtml(taskSolution)}</textarea>
             document.getElementById('convertToTaskModal').style.display = 'flex';
         }
         
-        function executeConvertToTask() {
+        async function executeConvertToTask() {
             if (!conversionContext) return;
             const { pid: oldPid, tidx: oldTidx } = conversionContext;
             const oldProject = projectMap.get(oldPid);
             const oldTask = oldProject.tasks[oldTidx];
+            const oldIdentity = getTaskSheetIdentity(oldProject, oldTask);
             
             const newProjId = document.getElementById('c2t-project').value;
             
@@ -3814,10 +4217,12 @@ ${escapeHtml(taskSolution)}</textarea>
             
             const newProject = projectMap.get(newProjId);
             if (!newProject) return;
+            const newTaskName = getTaskDisplayName(oldTask) || 'Nueva tarea';
             
             // Convertir a tarea
-            oldTask.tarea = oldTask.nombre;
-            oldTask.sheet_tarea = oldTask.nombre;
+            oldTask.nombre = newTaskName;
+            oldTask.tarea = newTaskName;
+            oldTask.sheet_tarea = newTaskName;
             oldTask.subtarea = '';
             oldTask.sheet_subtarea = '';
             
@@ -3830,17 +4235,160 @@ ${escapeHtml(taskSolution)}</textarea>
                 newTidx = newProject.tasks.length - 1;
             }
             
-            // Guardar
-            saveToSheetAsync(newProjId, newTidx, {
-                area: normalizeAreaName(oldTask.area),
-                proyecto: newProject.nombre,
-                tarea: oldTask.tarea,
-                subtarea: ''
-            });
+            await saveToSheetAsync(newProjId, newTidx, oldIdentity);
             
             document.getElementById('convertToTaskModal').style.display = 'none';
-            scheduleRender();
+            await loadDataFromSheet();
             showToast('Convertida a tarea', 'success');
+            conversionContext = null;
+        }
+
+        // MOVER TAREAS Y SUBTAREAS
+        function openMoveTaskFlow() {
+            if (!conversionContext) return;
+            const { pid } = conversionContext;
+            const p = projectMap.get(pid);
+            
+            // Cargar proyectos
+            const projSelect = document.getElementById('move-task-project');
+            projSelect.innerHTML = '<option value="">-- Selecciona un proyecto --</option>';
+            projectData.forEach(proj => {
+                projSelect.innerHTML += `<option value="${proj.id}">${proj.nombre}</option>`;
+            });
+            
+            document.getElementById('moveTaskModal').style.display = 'flex';
+        }
+        
+        async function executeMoveTask() {
+            if (!conversionContext) return;
+            const { pid: oldPid, tidx: oldTidx } = conversionContext;
+            const oldProject = projectMap.get(oldPid);
+            const oldTask = oldProject.tasks[oldTidx];
+            const taskGroup = getTaskGroupEntries(oldProject, oldTidx);
+            
+            const newProjId = document.getElementById('move-task-project').value;
+            
+            if (!newProjId) {
+                showToast('Selecciona un proyecto destino', 'error');
+                return;
+            }
+            
+            if (newProjId === oldPid) {
+                showToast('La tarea ya está en ese proyecto', 'error');
+                return;
+            }
+            
+            const newProject = projectMap.get(newProjId);
+            if (!newProject) return;
+
+            const removedEntries = [];
+            [...taskGroup]
+                .sort((a, b) => b.tIndex - a.tIndex)
+                .forEach(({ task, tIndex }) => {
+                    removedEntries.unshift({
+                        task,
+                        oldIdentity: getTaskSheetIdentity(oldProject, task)
+                    });
+                    oldProject.tasks.splice(tIndex, 1);
+                });
+
+            for (const entry of removedEntries) {
+                newProject.tasks.push(entry.task);
+                const newTidx = newProject.tasks.length - 1;
+                await saveToSheetAsync(newProjId, newTidx, entry.oldIdentity);
+            }
+            
+            document.getElementById('moveTaskModal').style.display = 'none';
+            await loadDataFromSheet();
+            showToast(removedEntries.length > 1 ? 'Tarea y subtareas movidas correctamente' : 'Tarea movida correctamente', 'success');
+            conversionContext = null;
+        }
+        
+        function openMoveSubtaskFlow() {
+            if (!conversionContext) return;
+            const { pid } = conversionContext;
+            const p = projectMap.get(pid);
+            
+            // Cargar proyectos
+            const projSelect = document.getElementById('move-subtask-project');
+            projSelect.innerHTML = '<option value="">-- Selecciona un proyecto --</option>';
+            projectData.forEach(proj => {
+                projSelect.innerHTML += `<option value="${proj.id}">${proj.nombre}</option>`;
+            });
+            
+            document.getElementById('moveSubtaskModal').style.display = 'flex';
+        }
+        
+        function loadMoveSubtaskParentTasks() {
+            const projSelect = document.getElementById('move-subtask-project');
+            const taskSelect = document.getElementById('move-subtask-task');
+            const projId = projSelect.value;
+            
+            if (!projId) {
+                taskSelect.innerHTML = '<option value="">-- Selecciona una tarea --</option>';
+                return;
+            }
+            
+            const p = projectMap.get(projId);
+            if (!p) return;
+            
+            taskSelect.innerHTML = '<option value="">-- Selecciona una tarea --</option>';
+            (p.tasks || []).forEach((t, idx) => {
+                const isSubtask = String(t.subtarea || '').trim() !== '';
+                if (!isSubtask) {
+                    const taskName = String(t.nombre || t.tarea || t.sheet_tarea || '').trim() || `Tarea ${idx + 1}`;
+                    taskSelect.innerHTML += `<option value="${idx}">${taskName}</option>`;
+                }
+            });
+        }
+        
+        async function executeMoveSubtask() {
+            if (!conversionContext) return;
+            const { pid: oldPid, tidx: oldTidx } = conversionContext;
+            const oldProject = projectMap.get(oldPid);
+            const oldSubtask = oldProject.tasks[oldTidx];
+            
+            const newProjId = document.getElementById('move-subtask-project').value;
+            const newParentTidx = parseInt(document.getElementById('move-subtask-task').value);
+            
+            if (!newProjId || newParentTidx === undefined || newParentTidx < 0) {
+                showToast('Selecciona proyecto y tarea destino', 'error');
+                return;
+            }
+            
+            const newProject = projectMap.get(newProjId);
+            if (!newProject) return;
+            const parentTask = newProject.tasks[newParentTidx];
+            if (!parentTask || String(parentTask.subtarea || '').trim() !== '') {
+                showToast('La tarea destino no es válida', 'error');
+                return;
+            }
+            const parentTaskName = getTaskParentKey(parentTask);
+            const parentArea = normalizeAreaName(parentTask.area) || normalizeAreaName(newProject.area) || normalizeAreaName(oldSubtask.area) || '';
+            const oldIdentity = getTaskSheetIdentity(oldProject, oldSubtask);
+            if (oldPid === newProjId && getTaskParentKey(oldSubtask) === parentTaskName) {
+                showToast('La subtarea ya está vinculada a esa tarea', 'error');
+                return;
+            }
+            
+            // Mover subtarea
+            oldSubtask.tarea = parentTaskName;
+            oldSubtask.sheet_tarea = parentTaskName;
+            oldSubtask.origen = '';
+            if (parentArea) oldSubtask.area = parentArea;
+
+            let newTidx = oldTidx;
+            if (oldPid !== newProjId) {
+                oldProject.tasks.splice(oldTidx, 1);
+                newProject.tasks.push(oldSubtask);
+                newTidx = newProject.tasks.length - 1;
+            }
+            
+            await saveToSheetAsync(newProjId, newTidx, oldIdentity);
+            
+            document.getElementById('moveSubtaskModal').style.display = 'none';
+            await loadDataFromSheet();
+            showToast('Subtarea movida correctamente', 'success');
             conversionContext = null;
         }
 
@@ -4494,12 +5042,15 @@ ${escapeHtml(taskSolution)}</textarea>
                 const pNumStr = normalizeValue(pNumRaw);
                 const hasNumericP = /^\d+$/.test(pNumStr);
                 const taskSolution = normalizeValue(pick(row, ['OBJETIVO_TAREA', 'QUE_SOLUCIONO_TAREA', 'QUE_SOLUCIONO', '¿QUE SOLUCIONO_TAREA?', '¿QUE SOLUCIONO?', 'Â¿QUE SOLUCIONO_TAREA?', 'Â¿QUE SOLUCIONO?']));
-                const taskIndicator = normalizeValue(pick(row, ['INDICADOR']));
-                const taskLBase = normalizeValue(pick(row, ['L_BASE', 'LINEA BASE', 'L BASE']));
-                const taskMeta = normalizeValue(pick(row, ['META']));
-                const taskNumerador = normalizeValue(pick(row, ['NUMERADOR']));
-                const taskDenominador = normalizeValue(pick(row, ['DENOMINADOR']));
-                const taskMonthly = {};
+            const taskProceso = normalizeValue(pick(row, ['PROCESO']));
+            const taskIndicator = normalizeValue(pick(row, ['INDICADOR']));
+            const taskLBase = normalizeValue(pick(row, ['L_BASE', 'LINEA BASE', 'L BASE']));
+            const taskMeta = normalizeValue(pick(row, ['META']));
+            const taskHrsDiaActual = normalizeValue(pick(row, ['HRS_DIA_ACTUAL', 'HRS DIA ACTUAL']));
+            const taskHrsDiaMejora = normalizeValue(pick(row, ['HRS_DIA_MEJORA', 'HRS DIA MEJORA']));
+            const taskNumerador = normalizeValue(pick(row, ['NUMERADOR']));
+            const taskDenominador = normalizeValue(pick(row, ['DENOMINADOR']));
+            const taskMonthly = {};
                 Object.entries(monthMap).forEach(([month, candidates]) => {
                     taskMonthly[month] = normalizeValue(pick(row, candidates));
                 });
@@ -4588,9 +5139,12 @@ ${escapeHtml(taskSolution)}</textarea>
                     prioridad: normalizeValue(priorityRaw),
                     origen: normalizeValue(pick(row, ['ORIGEN'])),
                     que_soluciono_tarea: taskSolution,
+                    proceso_tarea: taskProceso,
                     indicador_tarea: taskIndicator,
                     l_base_tarea: taskLBase,
                     meta_tarea: taskMeta,
+                    hrs_dia_actual_tarea: taskHrsDiaActual,
+                    hrs_dia_mejora_tarea: taskHrsDiaMejora,
                     numerador_tarea: taskNumerador,
                     denominador_tarea: taskDenominador,
                     monthly_tarea: taskMonthly,
