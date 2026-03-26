@@ -733,7 +733,7 @@ function render(){ const rows=normAC(acRows); const areaProjectCounts=countProje
       <div>${areaStackedBars(summary.areas)}</div>
     </div>
   </section>
-  <div class="grid2"><div class="card"><div class="kpi-title">Top Areas por Ahorro</div><div class="areas-kpi-inline"><div class="areas-kpi-box"><div class="kpi-mini-title">Ahorro total por mes</div><div class="kpi-mini-value">${fmt(sum)} min</div><div class="kpi-mini-sub">${fmt1(h)} h | ${fmt1(d)} dias</div></div><div class="areas-kpi-box"><div class="kpi-mini-title">Promedio por proyecto por mes</div><div class="kpi-mini-value">${fmt1(pa)} h</div><div class="kpi-mini-sub">${fmt1(rr)} min por registro</div></div></div>${areaAhorroDonut(tA,sum,areaProjectCounts,areaCoverage)}<div style="text-align:right;margin-top:8px;"><button class="btn area-table-detail-btn">Ver detalle</button></div></div><div class="card"><div class="kpi-title">Top Tipos por Ahorro</div>${bar(tT,'tipos',false,true)}${tiposShareDonut(tT,sum)}<div style="text-align:right;margin-top:8px;"><button class="btn" data-chart="tipos_full">Ver detalle</button></div></div><div class="card"><div class="kpi-title">Top Operaciones por Ahorro</div>${bar(tOp,'operaciones',false,true)}${tiposShareDonut(tOp,sum)}<div style="text-align:right;margin-top:8px;"><button class="btn" data-chart="operaciones_full">Ver detalle</button></div></div><div class="card"><div class="kpi-title">Top Agentes de Cambio</div>${agentsVerticalCombined(tG,'agentes')}</div></div>`;
+  <div class="grid2"><div class="card"><div class="kpi-title">Top Areas por Ahorro</div><div class="areas-kpi-inline"><div class="areas-kpi-box"><div class="kpi-mini-title">Ahorro total por mes</div><div class="kpi-mini-value">${fmt(sum)} min</div><div class="kpi-mini-sub">${fmt1(h)} h | ${fmt1(d)} dias</div></div><div class="areas-kpi-box"><div class="kpi-mini-title">Promedio por proyecto por mes</div><div class="kpi-mini-value">${fmt1(pa)} h</div><div class="kpi-mini-sub">${fmt1(rr)} min por registro</div></div></div>${areaAhorroDonut(tA,sum,areaProjectCounts,areaCoverage)}<div style="text-align:right;margin-top:8px;"><button class="btn area-table-detail-btn">Ver detalle</button></div></div><div class="card"><div class="kpi-title">Top Tipos por Ahorro</div>${bar(tT,'tipos',false,true)}${tiposShareDonut(tT,sum)}<div style="text-align:right;margin-top:8px;"><button class="btn" data-chart="tipos_full">Ver detalle</button></div></div><div class="card"><div class="kpi-title">Top Agentes de Cambio</div>${agentsVerticalCombined(tG,'agentes')}</div></div>`;
   // attach click handlers to area attendance list
   setTimeout(()=>{ document.querySelectorAll('.vbar-col[data-area], .area-att-row[data-area], .area-bar-row[data-area], .area-vbar-col[data-area]').forEach(el=>{ el.addEventListener('click',()=>{ const area=el.dataset.area||''; if(area) showAreaAbsentees(area); }); }); },50);
   // attach inasistencias button
@@ -1028,21 +1028,6 @@ function openTiposFullDetail(){
   const custom=$('detail-custom'); if(custom){ custom.style.display='block'; custom.innerHTML=tableHtml; }
   openModal('detail-modal');
 }
-function openOperacionesFullDetail(){
-  const operacionesTop = new Set((charts.operaciones||[]).map(o=>String(o.label||'').trim()).filter(Boolean));
-  const rows = normAC(acRows)
-    .filter(r=>operacionesTop.size?operacionesTop.has(String(r.operacion||'').trim()):true)
-    .slice()
-    .sort((a,b)=>num(b.ahorroMin)-num(a.ahorroMin));
-  const tableHtml = `<div class="table-wrap"><table><thead><tr><th>Mes</th><th>Area</th><th>A.Cambio</th><th>Proyecto</th><th>Operacion</th><th>Tipo</th><th>Frecuencia</th><th>Antes</th><th>Ahora</th><th>Ahorro</th><th>Link</th></tr></thead><tbody>${rows.map(r=>`<tr><td>${esc(r.mes)}</td><td>${esc(r.area)}</td><td>${esc(r.agenteCambio)}</td><td>${esc(r.proyecto)}</td><td>${esc(r.operacion)}</td><td>${esc(r.tipo)}</td><td>${esc(r.frecuencia)}</td><td>${esc(withMin(r.antes))}</td><td>${esc(withMin(r.ahora))}</td><td>${fmt(r.ahorroMin)} min</td><td style="text-align:center;">${r.linkUrl?`<a class="link-btn" href="${esc(r.linkUrl)}" target="_blank" rel="noopener">Ver detalle</a>`:'-'}</td></tr>`).join('')}</tbody></table></div>`;
-  $('detail-filter').style.display='none';
-  $('detail-title').textContent='Detalle: Top Operaciones por Ahorro (todos los datos)';
-  const modal=document.querySelector('#detail-modal .modal');
-  if(modal) modal.classList.add('modal-wide');
-  const wrap=$('detail-table-wrap'); if(wrap) wrap.style.display='none';
-  const custom=$('detail-custom'); if(custom){ custom.style.display='block'; custom.innerHTML=tableHtml; }
-  openModal('detail-modal');
-}
 function renderFaltasInModal(g){
   const all=(summary&&summary.faltas?summary.faltas:[]);
   const filtered = (g==null||g==='') ? all : all.filter(p=>{ const f=parseInt(p.faltas,10)||0; if(g==='4') return f>=4; return f===parseInt(g,10); });
@@ -1306,11 +1291,7 @@ $('content').addEventListener('click',(e)=>{
       openTiposFullDetail();
       return;
     }
-    if(b.dataset.chart==='operaciones_full'){
-      openOperacionesFullDetail();
-      return;
-    }
-    const k=b.dataset.chart, t={areas:'Top Areas por ahorro',tipos:'Top Tipos por ahorro',operaciones:'Top Operaciones por ahorro',agentes:'Top Agentes de cambio',agentes_all:'Todos los agentes de cambio',agentes_area:'Agentes de cambio por area'};
+    const k=b.dataset.chart, t={areas:'Top Areas por ahorro',tipos:'Top Tipos por ahorro',agentes:'Top Agentes de cambio',agentes_all:'Todos los agentes de cambio',agentes_area:'Agentes de cambio por area'};
     const hdr4 = $('detail-h4'); if(hdr4) hdr4.style.display='none';
     $('detail-filter').style.display='none';
     $('detail-title').textContent='Detalle: '+(t[k]||'Detalle');
