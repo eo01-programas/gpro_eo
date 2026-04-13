@@ -1074,6 +1074,10 @@
                             class="text-xs font-bold text-slate-500 uppercase mb-1 block">Tipo</span><select
                             id="edit-task-tipo"
                             class="w-full border border-slate-300 rounded p-2 text-sm bg-white outline-none"></select></label>
+                    <label class="block"><span
+                            class="text-xs font-bold text-slate-500 uppercase mb-1 block">Área</span><input id="edit-task-area"
+                            list="edit-areas-list" class="w-full border border-slate-300 rounded p-2 text-sm outline-none"
+                            placeholder="Área de la tarea"><datalist id="edit-areas-list"></datalist></label>
                     <div id="div-edit-task-origen" class="block">
                         <label class="block"><span
                                 class="text-xs font-bold text-slate-500 uppercase mb-1 block">Origen</span><input
@@ -1407,7 +1411,7 @@
 
     <script>
         // ========= CONFIG & GLOBALS =========
-        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxQZZR5_ujuIBPKcuBS3GZFgSQVONf7oaoAhFEIX2XNxvzQerSBKHCn7TO2rJ48Lxcs/exec';
+        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby1LJOox4drdjw9zZU_ehHeaZVTz4wUZkIY13aEdF2UUJ-8i_l65NsOG8aTWImb3uzr/exec';
         const PROJECT_TYPES = ['Digital', 'Digital + IA', 'Maquina', 'Proceso'];
         const STATUS_BADGE_CLASSES = { 1: 'sb-pendiente', 2: 'sb-proceso', 3: 'sb-terminado' };
         const STATE_ICONS = { 0: '', 1: '!', 2: '▶', 3: '✓' };
@@ -2424,7 +2428,7 @@
                         ? (placeLabelLeft
                             ? 'right-full mr-1.5 text-slate-700 bg-white/95 border border-slate-200 rounded px-1.5 py-0.5 shadow-sm'
                             : 'left-full ml-1.5 text-slate-700 bg-white/95 border border-slate-200 rounded px-1.5 py-0.5 shadow-sm')
-                        : 'left-1/2 -translate-x-1/2 text-white';
+                        : 'left-1/2 -translate-x-1/2 text-slate-900';
 
                     const barContainer = document.createElement('div');
                     barContainer.className = 'absolute top-1/2 -translate-y-1/2 h-5 bg-slate-200 rounded text-xs font-bold text-slate-700 flex items-center justify-center z-20 pointer-events-none overflow-visible whitespace-nowrap shadow-sm border border-slate-300';
@@ -2433,7 +2437,7 @@
 
                     barContainer.innerHTML = `
                         <div class="absolute left-0 top-0 h-full bg-blue-400 rounded-l transition-all duration-700 opacity-80" style="width: ${progressPct}%; border-radius: inherit;"></div>
-                        <span class="absolute top-1/2 -translate-y-1/2 z-20 text-[10px] font-semibold whitespace-nowrap drop-shadow-md ${labelPositionClass}">${progressLabel}</span>
+                        <span class="absolute top-1/2 -translate-y-1/2 z-20 text-[10px] font-semibold whitespace-nowrap ${labelPositionClass}">${progressLabel}</span>
                     `;
                     pRowRight.appendChild(barContainer);
                 }
@@ -3713,6 +3717,11 @@ ${escapeHtml(taskSolution)}</textarea>
             
             // Cargar datalist de ORIGEN y valor
             refreshCachedColumns();
+            const $areaEdit = document.getElementById('edit-task-area');
+            const $areaListEdit = document.getElementById('edit-areas-list');
+            if ($areaListEdit) $areaListEdit.innerHTML = cachedColumns.areas.map(a => `<option value="${a}">`).join('');
+            if ($areaEdit) $areaEdit.value = t.area || p.area || '';
+
             const $origenEdit = document.getElementById('edit-task-origen');
             const $origenListEdit = document.getElementById('edit-origenes-list');
             $origenListEdit.innerHTML = cachedColumns.origenes.map(o => `<option value="${o}">`).join('');
@@ -3757,6 +3766,11 @@ ${escapeHtml(taskSolution)}</textarea>
             }
             t.ejecutor = document.getElementById('edit-task-ejecutor').value || t.ejecutor;
             
+            const $areaEdit = document.getElementById('edit-task-area');
+            if ($areaEdit && $areaEdit.value.trim() !== '') {
+                t.area = normalizeAreaName($areaEdit.value.trim());
+            }
+
             // Guardar ORIGEN solo si no es subtarea
             const isSubtask = String(oldSubtaskKey).trim().length > 0;
             if (!isSubtask) {
