@@ -616,7 +616,7 @@
         }
 
         .kpi-sidebar-item {
-            padding: 10px;
+            padding: 8px 10px;
             cursor: pointer;
             border-radius: 6px;
             margin-bottom: 4px;
@@ -626,6 +626,8 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            gap: 8px;
+            word-break: break-word;
         }
 
         .kpi-sidebar-item:hover {
@@ -860,7 +862,7 @@
             <div class="task-panel">
                 <div id="taskHeaderRow" class="header-row px-2">
                     <div class="cell col-icon"></div>
-                    <div class="cell col-prioridad font-bold" style="justify-content: center;">P</div>
+                    <div class="cell col-prioridad" title="Prioridad manual"></div>
                     <div class="cell col-nombre">
                         <button class="header-filter-btn hidden text-slate-400 hover:text-slate-600 transition p-1" data-filter-col="project" title="Filtrar proyecto"><i class="fa-solid fa-filter"></i></button>
                         <span class="header-filter-label ml-0 font-bold">PROYECTO</span>
@@ -1408,10 +1410,10 @@
     </div>
 
     <div id="lastScrollPos" style="display:none;"></div>
-
+    
     <script>
         // ========= CONFIG & GLOBALS =========
-        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby1LJOox4drdjw9zZU_ehHeaZVTz4wUZkIY13aEdF2UUJ-8i_l65NsOG8aTWImb3uzr/exec';
+        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwUGmWV6LznaMzm9fh6bltKMC9bcEaT-XAySzYId4ZYryUPb3nVHQyWPP6Udm-1AYpY/exec';
         const PROJECT_TYPES = ['Digital', 'Digital + IA', 'Maquina', 'Proceso'];
         const STATUS_BADGE_CLASSES = { 1: 'sb-pendiente', 2: 'sb-proceso', 3: 'sb-terminado' };
         const STATE_ICONS = { 0: '', 1: '!', 2: '▶', 3: '✓' };
@@ -2373,10 +2375,9 @@
                 pRowLeft.innerHTML = `
                     <div class="cell col-icon group-hover:text-blue-600 transition" onclick="toggleProject('${p.id}')"><i class="fa-solid fa-chevron-${p.expanded ? 'down' : 'right'}"></i></div>
                     <div class="cell col-prioridad" onclick="event.stopPropagation()">
-                        <input type="number" min="0" value="${p.user_priority || ''}" onchange="updateProjectUserPriority('${p.id}', this.value)" placeholder="-" title="Número de prioridad">
+                        <input type="number" min="1" max="99" value="${p.user_priority || ''}" onchange="updateProjectUserPriority('${p.id}', this.value)" title="Prioridad manual">
                     </div>
                     <div class="cell col-nombre font-bold text-slate-700 group-hover:text-blue-800 transition">
-                        <span class="inline-flex items-center justify-center w-5 h-5 rounded bg-blue-600 text-white text-[9px] font-bold mr-1.5 flex-shrink-0" title="${escapeHtml(calculatedType)}">${escapeHtml(calculatedType.charAt(0).toUpperCase())}</span>
                         <button onclick="event.stopPropagation(); openEditProjectModal('${p.id}')" class="action-btn text-xs text-slate-500 hover:text-blue-600 mr-1" title="Editar Proyecto"><i class="fa-solid fa-pen-to-square"></i></button>
                         <span onclick="toggleProject('${p.id}')">${p.nombre}</span>
                     </div>
@@ -2500,10 +2501,6 @@
                         const addSubtaskBtn = canAddSubtask
                             ? `<button onclick="event.stopPropagation(); openCreateSubtaskModal('${p.id}', ${tIndex})" class="text-blue-600 hover:text-blue-700 p-1.5 transition" title="Agregar subtarea"><i class="fa-solid fa-plus"></i></button>`
                             : '';
-
-                        const taskTypeChar = (t.tipo && typeof t.tipo === 'string' && t.tipo.length > 0) ? t.tipo.charAt(0).toUpperCase() : 'P';
-                        const badgeColor = options.customNameHtml && options.namePaddingClass === 'pl-16' ? 'bg-slate-400' : 'bg-amber-500';
-                        const levelBadge = `<span class="inline-flex items-center justify-center w-5 h-5 rounded ${badgeColor} text-white text-[9px] font-bold mr-1.5 flex-shrink-0" title="${escapeHtml(t.tipo || 'Proceso')}">${escapeHtml(taskTypeChar)}</span>`;
                         
                         // Show indicator button only for tasks, not subtasks
                         const isSubtask = String(t.subtarea || '').trim() !== '';
@@ -2512,7 +2509,7 @@
                             : '';
                         
                         tRowLeft.innerHTML = `
-                            ${iconCellHtml}<div class="cell col-nombre ${namePaddingClass} text-sm">${treeDecorHtml}<div class="flex items-start gap-1 w-full min-w-0">${levelBadge}<button onclick="event.stopPropagation(); openEditTaskModal('${p.id}', ${tIndex})" class="action-btn text-xs text-slate-500 hover:text-blue-600 mt-0.5" title="Editar tarea"><i class="fa-solid fa-pen-to-square"></i></button><div class="min-w-0">${taskNameHtml}</div></div></div>
+                            ${iconCellHtml}<div class="cell col-prioridad"></div><div class="cell col-nombre ${namePaddingClass} text-sm">${treeDecorHtml}<div class="flex items-start gap-1 w-full min-w-0"><button onclick="event.stopPropagation(); openEditTaskModal('${p.id}', ${tIndex})" class="action-btn text-xs text-slate-500 hover:text-blue-600 mt-0.5" title="Editar tarea"><i class="fa-solid fa-pen-to-square"></i></button><div class="min-w-0">${taskNameHtml}</div></div></div>
                             <div class="cell col-estado">${statusSelectTask}</div>
                             <div class="cell col-inicio"><input type="date" class="table-input text-center font-bold text-xs" value="${dateToISO(t.inicio || p.inicio)}" onchange="updateTaskDate('${p.id}', ${tIndex}, formatDateDMY(this.value))" onclick="event.stopPropagation()"></div>
                             <div class="cell col-area text-slate-500 text-xs">${escapeHtml(taskAreaDisplay)}</div>
@@ -2640,8 +2637,8 @@
                         groupRowLeft.className = 'data-row task-parent-row';
                         groupRowLeft.innerHTML = `
                             <div class="cell col-icon text-slate-500 hover:text-blue-600 cursor-pointer task-group-toggle"><i class="fa-solid fa-chevron-${groupExpanded ? 'down' : 'right'}"></i></div>
+                            <div class="cell col-prioridad"></div>
                             <div class="cell col-nombre pl-8 text-sm">
-                                <span class="inline-flex items-center justify-center w-5 h-5 rounded bg-amber-500 text-white text-[9px] font-bold mr-1.5 flex-shrink-0" title="${escapeHtml(groupType)}">${escapeHtml(groupType.charAt(0).toUpperCase())}</span>
                                 <div class="leading-tight min-w-0">
                                     <div class="flex items-center gap-1 min-w-0">${groupEditButton}<div class="font-bold text-slate-700 cursor-pointer task-group-name">${escapeHtml(group.name)}</div></div>
                                     <div class="text-[11px] text-slate-500">${visibleSubtasks.length} subtarea(s)</div>
@@ -3148,7 +3145,7 @@
                             <i class="fa-solid fa-lightbulb text-amber-500 mr-1"></i>Objetivo Tarea
                         </label>
                         <textarea id="to-task-solution" 
-                            class="w-full border-2 border-slate-300 rounded-lg p-3 text-sm text-slate-700 bg-white focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200 resize-vertical min-h-[100px] placeholder-slate-400"
+                            class="w-full border-2 border-slate-300 rounded-lg p-3 text-sm text-slate-700 bg-white focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200 resize-vertical min-h-[40px] placeholder-slate-400"
                             placeholder="Describe el objetivo, solución y el impacto esperado...">
 ${escapeHtml(taskSolution)}</textarea>
                     </div>
@@ -4549,18 +4546,34 @@ ${escapeHtml(taskSolution)}</textarea>
             const project = projectMap.get(projectId); if (!project) return;
             currentKpiProject = project;
             document.getElementById('kpiModalProjectTitle').innerText = `${project.nombre}`;
-            const firstKpi = (project.kpis && project.kpis.length > 0) ? project.kpis[0] : {};
-            project.kpis = [{
-                id: firstKpi.id || ('new_' + Date.now()),
-                a_cambio: firstKpi.a_cambio || '',
-                que_soluciono: firstKpi.que_soluciono || '',
-                l_base: firstKpi.l_base || '',
-                meta: firstKpi.meta || '',
-                indicador: firstKpi.indicador || '',
-                numerador: firstKpi.numerador || '',
-                denominador: firstKpi.denominador || '',
-                monthly: firstKpi.monthly || {}
-            }];
+            
+            // Si no hay KPIs cargados, inicializar con el fallback (datos de la fila maestra del proyecto)
+            if (!project.kpis || project.kpis.length === 0) {
+                const fb = project.project_kpi_fallback || {};
+                project.kpis = [{
+                    id: 'k_' + Date.now(),
+                    sheet_row: '',
+                    uuid: fb.uuid || '',
+                    a_cambio: fb.a_cambio || project.a_cambio || '',
+                    f_inicio: fb.f_inicio || project.inicio || '',
+                    que_soluciono: fb.que_soluciono || '',
+                    l_base: fb.l_base || '',
+                    meta: fb.meta || '',
+                    indicador: fb.indicador || '',
+                    proceso: fb.proceso || '',
+                    hrs_dia_actual: fb.hrs_dia_actual || '',
+                    hrs_dia_mejora: fb.hrs_dia_mejora || '',
+                    numerador: fb.numerador || '',
+                    denominador: fb.denominador || '',
+                    monthly: { ...(fb.monthly || {}) }
+                }];
+            } else {
+                project.kpis.forEach(k => {
+                    if (k.sheet_row === undefined) k.sheet_row = '';
+                    if (k.uuid === undefined) k.uuid = '';
+                });
+            }
+
             activeKpiIndex = 0;
             renderKpiModalContent();
             document.getElementById('kpiModal').style.display = 'flex';
@@ -4580,10 +4593,14 @@ ${escapeHtml(taskSolution)}</textarea>
 
                 // Title span
                 const span = document.createElement('span');
-                const title = kpi.indicador || kpi.que_soluciono || `Indicador ${idx + 1}`;
-                span.textContent = title.length > 18 ? title.substring(0, 18) + '...' : title;
+                const title = kpi.indicador || `Indicador ${idx + 1}`;
+                span.textContent = title;
                 span.className = "flex-1";
-                span.onclick = () => { activeKpiIndex = idx; renderKpiModalContent(); };
+                span.onclick = async () => {
+                    await persistCurrentKpiIfNeeded();
+                    activeKpiIndex = idx;
+                    renderKpiModalContent();
+                };
 
                 // Actions div
                 const actions = document.createElement('div');
@@ -4592,7 +4609,12 @@ ${escapeHtml(taskSolution)}</textarea>
                 // Edit btn
                 const btnEdit = document.createElement('i');
                 btnEdit.className = "fa-solid fa-pencil hover:text-blue-600 p-1";
-                btnEdit.onclick = (e) => { e.stopPropagation(); activeKpiIndex = idx; renderKpiModalContent(); };
+                btnEdit.onclick = async (e) => {
+                    e.stopPropagation();
+                    await persistCurrentKpiIfNeeded();
+                    activeKpiIndex = idx;
+                    renderKpiModalContent();
+                };
 
                 // Delete btn
                 const btnDel = document.createElement('i');
@@ -4608,28 +4630,121 @@ ${escapeHtml(taskSolution)}</textarea>
             });
         }
 
-        function deleteKpi(index) {
+        async function deleteKpi(index) {
             if (confirm('¿Eliminar este indicador?')) {
+                // No esperamos al guardado del activo para no demorar la eliminacion
+                persistCurrentKpiIfNeeded(); 
+                
                 const kpi = currentKpiProject.kpis[index];
-                // Optimistic UI update
-                currentKpiProject.kpis.splice(index, 1);
-                // Adjust active index
-                if (index <= activeKpiIndex) activeKpiIndex = Math.max(0, activeKpiIndex - 1);
-                if (currentKpiProject.kpis.length === 0) createNewKpi(); // Ensure at least one
-                else renderKpiModalContent();
+                const isSaved = Boolean(kpi && kpi.sheet_row);
 
-                // Call backend
-                deleteKpiAsync(kpi);
+                // Actualización optimista de la UI
+                currentKpiProject.kpis.splice(index, 1);
+                
+                // Ajustar índice activo
+                if (index <= activeKpiIndex) activeKpiIndex = Math.max(0, activeKpiIndex - 1);
+                
+                if (currentKpiProject.kpis.length === 0) {
+                    createNewKpi();
+                } else {
+                    renderKpiModalContent();
+                }
+
+                if (isSaved) {
+                    // Llamada al backend en segundo plano
+                    deleteKpiAsync(kpi);
+                }
+                showToast('Indicador eliminado', 'success');
             }
         }
 
         async function deleteKpiAsync(kpi) {
-            try { await fetch(APPS_SCRIPT_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'deleteKpiData', payload: { id: kpi.id, proyecto: currentKpiProject.nombre } }) }); showToast('Indicador eliminado', 'success'); } catch (e) { console.error(e); }
+            try { 
+                await fetch(APPS_SCRIPT_URL, { 
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' }, 
+                    body: JSON.stringify({ 
+                        action: 'deleteKpiData', 
+                        payload: { 
+                            id: kpi.id, 
+                            uuid: kpi.uuid, 
+                            sheet_row: kpi.sheet_row, 
+                            proyecto: currentKpiProject.nombre, 
+                            area: currentKpiProject.area 
+                        } 
+                    }) 
+                }); 
+                // Toast silencioso al terminar en segundo plano
+                console.log('KPI eliminado en el backend');
+            } catch (e) { 
+                console.error('Error eliminando KPI:', e); 
+            }
+        }
+
+        function generateKpiUuid() {
+            if (window.crypto && typeof window.crypto.randomUUID === 'function') {
+                return window.crypto.randomUUID();
+            }
+            return `k_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
+        }
+
+        function hasKpiContent(kpi) {
+            if (!kpi) return false;
+            const monthly = kpi.monthly || {};
+            const fields = [
+                'a_cambio',
+                'que_soluciono',
+                'l_base',
+                'meta',
+                'indicador',
+                'proceso',
+                'hrs_dia_actual',
+                'hrs_dia_mejora',
+                'numerador',
+                'denominador'
+            ];
+            return fields.some((field) => String(kpi[field] || '').trim() !== '') ||
+                Object.values(monthly).some((value) => String(value || '').trim() !== '');
+        }
+
+        async function persistCurrentKpiIfNeeded() {
+            if (!currentKpiProject || !currentKpiProject.kpis || !currentKpiProject.kpis[activeKpiIndex]) return;
+            const kpi = currentKpiProject.kpis[activeKpiIndex];
+            if (!hasKpiContent(kpi)) return;
+            if (!kpi.uuid) kpi.uuid = generateKpiUuid();
+            
+            // Guardar en segundo plano sin bloquear la UI
+            saveCurrentKpi(true);
         }
 
         function createNewKpi() {
-            currentKpiProject.kpis.push({ id: 'new_' + Date.now() + Math.random().toString(36).substr(2, 5), a_cambio: '', que_soluciono: '', l_base: '', meta: '', indicador: '', numerador: '', denominador: '', monthly: {} });
-            activeKpiIndex = currentKpiProject.kpis.length - 1; renderKpiModalContent();
+            if (!currentKpiProject) return;
+
+            persistCurrentKpiIfNeeded();
+
+            const sourceKpi = currentKpiProject.kpis && currentKpiProject.kpis.length > 0
+                ? currentKpiProject.kpis[activeKpiIndex] || currentKpiProject.kpis[currentKpiProject.kpis.length - 1]
+                : (currentKpiProject.project_kpi_fallback || {});
+
+            currentKpiProject.kpis.push({
+                id: 'new_' + Date.now() + Math.random().toString(36).substr(2, 5),
+                uuid: generateKpiUuid(),
+                sheet_row: '',
+                a_cambio: sourceKpi.a_cambio || currentKpiProject.a_cambio || '',
+                f_inicio: sourceKpi.f_inicio || currentKpiProject.inicio || '',
+                que_soluciono: '',
+                l_base: '',
+                meta: '',
+                indicador: '',
+                proceso: '',
+                hrs_dia_actual: '',
+                hrs_dia_mejora: '',
+                numerador: '',
+                denominador: '',
+                monthly: {}
+            });
+            activeKpiIndex = currentKpiProject.kpis.length - 1;
+            renderKpiModalContent();
         }
 
         // Helper to update KPI data on input
@@ -4713,16 +4828,19 @@ ${escapeHtml(taskSolution)}</textarea>
             container.innerHTML = fieldsHTML + tableHTML;
         }
 
-        async function saveCurrentKpi() {
+        async function saveCurrentKpi(silent = false) {
             if (!currentKpiProject || !currentKpiProject.kpis || !currentKpiProject.kpis[activeKpiIndex]) {
-                showToast('Error: indicador no válido', 'error');
+                if (!silent) showToast('Error: indicador no válido', 'error');
                 return;
             }
             const kpi = currentKpiProject.kpis[activeKpiIndex];
+            if (!kpi.uuid) kpi.uuid = generateKpiUuid();
             const kpiPayload = {
                 area: currentKpiProject.area,
                 proyecto: currentKpiProject.nombre,
                 id: kpi.id,
+                uuid: kpi.uuid,
+                sheet_row: kpi.sheet_row || '',
                 f_inicio: currentKpiProject.inicio,
                 que_soluciono: kpi.que_soluciono,
                 objetivo: '',
@@ -4737,7 +4855,7 @@ ${escapeHtml(taskSolution)}</textarea>
                 datos_mensuales: kpi.monthly
             };
             try {
-                showToast('Guardando indicador...', 'info');
+                if (!silent) showToast('Guardando indicador...', 'info');
                 const response = await fetch(APPS_SCRIPT_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'text/plain;charset=utf-8' },
@@ -4746,15 +4864,17 @@ ${escapeHtml(taskSolution)}</textarea>
                 const result = await response.json();
                 console.log('Indicador guardado:', result);
                 if (result.success) {
-                    showToast('Indicador guardado', 'success');
+                    if (result.uuid) kpi.uuid = result.uuid;
+                    if (result.sheet_row) kpi.sheet_row = result.sheet_row;
+                    if (!silent) showToast('Indicador guardado', 'success');
                     renderKpiList();
                 } else {
-                    showToast(result.message || 'Error al guardar indicador', 'error');
+                    if (!silent) showToast(result.message || 'Error al guardar indicador', 'error');
                     console.error('Backend error:', result);
                 }
             } catch (e) {
                 console.error('Error guardando indicador:', e);
-                showToast('Error: ' + e.message, 'error');
+                if (!silent) showToast('Error: ' + e.message, 'error');
             }
         }
 
@@ -4775,40 +4895,90 @@ ${escapeHtml(taskSolution)}</textarea>
         async function loadDataFromSheet() {
             isLoadingData = true;
             try {
-                console.log('Cargando datos...');
-                const response = await fetch(APPS_SCRIPT_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'fetchAllData' }) });
-                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                console.log('Cargando datos desde:', APPS_SCRIPT_URL);
+                const response = await fetch(APPS_SCRIPT_URL, { 
+                    method: 'POST', 
+                    cache: 'no-store',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' }, 
+                    body: JSON.stringify({ action: 'fetchAllData' }) 
+                });
+                
+                if (!response.ok) throw new Error(`Error HTTP: ${response.status}`);
+                
                 const text = await response.text();
-                if (text.trim().startsWith('<')) throw new Error('Recibí HTML (Login Page). Revisa permisos "Cualquier persona".');
-                const result = JSON.parse(text);
+                if (text.trim().startsWith('<')) {
+                    throw new Error('El servidor devolvió HTML en lugar de datos. Verifica que la implementación esté configurada para "Cualquier persona" (Anyone).');
+                }
+                
+                let result;
+                try {
+                    result = JSON.parse(text);
+                    console.log("Servidor:", result ? "OK" : "Vacio");
+                } catch (parseErr) {
+                    console.error('Error parseando JSON:', text);
+                    throw new Error('La respuesta del servidor no tiene un formato válido.');
+                }
 
                 if (result.datosData) {
-                    projectData = transformSheetDataToGantt(result.datosData, result.kpiData);
-                    // Ensure all projects start collapsed by default
+                    projectData = transformSheetDataToGantt(result.datosData);
+                    console.log("Transformados:", projectData.length);
+
+                    if (Array.isArray(result.kpiData) && result.kpiData.length > 0) {
+                        const normalizeProjectKey = (value) => String(value || '').trim().toUpperCase();
+                        const kpisByProject = new Map();
+
+                        result.kpiData.forEach((kpi) => {
+                            const key = normalizeProjectKey(kpi.proyecto);
+                            if (!key) return;
+                            if (!kpisByProject.has(key)) kpisByProject.set(key, []);
+                            kpisByProject.get(key).push({
+                                ...kpi,
+                                sheet_row: String(kpi.sheet_row || '').trim(),
+                                uuid: String(kpi.uuid || '').trim()
+                            });
+                        });
+
+                        projectData.forEach((project) => {
+                            const key = normalizeProjectKey(project.nombre);
+                            const projectKpis = kpisByProject.get(key) || [];
+                            project.kpis = projectKpis.sort((a, b) => {
+                                const rowA = parseInt(a.sheet_row, 10) || 0;
+                                const rowB = parseInt(b.sheet_row, 10) || 0;
+                                return rowA - rowB;
+                            });
+                        });
+                    }
                     projectData.forEach(p => p.expanded = false);
                     updateProjectMap();
                     updateLastUpdateTime();
                     showToast('Datos cargados', 'success');
-                } else { projectData = []; }
+                } else { 
+                    projectData = []; 
+                    console.warn("datosData no presente en respuesta");
+                }
                 populateFilterOptions(); render();
             } catch (e) {
-                console.error('Error cargando:', e);
+                console.error('Detalles del error de carga:', e);
+                const isFailedToFetch = e.message.includes('fetch');
+                const errorMsg = isFailedToFetch 
+                    ? 'Error de conexión (CORS o Red). Verifica internet o permisos del Script.'
+                    : `Error: ${e.message}`;
+                
                 // Demo fallback
-                const DEMO = [{ id: 'p1', area: 'HILANDERIA', tipo: 'Digital', prioridad: 'Alta', inicio: '14/01/2026', nombre: 'Digitalización y sistematización', ejecutor: 'EO', expanded: false, status: 2, gantt: padGantt([]), kpis: [], tasks: [] }];
+                const DEMO = [{ id: 'error-demo', area: 'ERROR', tipo: 'Error', prioridad: 'Alta', inicio: '14/01/2026', nombre: 'Error: ' + e.message, ejecutor: 'EO', expanded: false, status: 1, gantt: padGantt([]), kpis: [], tasks: [] }];
                 projectData = DEMO;
                 updateProjectMap();
                 render();
-                showToast(`Error: ${e.message}`, 'error');
+                showToast(errorMsg, 'error');
             } finally {
                 isLoadingData = false;
             }
         }
 
-        function transformSheetDataToGantt(datosData, kpiData) {
+        function transformSheetDataToGantt(datosData) {
             const rows = Array.isArray(datosData) ? datosData : [];
             const proyectosMap = new Map();
             const kpiMap = new Map();
-            const kpiSeenByProject = new Map();
 
             const slugify = (value) => String(value || '')
                 .toLowerCase()
@@ -4872,14 +5042,15 @@ ${escapeHtml(taskSolution)}</textarea>
                     monthly[month] = normalizeValue(pick(row, candidates));
                 });
                 return {
+                    uuid: normalizeValue(pick(row, ['ID_SISTEMA', 'UUID', 'ID'])),
                     a_cambio: normalizeValue(pick(row, ['A_CAMBIO', 'AGENTE_CAMBIO', 'AGENTE DE CAMBIO', 'AGENTE', 'A CAMBIO'])),
-                    que_soluciono: normalizeValue(pick(row, ['OBJETIVO_PROY', 'QUE_SOLUCIONO', 'QUE SOLUCIONO', '¿QUE SOLUCIONO?', 'Â¿QUE SOLUCIONO?'])),
+                    que_soluciono: normalizeValue(pick(row, ['OBJETIVO_PROY', 'QUE_SOLUCIONO', 'QUE SOLUCIONO', '¿QUE SOLUCIONO?', 'Â¿QUE SOLUCIONO?', 'OBJETIVO PROYECTO', 'OBJETIVO'])),
                     l_base: normalizeValue(pick(row, ['L_BASE', 'LINEA BASE', 'L BASE'])),
-                    meta: normalizeValue(pick(row, ['META'])),
-                    indicador: normalizeValue(pick(row, ['INDICADOR'])),
-                    proceso: normalizeValue(pick(row, ['PROCESO'])),
-                    hrs_dia_actual: normalizeValue(pick(row, ['HRS_DIA_ACTUAL', 'HRS DIA ACTUAL'])),
-                    hrs_dia_mejora: normalizeValue(pick(row, ['HRS_DIA_MEJORA', 'HRS DIA MEJORA'])),
+                    meta: normalizeValue(pick(row, ['META', 'META_INDICADOR', 'VALOR_OBJETIVO', 'OBJETIVO_VALOR'])),
+                    indicador: normalizeValue(pick(row, ['INDICADOR', 'NOMBRE_INDICADOR', 'INDICADOR_NOMBRE', 'KPI'])),
+                    proceso: normalizeValue(pick(row, ['PROCESO', 'AREA_PROCESO', 'PROCESO_AFECTADO'])),
+                    hrs_dia_actual: normalizeValue(pick(row, ['HRS_DIA_ACTUAL', 'HRS DIA ACTUAL', 'HORAS_DIA_ACTUAL'])),
+                    hrs_dia_mejora: normalizeValue(pick(row, ['HRS_DIA_MEJORA', 'HRS DIA MEJORA', 'HORAS_DIA_MEJORA'])),
                     numerador: normalizeValue(pick(row, ['NUMERADOR'])),
                     denominador: normalizeValue(pick(row, ['DENOMINADOR'])),
                     monthly
@@ -4887,7 +5058,7 @@ ${escapeHtml(taskSolution)}</textarea>
             };
             const mergeProjectKpiFallback = (target, source) => {
                 if (!target || !source) return target;
-                ['a_cambio', 'que_soluciono', 'l_base', 'meta', 'indicador', 'proceso', 'hrs_dia_actual', 'hrs_dia_mejora', 'numerador', 'denominador'].forEach((field) => {
+                ['uuid', 'a_cambio', 'que_soluciono', 'l_base', 'meta', 'indicador', 'proceso', 'hrs_dia_actual', 'hrs_dia_mejora', 'numerador', 'denominador'].forEach((field) => {
                     if (!normalizeValue(target[field]) && normalizeValue(source[field])) target[field] = source[field];
                 });
                 Object.keys(monthMap).forEach((month) => {
@@ -4900,7 +5071,8 @@ ${escapeHtml(taskSolution)}</textarea>
 
             const normalizedRows = rows.map(raw => ({
                 raw,
-                row: toCanonicalRow(raw)
+                row: toCanonicalRow(raw),
+                sheetRow: Number(raw.__rowNumber || raw.__ROWNUMBER || 0) || null
             }));
 
             const knownAreasByProject = new Map();
@@ -4943,7 +5115,6 @@ ${escapeHtml(taskSolution)}</textarea>
                 if (hasTaskLevelIdentity) return;
                 const kpiKey = buildProjectKey(projectName);
                 if (!kpiMap.has(kpiKey)) kpiMap.set(kpiKey, []);
-                if (!kpiSeenByProject.has(kpiKey)) kpiSeenByProject.set(kpiKey, new Set());
 
                 const monthly = {};
                 Object.entries(monthMap).forEach(([month, candidates]) => {
@@ -4952,15 +5123,17 @@ ${escapeHtml(taskSolution)}</textarea>
 
                 const kpiItem = {
                     id: 'k_' + Math.random().toString(36).substr(2, 5),
+                    sheet_row: normalizeValue(pick(rowObj, ['SHEETROW', '__ROWNUMBER', '__rowNumber'])),
+                    uuid: normalizeValue(pick(rowObj, ['ID_SISTEMA', 'UUID', 'ID'])),
                     f_inicio: pick(rowObj, ['F_INCIO', 'F_INCIO_PROYECTO', 'F_INICIO_PROYECTO', 'F.INICIO', 'F INICIO']),
                     a_cambio: pick(rowObj, ['A_CAMBIO', 'AGENTE_CAMBIO', 'AGENTE DE CAMBIO', 'AGENTE', 'A CAMBIO']),
-                    que_soluciono: pick(rowObj, ['OBJETIVO_PROY', 'QUE_SOLUCIONO', 'QUE SOLUCIONO', '¿QUE SOLUCIONO?', 'Â¿QUE SOLUCIONO?']),
+                    que_soluciono: pick(rowObj, ['OBJETIVO_PROY', 'QUE_SOLUCIONO', 'QUE SOLUCIONO', '¿QUE SOLUCIONO?', 'Â¿QUE SOLUCIONO?', 'OBJETIVO PROYECTO', 'OBJETIVO']),
                     l_base: pick(rowObj, ['L_BASE', 'LINEA BASE', 'L BASE']),
-                    meta: pick(rowObj, ['META']),
-                    indicador: pick(rowObj, ['INDICADOR']),
-                    proceso: pick(rowObj, ['PROCESO']),
-                    hrs_dia_actual: pick(rowObj, ['HRS_DIA_ACTUAL', 'HRS DIA ACTUAL']),
-                    hrs_dia_mejora: pick(rowObj, ['HRS_DIA_MEJORA', 'HRS DIA MEJORA']),
+                    meta: pick(rowObj, ['META', 'META_INDICADOR', 'VALOR_OBJETIVO', 'OBJETIVO_VALOR']),
+                    indicador: pick(rowObj, ['INDICADOR', 'NOMBRE_INDICADOR', 'INDICADOR_NOMBRE', 'KPI']),
+                    proceso: pick(rowObj, ['PROCESO', 'AREA_PROCESO', 'PROCESO_AFECTADO']),
+                    hrs_dia_actual: pick(rowObj, ['HRS_DIA_ACTUAL', 'HRS DIA ACTUAL', 'HORAS_DIA_ACTUAL']),
+                    hrs_dia_mejora: pick(rowObj, ['HRS_DIA_MEJORA', 'HRS DIA MEJORA', 'HORAS_DIA_MEJORA']),
                     denominador: pick(rowObj, ['DENOMINADOR']),
                     numerador: pick(rowObj, ['NUMERADOR']),
                     monthly: monthly
@@ -4978,31 +5151,13 @@ ${escapeHtml(taskSolution)}</textarea>
                     hasMonthly;
                 if (!hasKpiData) return;
 
-                const fingerprint = JSON.stringify({
-                    f_inicio: normalizeValue(kpiItem.f_inicio),
-                    a_cambio: normalizeValue(kpiItem.a_cambio),
-                    que_soluciono: normalizeValue(kpiItem.que_soluciono),
-                    l_base: normalizeValue(kpiItem.l_base),
-                    meta: normalizeValue(kpiItem.meta),
-                    indicador: normalizeValue(kpiItem.indicador),
-                    proceso: normalizeValue(kpiItem.proceso),
-                    hrs_dia_actual: normalizeValue(kpiItem.hrs_dia_actual),
-                    hrs_dia_mejora: normalizeValue(kpiItem.hrs_dia_mejora),
-                    denominador: normalizeValue(kpiItem.denominador),
-                    numerador: normalizeValue(kpiItem.numerador),
-                    monthly: Object.fromEntries(Object.entries(monthly).map(([k, v]) => [k, normalizeValue(v)]))
-                });
-                const seenSet = kpiSeenByProject.get(kpiKey);
-                if (seenSet.has(fingerprint)) return;
-                seenSet.add(fingerprint);
                 kpiMap.get(kpiKey).push(kpiItem);
             };
 
-            normalizedRows.forEach(({ row }) => registerKpi(row));
-
-            if (Array.isArray(kpiData)) {
-                kpiData.forEach(k => registerKpi(toCanonicalRow(k)));
-            }
+            normalizedRows.forEach(({ row, sheetRow }) => {
+                const rowWithSheet = Object.assign({ __sheetRow: sheetRow || '' }, row);
+                registerKpi(rowWithSheet);
+            });
 
             normalizedRows.forEach(({ row }) => {
                 const projectName = normalizeValue(pick(row, ['PROYECTO']));
